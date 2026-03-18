@@ -1,0 +1,447 @@
+uuid,date,user,home_team,away_team,competition,bet_type,selection,odds,stake,status,actual_winnings,matchday,sport,is_bet,is_banking
+dep-001,2024-08-01,Syndicate,,,,Deposit,,,,,300.01,,,False,True
+c4ca4238-a0b9-2382-0dcc-509a6f75849b,2024-08-17,Team,Man Utd,Fulham,EPL 24/25,Full Time Result,Man Utd,1.57,2,Win,1.15,1,Football,True,False
+c81e728d-9d4c-2f63-6f06-7f89cc14862c,2024-08-18,Team,Arsenal,Wolves,EPL 24/25,Asian Handicap,Arsenal-1.5,1.625,2,Win,1.25,1,Football,True,False
+eccbc87e-4b5c-e2fe-2830-8fd9f2a7baf3,2024-08-18,Team,West Ham,Villa,EPL 24/25,Full Time Result,Draw,3.5,2,Loss,-2.0,1,Football,True,False
+a87ff679-a2f3-e71d-9181-a67b7542122c,2024-08-19,Team,Brentford,Palace,EPL 24/25,Double Chance,Palace or Draw,1.57,2,Loss,-2.0,1,Football,True,False
+e4da3b7f-bbce-2345-d777-2b0674a318d5,2024-08-20,Team,Leicester,Tottenham,EPL 24/25,Full Time Result,Tottenham,1.6,2,Loss,-2.0,1,Football,True,False
+1679091c-5a88-0faf-6fb5-e6087eb1b2dc,2024-08-25,Team,Brighton,Man Utd,EPL 24/25,Draw No Bet,Man Utd,1.83,1.5,Loss,-1.5,2,Football,True,False
+8f14e45f-ceea-167a-5a36-dedd4bea2543,2024-08-25,Team,Palace,West Ham,EPL 24/25,Draw No Bet,Palace,1.53,0.5,Loss,-0.5,2,Football,True,False
+c9f0f895-fb98-ab91-59f5-1fd0297e236d,2024-08-25,Team,Fulham,Leicester,EPL 24/25,Draw No Bet,Fulham,1.33,1.5,Win,0.5,2,Football,True,False
+45c48cce-2e2d-7fbd-ea1a-fc51c7c6ad26,2024-08-25,Team,Man City,Ipswich,EPL 24/25,Handicap,Man City -1,1.3,3,Win,0.9,2,Football,True,False
+d3d94468-02a4-4259-755d-38e6d163e820,2024-08-25,Team,Tottenham,Everton,EPL 24/25,Full Time Result,Tottenham,1.45,0.5,Win,0.23,2,Football,True,False
+6512bd43-d9ca-a6e0-2c99-0b0a82652dca,2024-08-26,Team,Bournemouth,Newcastle,EPL 24/25,Handicap,Bournemouth +2,1.22,1.5,Win,0.34,2,Football,True,False
+c20ad4d7-6fe9-7759-aa27-a0c99bff6710,2024-08-26,Team,Liverpool,Brentford,EPL 24/25,Handicap,Liverpool -1,1.66,1.5,Win,1.0,2,Football,True,False
+c51ce410-c124-a10e-0db5-e4b97fc2af39,2024-08-31,Team,Arsenal,Brighton,EPL 24/25,Full Time Result,Arsenal,1.33,2,Loss,-2.0,3,Football,True,False
+aab32389-22bc-c25a-6f60-6eb525ffdc56,2024-08-31,Team,Arsenal,Brighton,EPL 24/25,Handicap,Brighton +3,1.33,2,Win,0.67,3,Football,True,False
+9bf31c7f-f062-936a-96d3-c8bd1f8f2ff3,2024-09-01,Team,Ipswich,Fulham,EPL 24/25,Handicap,Ipswich +2,1.2,0.5,Win,0.1,3,Football,True,False
+c74d97b0-1eae-257e-44aa-9d5bade97baf,2024-09-01,Team,Ipswich,Fulham,EPL 24/25,Handicap,Fulham +1,1.36,0.5,Win,0.19,3,Football,True,False
+70efdf2e-c9b0-8607-9795-c442636b55fb,2024-09-01,Team,West Ham,Man City,EPL 24/25,Handicap,Man City -1,1.9,2,Win,1.82,3,Football,True,False
+6f4922f4-5568-161a-8cdf-4ad2299f6d23,2024-09-01,Team,Chelsea,Palace,EPL 24/25,Full Time Result,Chelsea,1.61,3,Loss,-3.0,3,Football,True,False
+1f0e3dad-9990-8345-f743-9f8ffabdffc4,2024-09-01,Team,Multiple,Multiple,EPL 24/25,Relegation,Everton,3,4,Loss,-1.0,,Football,True,False
+98f13708-2101-94c4-7568-7be6106a3b84,2024-09-08,Team,Mexico,New Zealand,World Cup OFC qualification,Double Chance,New Zealand or Draw,3,1,Loss,-1.0,,Football,True,False
+3c59dc04-8e88-5024-3be8-079a5c74d079,2024-09-15,Team,Villa,Everton,EPL 24/25,Full Time Result,Villa,1.5,2,Win,1.0,4,Football,True,False
+b6d767d2-f8ed-5d21-a44b-0e5886680cb9,2024-09-15,Team,Man City,Brentford,EPL 24/25,Handicap,Man City -1,1.5,2,Loss,-2.0,4,Football,True,False
+37693cfc-7480-49e4-5d87-b8c7d8b9aacd,2024-09-15,Team,Liverpool,Forest,EPL 24/25,Handicap,Liverpool -1,1.61,2,Loss,-2.0,4,Football,True,False
+1ff1de77-4005-f8da-13f4-2943881c655f,2024-09-15,Team,Palace,Leicester,EPL 24/25,Full Time Result,Palace,1.61,2,Loss,-2.0,4,Football,True,False
+8e296a06-7a37-5633-70de-d05f5a3bf3ec,2024-09-16,Team,Wolves,Newcastle,EPL 24/25,Double Chance,Newcastle or Draw,1.3,2,Win,0.6,4,Football,True,False
+4e732ced-3463-d06d-e0ca-9a15b6153677,2024-09-22,Team,Villa,Wolves,EPL 24/25,Full Time Result,Villa,1.57,2,Win,1.15,5,Football,True,False
+02e74f10-e032-7ad8-68d1-38f2b4fdd6f0,2024-09-22,Team,Tottenham,Brentford,EPL 24/25,Full Time Result,Tottenham,1.5,2,Win,1.0,5,Football,True,False
+33e75ff0-9dd6-01bb-e69f-351039152189,2024-09-22,Team,Leicester,Everton,EPL 24/25,Handicap,Leicester +1,1.4,2,Win,0.8,5,Football,True,False
+6ea9ab1b-aa0e-fb9e-1909-4440c317e21b,2024-09-22,Team,Palace,Man Utd,EPL 24/25,Handicap,Man Utd +1,1.4,2,Win,0.8,5,Football,True,False
+34173cb3-8f07-f89d-dbeb-c2ac9128303f,2024-09-23,Team,Man City,Arsenal,EPL 24/25,BTTS,Yes,1.8,2,Win,1.6,5,Football,True,False
+c16a5320-fa47-5530-d958-3c34fd356ef5,2024-09-29,Team,Everton,Palace,EPL 24/25,Handicap,Everton +1,1.5,2,Win,1.0,6,Football,True,False
+6364d3f0-f495-b6ab-9dcf-8d3b5c6e0b01,2024-09-29,Team,Arsenal,Leicester,EPL 24/25,Handicap,Arsenal-1,1.53,2,Win,1.07,6,Football,True,False
+182be0c5-cdcd-5072-bb18-64cdee4d3d6e,2024-09-29,Team,Wolves,Liverpool,EPL 24/25,Full Time Result,Liverpool,1.38,2,Win,0.76,6,Football,True,False
+e369853d-f766-fa44-e1ed-0ff613f563bd,2024-09-30,Team,Ipswich,Villa,EPL 24/25,Full Time Result,Villa,1.83,2,Loss,-2.0,6,Football,True,False
+1c383cd3-0b7c-298a-b502-93adfecb7b18,2024-09-30,Team,Man Utd,Tottenham,EPL 24/25,Handicap,Man Utd +1,1.4,2,Loss,-2.0,6,Football,True,False
+19ca14e7-ea63-28a4-2e0e-b13d585e4c22,2024-10-06,Team,Palace,Liverpool,EPL 24/25,Full Time Result,Liverpool,1.5,2,Win,1.0,7,Football,True,False
+a5bfc9e0-7964-f8dd-deb9-5fc584cd965d,2024-10-06,Team,Arsenal,Southampton,EPL 24/25,Handicap,Arsenal-1,1.4,2,Win,0.8,7,Football,True,False
+a5771bce-93e2-00c3-6f7c-d9dfd0e5deaa,2024-10-06,Team,Man City,Fulham,EPL 24/25,Handicap,Man City -1,1.66,2,Loss,-2.0,7,Football,True,False
+d67d8ab4-f4c1-0bf2-2aa3-53e27879133c,2024-10-07,Team,Villa,Man Utd,EPL 24/25,Handicap,Villa +1,1.4,2,Win,0.8,7,Football,True,False
+d645920e-395f-edad-7bbb-ed0eca3fe2e0,2024-10-07,Team,Chelsea,Forest,EPL 24/25,Full Time Result,Chelsea,1.48,2,Loss,-2.0,7,Football,True,False
+3416a75f-4cea-9109-507c-acd8e2f2aefc,2024-10-07,Team,Brighton,Tottenham,EPL 24/25,BTTS,Yes,1.36,2,Win,0.73,7,Football,True,False
+a1d0c6e8-3f02-7327-d846-1063f4ac58a6,2024-10-11,Team,New Zealand,Tahiti,World Cup OFC qualification,Handicap,New Zealand -2,1.36,2,Win,0.73,,Football,True,False
+17e62166-fc85-86df-a4d1-bc0e1742c08b,2024-10-11,Team,New Zealand,Tahiti,World Cup OFC qualification,Handicap,New Zealand -4,2.75,1,Loss,-1.0,,Football,True,False
+f7177163-c833-dff4-b38f-c8d2872f1ec6,2024-10-14,Team,New Zealand,Malaysia,World Cup OFC qualification,Full Time Result,New Zealand,1.42,2,Win,0.84,,Football,True,False
+6c8349cc-7260-ae62-e3b1-396831a8398f,2024-10-20,Team,Fulham,Villa,EPL 24/25,BTTS,Yes,1.61,2,Win,1.24,8,Football,True,False
+d9d4f495-e875-a2e0-75a1-a4a6e1b9770f,2024-10-20,Team,Man Utd,Brentford,EPL 24/25,Handicap,Brentford +2,1.44,2,Win,0.89,8,Football,True,False
+67c6a1e7-ce56-d3d6-fa74-8ab6d9af3fd7,2024-10-20,Team,Bournemouth,Arsenal,EPL 24/25,Full Time Result,Arsenal,1.66,2,Loss,-2.0,8,Football,True,False
+642e92ef-b794-2173-4881-b53e1e1b18b6,2024-10-20,Team,Wolves,Man City,EPL 24/25,Full Time Result,Man City,1.33,4,Win,1.34,8,Football,True,False
+f457c545-a9de-d88f-18ec-ee47145a72c0,2024-10-27,Team,Villa,Bournemouth,EPL 24/25,Draw No Bet,Villa,1.44,1.5,Push,0.0,9,Football,True,False
+c0c7c76d-30bd-3dca-efc9-6f40275bdc0a,2024-10-27,Team,Brentford,Ipswich,EPL 24/25,Handicap,Brentford +1,1.22,1.5,Win,0.34,9,Football,True,False
+2838023a-778d-faec-dc21-2708f721b788,2024-10-27,Team,Brighton,Wolves,EPL 24/25,Full Time Result,Brighton,1.6,1.5,Win,0.9,9,Football,True,False
+9a115815-4dfa-42ca-ddbd-0694a4e9bdc8,2024-10-27,Team,Man City,Southampton,EPL 24/25,Handicap,Southampton +4,1.36,1.5,Win,0.55,9,Football,True,False
+d82c8d16-19ad-8176-d665-453cfb2e55f0,2024-10-27,Team,Man City,Southampton,EPL 24/25,Handicap,Man City -1,1.36,1.5,Loss,-1.5,9,Football,True,False
+a684ecee-e76f-c522-7732-86a895bc8436,2024-10-28,Team,Chelsea,Newcastle,EPL 24/25,Full Time Result,Chelsea,1.8,1,Win,0.8,9,Football,True,False
+b53b3a3d-6ab9-0ce0-2682-29151c9bde11,2024-10-28,Team,Arsenal,Liverpool,EPL 24/25,Draw No Bet,Arsenal,1.72,1.5,Push,0.0,9,Football,True,False
+9f61408e-3afb-633e-50cd-f1b20de6f466,2024-11-02,Team,Newcastle,Arsenal,EPL 24/25,Draw No Bet,Arsenal,1.44,1.5,Loss,-1.5,10,Football,True,False
+72b32a1f-754b-a1c0-9b36-95e0cb6cde7f,2024-11-02,Team,Liverpool,Brighton,EPL 24/25,Full Time Result,Liverpool,1.42,1.5,Win,0.63,10,Football,True,False
+66f041e1-6a60-928b-05a7-e228a89c3799,2024-11-02,Team,Bournemouth,Man City,EPL 24/25,Full Time Result,Man City,1.55,2,Loss,-2.0,10,Football,True,False
+093f65e0-80a2-95f8-076b-1c5722a46aa2,2024-11-02,Team,Southampton,Everton,EPL 24/25,Handicap,Everton +1,1.5,1,Loss,-1.0,10,Football,True,False
+072b030b-a126-b2f4-b237-4f342be9ed44,2024-11-02,Team,Forest,West Ham,EPL 24/25,Draw No Bet,Forest,1.53,1.5,Win,0.8,10,Football,True,False
+7f39f831-7fbd-b198-8ef4-c628eba02591,2024-11-02,Team,Wolves,Palace,EPL 24/25,Handicap,Palace +1,1.44,1,Win,0.45,10,Football,True,False
+44f683a8-4163-b352-3afe-57c2e008bc8c,2024-11-03,Team,Man Utd,Chelsea,EPL 24/25,BTTS,Yes,1.4,1.5,Win,0.6,10,Football,True,False
+03afdbd6-6e79-29b1-25f8-597834fa83a4,2024-11-09,Team,Palace,Fulham,EPL 24/25,BTTS,Yes,1.7,2,Loss,-2.0,11,Football,True,False
+ea5d2f1c-4608-232e-07d3-aa3d998e5135,2024-11-09,Team,Brighton,Man City,EPL 24/25,Handicap,Brighton +2,1.4,2,Win,0.8,11,Football,True,False
+fc490ca4-5c00-b124-9bbe-3554a4fdf6fb,2024-11-09,Team,Liverpool,Villa,EPL 24/25,Full Time Result,Liverpool,1.44,2,Win,0.89,11,Football,True,False
+3295c76a-cbf4-caae-d33c-36b1b5fc2cb1,2024-11-10,Team,Man Utd,Leicester,EPL 24/25,Full Time Result,Man Utd,1.38,2,Win,0.76,11,Football,True,False
+735b90b4-5681-25ed-6c3f-678819b6e058,2024-11-10,Team,Forest,Newcastle,EPL 24/25,Handicap,Forest +1,1.5,2,Loss,-2.0,11,Football,True,False
+a3f390d8-8e4c-41f2-747b-fa2f1b5f87db,2024-11-10,Team,Tottenham,Ipswich,EPL 24/25,Handicap,Tottenham -1,1.66,2,Loss,-2.0,11,Football,True,False
+14bfa6bb-1487-5e45-bba0-28a21ed38046,2024-11-15,Team,New Zealand,Vanuatu,World Cup OFC qualification,BTTS,No,1.28,5,Loss,-5.0,,Football,True,False
+7cbbc409-ec99-0f19-c78c-75bd1e06f215,2024-11-18,Team,New Zealand,Samoa,World Cup OFC qualification,Goal Line,Over 8.5 goals,1.85,5,Loss,-5.0,,Football,True,False
+e2c420d9-28d4-bf8c-e0ff-2ec19b371514,2024-11-24,Team,Leicester,Chelsea,EPL 24/25,Full Time Result,Chelsea,1.45,1.5,Win,0.68,12,Football,True,False
+32bb90e8-976a-ab52-98d5-da10fe66f21d,2024-11-24,Team,Fulham,Wolves,EPL 24/25,Full Time Result,Fulham,1.55,1.5,Loss,-1.5,12,Football,True,False
+d2ddea18-f006-65ce-8623-e36bd4e3c7c5,2024-11-24,Team,Everton,Brentford,EPL 24/25,Handicap,Brentford +1,1.57,1.5,Win,0.86,12,Football,True,False
+ad61ab14-3223-efbc-24c7-d2583be69251,2024-11-24,Team,Arsenal,Forest,EPL 24/25,Full Time Result,Arsenal,1.4,1.5,Win,0.63,12,Football,True,False
+d09bf415-44a3-365a-46c9-077ebb5e35c3,2024-11-24,Team,Bournemouth,Brighton,EPL 24/25,BTTS,Yes,1.44,1.5,Win,0.58,12,Football,True,False
+fbd7939d-6749-97cd-b469-2d34de8633c4,2024-11-24,Team,Villa,Palace,EPL 24/25,Full Time Result,Villa,1.65,1.5,Loss,-1.5,12,Football,True,False
+28dd2c79-55ce-9264-5624-0b2ff0100bde,2024-11-25,Team,Southampton,Liverpool,EPL 24/25,Full Time Result,Liverpool,1.28,1.5,Win,0.46,12,Football,True,False
+35f4a8d4-65e6-e1ed-c05f-3d8ab658c551,2024-11-30,Team,Brighton,Southampton,EPL 24/25,Full Time Result,Brighton,1.38,2,Loss,-2.0,13,Football,True,False
+d1fe173d-08e9-5939-7adf-34b1d77e88d7,2024-12-01,Team,Brentford,Leicester,EPL 24/25,Full Time Result,Brentford,1.65,2,Win,1.3,13,Football,True,False
+f033ab37-c302-01f7-3f14-2449d037028d,2024-12-02,Team,Chelsea,Villa,EPL 24/25,Full Time Result,Chelsea,1.7,2,Win,1.4,13,Football,True,False
+43ec517d-68b6-edd3-015b-3edc9a11367b,2024-12-02,Team,Man Utd,Everton,EPL 24/25,Full Time Result,Man Utd,1.53,2,Win,1.07,13,Football,True,False
+9778d5d2-19c5-080b-9a6a-17bef029331c,2024-12-02,Team,Liverpool,Man City,EPL 24/25,Full Time Result,Liverpool,2.1,2,Win,2.2,13,Football,True,False
+fe9fc289-c3ff-0af1-42b6-d3bead98a923,2024-12-04,Team,Villa,Brentford,EPL 24/25,Full Time Result,Villa,1.83,2,Win,1.67,14,Football,True,False
+68d30a95-9472-8bc3-9aa2-4be94b319d21,2024-12-04,Team,Arsenal,Man Utd,EPL 24/25,Full Time Result,Arsenal,1.4,2,Win,1.03,14,Football,True,False
+3ef81541-6f77-5098-fe97-7004015c6193,2024-12-05,Team,Newcastle,Liverpool,EPL 24/25,Full Time Result,Liverpool,1.8,2,Loss,-2.0,14,Football,True,False
+93db85ed-909c-1383-8ff9-5ccfa94cebd9,2024-12-05,Team,Man City,Forest,EPL 24/25,BTTS,Yes,1.8,2,Loss,-2.0,14,Football,True,False
+c7e1249f-fc03-eb9d-ed90-8c236bd1996d,2024-12-05,Team,Everton,Wolves,EPL 24/25,Handicap,Everton +1,1.3,2,Win,0.6,14,Football,True,False
+2a38a4a9-316c-49e5-a833-517c45d31070,2024-12-08,Team,Villa,Southampton,EPL 24/25,Handicap,Villa -1,1.8,2,Loss,-2.0,15,Football,True,False
+8613985e-c49e-b8f7-57ae-6439e879bb2a,2024-12-08,Team,Palace,Man City,EPL 24/25,Full Time Result,Man City,1.57,2,Loss,-2.0,15,Football,True,False
+54229abf-cfa5-649e-7003-b83dd4755294,2024-12-09,Team,Fulham,Arsenal,EPL 24/25,Full Time Result,Arsenal,1.57,2,Loss,-2.0,15,Football,True,False
+92cc2275-32d1-7e56-e079-02b254dfad10,2024-12-09,Team,Leicester,Brighton,EPL 24/25,BTTS,Yes,1.61,2,Win,1.24,15,Football,True,False
+98dce83d-a57b-0395-e163-467c9dae521b,2024-12-09,Team,Tottenham,Chelsea,EPL 24/25,Full Time Result,Tottenham,3.3,1,Win,2.3,15,Football,True,False
+f4b9ec30-ad9f-68f8-9b29-639786cb62ef,2024-12-15,Team,Multiple,Multiple,EPL 24/25,Multi,Multiple,4.68,1,Loss,-1.0,16,Football,True,False
+812b4ba2-87f5-ee0b-c9d4-3bbf5bbe87fb,2024-12-15,Team,Multiple,Multiple,EPL 24/25,Multi,Multiple,3.43,1,Loss,-1.0,16,Football,True,False
+26657d5f-f902-0d2a-befe-558796b99584,2024-12-15,Team,Multiple,Multiple,EPL 24/25,Multi,Multiple,2.82,1,Loss,-1.0,16,Football,True,False
+e2ef524f-bf3d-9fe6-11d5-a8e90fefdc9c,2024-12-15,Team,Multiple,Multiple,EPL 24/25,Multi,Multiple,3.56,1,Loss,-1.0,16,Football,True,False
+ed3d2c21-991e-3bef-5e06-9713af9fa6ca,2024-12-15,Team,Multiple,Multiple,EPL 24/25,Multi,Multiple,3.56,1,Loss,-1.0,16,Football,True,False
+ac627ab1-ccbd-b62e-c96e-702f07f6425b,2024-12-15,Team,Multiple,Multiple,EPL 24/25,Multi,Multiple,3.75,1,Loss,-1.0,16,Football,True,False
+f899139d-f5e1-0593-9643-1415e770c6dd,2024-12-15,Team,Multiple,Multiple,EPL 24/25,Multi,Multiple,2.07,1,Loss,-1.0,16,Football,True,False
+38b3eff8-baf5-6627-478e-c76a704e9b52,2024-12-15,Team,Multiple,Multiple,EPL 24/25,Multi,Multiple,2.15,1,Loss,-1.0,16,Football,True,False
+ec895663-7a99-787b-d197-eacd77acce5e,2024-12-15,Team,Multiple,Multiple,EPL 24/25,Multi,Multiple,2.15,1,Loss,-1.0,16,Football,True,False
+6974ce5a-c660-610b-44d9-b9fed0ff9548,2024-12-15,Team,Multiple,Multiple,EPL 24/25,Multi,Multiple,2.26,1,Loss,-1.0,16,Football,True,False
+c9e1074f-5b3f-9fc8-ea15-d152add07294,2024-12-22,Team,Villa,Man City,EPL 24/25,Draw No Bet,Man City,1.61,2,Loss,-2.0,17,Football,True,False
+65b9eea6-e1cc-6bb9-f0cd-2a47751a186f,2024-12-22,Team,Brentford,Forest,EPL 24/25,Handicap,Forest +1,1.53,2,Win,1.07,17,Football,True,False
+f0935e4c-d592-0aa6-c7c9-96a5ee53a70f,2024-12-22,Team,Ipswich,Newcastle,EPL 24/25,Full Time Result,Newcastle,1.65,2,Win,1.3,17,Football,True,False
+a97da629-b098-b75c-294d-ffdc3e463904,2024-12-22,Team,Palace,Arsenal,EPL 24/25,BTTS,Yes,1.95,2,Win,1.9,17,Football,True,False
+a3c65c29-7427-0fd0-93ee-8a9bf8ae7d0b,2024-12-23,Team,Everton,Chelsea,EPL 24/25,Full Time Result,Chelsea,1.61,2,Loss,-2.0,17,Football,True,False
+2723d092-b638-85e0-d7c2-60cc007e8b9d,2024-12-23,Team,Man Utd,Bournemouth,EPL 24/25,Full Time Result,Man Utd,1.8,2,Loss,-2.0,17,Football,True,False
+5f93f983-524d-ef3d-ca46-4469d2cf9f3e,2024-12-27,Team,Forest,Tottenham,EPL 24/25,BTTS,Yes,1.4,2,Loss,-2.0,18,Football,True,False
+698d51a1-9d8a-121c-e581-499d7b701668,2024-12-27,Team,Newcastle,Villa,EPL 24/25,BTTS,Yes,1.57,2,Loss,-2.0,18,Football,True,False
+7f6ffaa6-bb0b-4080-17b6-2254211691b5,2024-12-27,Team,Man City,Everton,EPL 24/25,BTTS,No,1.9,2,Loss,-2.0,18,Football,True,False
+73278a4a-8696-0eeb-576a-8fd4c9ec6997,2024-12-27,Team,Bournemouth,Palace,EPL 24/25,Full Time Result,Bournemouth,2,2,Loss,-2.0,18,Football,True,False
+5fd0b37c-d7db-bb00-f97b-a6ce92bf5add,2024-12-27,Team,Liverpool,Leicester,EPL 24/25,Handicap,Liverpool -1,1.22,2,Win,-0.78,18,Football,True,False
+2b44928a-e11f-b938-4c4c-f38708677c48,2024-12-28,Team,Arsenal,Ipswich,EPL 24/25,Full Time Result,Arsenal,1.14,5,Win,0.72,18,Football,True,False
+c45147de-e729-311e-f5b5-c3003946c48f,2024-12-30,Team,Everton,Forest,EPL 24/25,Draw No Bet,Forest,1.83,2,Win,1.67,19,Football,True,False
+eb160de1-de89-d905-8fcb-0b968dbbbd68,2024-12-30,Team,Tottenham,Wolves,EPL 24/25,Full Time Result,Tottenham,1.66,2,Loss,-2.0,19,Football,True,False
+5ef05993-8ba7-99aa-a845-e1c2e8a762bd,2024-12-30,Team,West Ham,Liverpool,EPL 24/25,Full Time Result,Liverpool,1.38,2,Win,1.76,19,Football,True,False
+07e1cd7d-ca89-a167-8042-477183b7ac3f,2024-12-31,Team,Man Utd,Newcastle,EPL 24/25,Full Time Result,Newcastle,2.6,2,Win,3.2,19,Football,True,False
+da4fb5c6-e93e-74d3-df85-27599fa62642,2024-12-31,Team,Ipswich,Chelsea,EPL 24/25,Full Time Result,Chelsea,1.38,2,Loss,-2.0,19,Football,True,False
+4c56ff4c-e4aa-f957-3aa5-dff913df997a,2025-01-04,Team,Liverpool,Man Utd,EPL 24/25,Handicap,Liverpool -1,1.72,2,Loss,-2.0,20,Football,True,False
+a0a080f4-2e6f-13b3-a2df-133f073095dd,2025-01-05,Team,Southampton,Brentford,EPL 24/25,Draw No Bet,Brentford,1.57,2,Win,1.15,20,Football,True,False
+202cb962-ac59-075b-964b-07152d234b70,2025-01-05,Team,Brighton,Arsenal,EPL 24/25,Full Time Result,Arsenal,1.8,2,Loss,-2.0,20,Football,True,False
+c8ffe9a5-87b1-26f1-52ed-3d89a146b445,2025-01-05,Team,Villa,Leicester,EPL 24/25,Full Time Result,Villa,1.33,2,Win,0.67,20,Football,True,False
+3def184a-d8f4-755f-f269-862ea77393dd,2025-01-05,Team,Tottenham,Newcastle,EPL 24/25,Full Time Result,Newcastle,1.83,2,Win,1.67,20,Football,True,False
+069059b7-ef84-0f0c-74a8-14ec9237b6ec,2025-01-06,Team,Wolves,Forest,EPL 24/25,Full Time Result,Forest,2.3,2,Win,2.6,20,Football,True,False
+ec5decca-5ed3-d6b8-079e-2e7e7bacc9f2,2025-01-11,Team,Multiple,Multiple,FA cup 2025,Multi,Multiple,1.96,1,Loss,-1.0,,Football,True,False
+76dc611d-6eba-afc6-6cc0-879c71b5db5c,2025-01-11,Team,Multiple,Multiple,FA cup 2025,Multi,Multiple,1.75,1,Loss,-1.0,,Football,True,False
+d1f491a4-04d6-8548-8094-3e5c3cd9ca25,2025-01-11,Team,Multiple,Multiple,FA cup 2025,Multi,Multiple,2.01,1,Loss,-1.0,,Football,True,False
+9b861925-1a19-057c-ff70-779273e95aa6,2025-01-11,Team,Multiple,Multiple,FA cup 2025,Multi,Multiple,3.81,1,Loss,-1.0,,Football,True,False
+1afa34a7-f984-eeab-dbb0-a7d494132ee5,2025-01-11,Team,Multiple,Multiple,FA cup 2025,Multi,Multiple,2.04,1,Loss,-1.0,,Football,True,False
+65ded535-3c5e-e48d-0b7d-48c591b8f430,2025-01-18,Team,Chelsea,Wolves,EPL 24/25,Full Time Result,Chelsea,1.36,2,Win,0.73,21,Football,True,False
+9fc3d715-2ba9-336a-670e-36d0ed79bc43,2025-01-18,Team,Forest,Southampton,EPL 24/25,Full Time Result,Forest,1.38,4,Win,1.52,21,Football,True,False
+02522a2b-2726-fb0a-03bb-19f2d8d9524d,2025-01-18,Team,Brentford,Liverpool,EPL 24/25,Full Time Result,Liverpool,1.45,2,Win,0.9,21,Football,True,False
+7f1de29e-6da1-9d22-b51c-68001e7e0e54,2025-01-18,Team,Newcastle,Bournemouth,EPL 24/25,Full Time Result,Newcastle,1.57,2,Loss,-2.0,21,Football,True,False
+42a0e188-f503-3bc6-5bf8-d78622277c4e,2025-01-25,Team,Villa,West Ham,EPL 24/25,Full Time Result,Villa,1.53,2,Loss,-2.0,22,Football,True,False
+3988c7f8-8ebc-b58c-6ce9-32b957b6f332,2025-01-25,Team,Palace,Brentford,EPL 24/25,BTTS,Yes,1.61,2,Win,1.24,22,Football,True,False
+013d4071-66ec-4fa5-6eb1-e1f8cbe183b9,2025-01-25,Team,Wolves,Arsenal,EPL 24/25,Full Time Result,Arsenal,1.5,2,Win,1.0,22,Football,True,False
+e00da03b-685a-0dd1-8fb6-a08af0923de0,2025-01-25,Team,Liverpool,Ipswich,EPL 24/25,Handicap,Liverpool -1,1.3,3,Win,0.9,22,Football,True,False
+1385974e-d590-4a43-8616-ff7bdb3f7439,2025-01-25,Team,Brighton,Everton,EPL 24/25,Full Time Result,Brighton,1.66,2,Loss,-2.0,22,Football,True,False
+0f28b5d4-9b30-20af-eecd-95b4009adf4c,2025-01-25,Team,Bournemouth,Forest,EPL 24/25,Full Time Result,Forest,3.3,1,Loss,-1.0,22,Football,True,False
+a8baa565-54f9-6369-ab93-e4f3bb068c22,2025-01-25,Team,Bournemouth,Forest,EPL 24/25,Handicap,Forest +1,1.72,1,Loss,-1.0,22,Football,True,False
+903ce922-5fca-3e98-8c2a-f215d4e544d3,2025-02-01,Team,Chelsea,West Ham,EPL 24/25,Full Time Result,Chelsea,1.33,2,Win,0.67,23,Football,True,False
+0a09c884-4ba8-f093-6c20-bd791130d6b6,2025-02-01,Team,Wolves,Villa,EPL 24/25,Full Time Result,Villa,2,2,Loss,-2.0,24,Football,True,False
+2b24d495-052a-8ce6-6358-eb576b8912c8,2025-02-02,Team,Ipswich,Southampton,EPL 24/25,Full Time Result,Ipswich,2.05,2,Loss,-2.0,24,Football,True,False
+a5e00132-373a-7031-000f-d987a3c9f87b,2025-02-02,Team,Bournemouth,Liverpool,EPL 24/25,Full Time Result,Liverpool,1.7,2,Win,1.4,24,Football,True,False
+8d5e957f-2978-9348-7bd9-8fa830fa6413,2025-02-02,Team,Forest,Brighton,EPL 24/25,Handicap,Forest +1,1.4,2,Win,0.8,24,Football,True,False
+47d1e990-583c-9c67-424d-369f3414728e,2025-02-08,Team,Multiple,Multiple,FA cup 2025,Multi,Multiple,2.91,5,Loss,-5.0,Null,Football,True,False
+f2217062-e9a3-97a1-dca4-29e7d70bc6ca,2025-02-15,Team,Southampton,Bournemouth,EPL 24/25,Full Time Result,Bournemouth,1.45,2,Win,0.9,25,Football,True,False
+7ef605fc-8dba-5425-d696-5fbd4c8fbe1f,2025-02-15,Team,Fulham,Forest,EPL 24/25,Handicap,Forest +1,1.66,2,Loss,-2.0,25,Football,True,False
+a8f15eda-80c5-0adb-0e71-943adc8015cf,2025-02-15,Team,Villa,Ipswich,EPL 24/25,Full Time Result,Villa,1.48,2,Loss,-2.0,25,Football,True,False
+37a749d8-08e4-6495-a8da-1e5352d03cae,2025-02-15,Team,Leicester,Arsenal,EPL 24/25,Full Time Result,Arsenal,1.3,2,Win,0.6,25,Football,True,False
+b3e3e393-c77e-35a4-a3f3-cbd1e429b5dc,2025-02-17,Team,Liverpool,Wolves,EPL 24/25,Handicap,Liverpool -1,1.57,2,Loss,-2.0,25,Football,True,False
+1d7f7abc-18fc-b439-7506-5399b0d1e48e,2025-02-17,Team,Liverpool,Wolves,EPL 24/25,Handicap,Liverpool -2,2.37,1,Loss,-1.0,25,Football,True,False
+2a79ea27-c279-e471-f4d1-80b08d62b00a,2025-02-22,Team,Leicester,Brentford,EPL 24/25,Full Time Result,Brentford,1.95,2,Win,1.9,26,Football,True,False
+1c9ac015-9c94-d8d0-cbed-c973445af2da,2025-02-22,Team,Arsenal,West Ham,EPL 24/25,Full Time Result,Arsenal,1.27,2,Loss,-2.0,26,Football,True,False
+6c4b761a-28b7-34fe-9383-1e3fb400ce87,2025-02-23,Team,Bournemouth,Wolves,EPL 24/25,Full Time Result,Bournemouth,1.6,2,Loss,-2.0,26,Football,True,False
+06409663-226a-f2f3-1144-85aa4e0a23b4,2025-02-23,Team,Newcastle,Forest,EPL 24/25,Full Time Result,Forest,4.1,2,Loss,-2.0,26,Football,True,False
+140f6969-d521-3fd0-ece0-3148e62e461e,2025-02-23,Team,Southampton,Brighton,EPL 24/25,Full Time Result,Brighton,1.53,2,Win,1.07,26,Football,True,False
+b73ce398-c39f-506a-f761-d2277d853a92,2025-02-28,Team,West Ham,Leicester,EPL 24/25,Full Time Result,West Ham,1.61,2,Win,1.24,27,Football,True,False
+bd4c9ab7-30f5-5132-06b9-99ec0d90d1fb,2025-02-28,Team,Man Utd,Ipswich,EPL 24/25,Full Time Result,Man Utd,1.53,2,Win,1.07,27,Football,True,False
+82aa4b0a-f34c-2313-a562-076992e50aa3,2025-02-28,Team,Brentford,Everton,EPL 24/25,Full Time Result,Brentford,2,2,Loss,-2.0,27,Football,True,False
+0777d5c1-7d40-66b8-2ab8-6dff8a46af6f,2025-02-28,Team,Palace,Villa,EPL 24/25,Handicap,Villa (+1),1.53,2,Loss,-2.0,27,Football,True,False
+fa7cdfad-1a5a-af83-70eb-eda47a1ff1c3,2025-03-02,Team,Multiple,Multiple,FA cup 2025,Multi,Multiple,2.22,5,Loss,-5.0,,Football,True,False
+9766527f-2b5d-3e95-d4a7-33fcfb77bd7e,2025-03-02,Team,Multiple,Multiple,FA cup 2025,Multi,Multiple,3.822,5,Loss,-5.0,,Football,True,False
+7e7757b1-e12a-bcb7-36ab-9a754ffb617a,2025-03-10,Team,Man Utd,Arsenal,EPL 24/25,Full Time Result,Arsenal,1.7,2,Loss,-2.0,28,Football,True,False
+5878a7ab-84fb-4340-2106-c575658472fa,2025-03-10,Team,Multiple,Multiple,EPL 24/25,Multi,Multiple,1.18,2,Win,0.37,28,Football,True,False
+006f52e9-102a-8d3b-e2fe-5614f42ba989,2025-03-10,Team,Palace,Ipswich,EPL 24/25,Full Time Result,Palace,1.55,5,Win,2.75,28,Football,True,False
+36366388-1777-2e42-b59d-74cff571fbb3,2025-03-10,Team,Brighton,Fulham,EPL 24/25,Handicap,Brighton +1,1.28,2,Win,0.58,28,Football,True,False
+149e9677-a598-9fd3-42ae-44213df68868,2025-03-10,Team,Forest,Man City,EPL 24/25,BTTS,Yes,1.53,2,Loss,-2.0,28,Football,True,False
+a4a042cf-4fd6-bfb4-7701-cbc8a1653ada,2025-03-16,Team,Ipswich,Forest,EPL 24/25,To Score Anytime,Chris Wook,2.4,1,Loss,-1.0,29,Football,True,False
+1ff8a7b5-dc7a-7d1f-0ed6-5aaa29c04b1e,2025-03-16,Team,Ipswich,Forest,EPL 24/25,Full Time Result,Forest,2,2,Win,2.0,29,Football,True,False
+f7e6c855-04ce-6e82-442c-770f7c8606f0,2025-03-16,Team,Man City,Brighton,EPL 24/25,Draw No Bet,Man City,1.3,4,Push,0.0,29,Football,True,False
+bf822969-6f7a-3bb4-700c-fddef19fa23f,2025-03-16,Team,Southampton,Wolves,EPL 24/25,Draw No Bet,Wolves,1.33,4,Win,1.34,29,Football,True,False
+82161242-827b-703e-6acf-9c726942a1e4,2025-03-16,Team,Bournemouth,Brentford,EPL 24/25,Full Time Result,Bournemouth,1.7,2,Loss,-2.0,29,Football,True,False
+38af8613-4b65-d0f1-0fe3-3d30dd76442e,2025-03-17,Team,Arsenal,Chelsea,EPL 24/25,Draw No Bet,Arsenal,1.33,4,Win,1.34,29,Football,True,False
+96da2f59-0cd7-246b-bde0-051047b0d6f7,2025-03-17,Team,Fulham,Tottenham,EPL 24/25,Full Time Result,Tottenham,3.6,1,Loss,-1.0,29,Football,True,False
+8f855179-6779-5eee-f66c-225f7883bdcb,2025-03-17,Team,Leicester,Man Utd,EPL 24/25,Full Time Result,Man Utd,1.83,2,Win,1.67,29,Football,True,False
+8f53295a-7387-8494-e9bc-8dd6c3c7104f,2025-03-21,Team,New Zealand,Fiji,World Cup OFC qualification,Multi,Multiple,1.44,3,Win,1.34,,Football,True,False
+045117b0-e0a1-1a24-2b97-65e79cbf113f,2025-03-21,Team,New Zealand,Fiji,World Cup OFC qualification,Total Goals,Over 3.5,1.57,3,Win,1.72,,Football,True,False
+fc221309-7460-13ac-5545-71fbd180e1c8,2025-03-21,Team,New Zealand,Fiji,World Cup OFC qualification,1st Half Goal Line,Over 1.5,1.75,3,Win,2.25,,Football,True,False
+4c5bde74-a8f1-1065-6874-902f07378009,2025-03-21,Team,New Zealand,Fiji,World Cup OFC qualification,Multi,Multiple,2.3,3,Win,3.9,,Football,True,False
+cedebb6e-872f-539b-ef8c-3f919874e9d7,2025-03-30,Team,Preston,Villa,FA cup 2025,Full Time Result,Villa,1.48,5,Win,2.4,,Football,True,False
+6cdd60ea-0045-eb7a-6ec4-4c54d29ed402,2025-03-30,Team,Bournemouth,Man City,FA cup 2025,To Qualify,Man City,1.66,5,Win,3.34,,Football,True,False
+eecca5b6-365d-9607-ee5a-9d336962c534,2025-04-02,Team,Multiple,Multiple,EPL 24/25,Multi,Multiple,2.6,3,Loss,-3.0,30,Football,True,False
+9872ed9f-c22f-c182-d371-c3e9ed316094,2025-04-02,Team,Southampton,Palace,EPL 24/25,Full Time Result,Palace,1.57,3,Loss,-3.0,30,Football,True,False
+31fefc0e-570c-b386-0f2a-6d4b38c6490d,2025-04-02,Team,Man City,Leicester,EPL 24/25,Full Time Result,Man City,1.2,3,Win,0.6,30,Football,True,False
+9dcb88e0-1376-4959-0b75-5372b040afad,2025-04-02,Team,Bournemouth,Ipswich,EPL 24/25,Full Time Result,Bournemouth,1.38,3,Loss,-3.0,30,Football,True,False
+a2557a7b-2e94-197f-f767-970b67041697,2025-04-06,Team,Villa,Forest,EPL 24/25,Full Time Result,Forest,4,3,Loss,-3.0,31,Football,True,False
+cfecdb27-6f63-4854-f3ef-915e2e980c31,2025-04-06,Team,Leicester,Newcastle,EPL 24/25,Full Time Result,Newcastle,1.5,3,Win,1.5,31,Football,True,False
+0aa1883c-6411-f787-3cb8-3dacb17b0afc,2025-04-06,Team,Man Utd,Man City,EPL 24/25,Draw No Bet,Man City,1.5,3,Push,0.0,31,Football,True,False
+58a2fc6e-d39f-d083-f55d-4182bf88826d,2025-04-06,Team,Tottenham,Southampton,EPL 24/25,Full Time Result,Tottenham,1.4,3,Win,1.2,31,Football,True,False
+bd686fd6-40be-98ef-aae0-091fa301e613,2025-04-06,Team,Fulham,Liverpool,EPL 24/25,Draw No Bet,Liverpool,1.33,3,Loss,-3.0,31,Football,True,False
+a597e505-02f5-ff68-e3e2-5b9114205d4a,2025-04-12,Team,Multiple,Multiple,EPL 24/25,Multi,Multiple,3.27,3,Loss,-3.0,32,Football,True,False
+0336dcba-b05b-9d5a-d24f-4333c7658a0e,2025-04-12,Team,Liverpool,West Ham,EPL 24/25,Full Time Result,Liverpool,1.3,3,Win,0.9,32,Football,True,False
+084b6fbb-1072-9ed4-da8c-3d3f5a3ae7c9,2025-04-12,Team,Arsenal,Brentford,EPL 24/25,Full Time Result,Arsenal,1.61,3,Loss,-3.0,32,Football,True,False
+85d8ce59-0ad8-981c-a2c8-286f79f59954,2025-04-12,Team,Southampton,Villa,EPL 24/25,Full Time Result,Villa,1.53,3,Win,1.6,32,Football,True,False
+0e65972d-ce68-dad4-d52d-063967f0a705,2025-04-12,Team,Forest,Everton,EPL 24/25,Full Time Result,Forest,1.95,3,Loss,-3.0,32,Football,True,False
+84d9ee44-e457-ddef-7f2c-4f25dc8fa865,2025-04-13,Team,Everton,Man City,EPL 24/25,Full Time Result,City,1.9,2.5,Win,2.25,33,Football,True,False
+3644a684-f98e-a8fe-223c-713b77189a77,2025-04-20,Team,Ipswich,Arsenal,EPL 24/25,Full Time Result,Arsenal,1.42,2.5,Win,1.05,33,Football,True,False
+757b505c-fd34-c64c-85ca-5b5690ee5293,2025-04-20,Team,Leicester,Liverpool,EPL 24/25,Full Time Result,Liverpool,1.2,2.5,Win,0.5,33,Football,True,False
+854d6fae-5ee4-2911-677c-739ee1734486,2025-04-20,Team,Palace,Bournemouth,EPL 24/25,BTTS,Yes,1.61,2.5,Loss,-2.5,33,Football,True,False
+e2c0be24-560d-78c5-e599-c2a9c9d0bbd2,2025-04-20,Team,Villa,Newcastle,EPL 24/25,BTTS,Yes,1.57,2.5,Win,1.43,33,Football,True,False
+274ad478-6c3a-bca6-9fa0-97b85867d9a4,2025-04-20,Team,Tottenham,Forest,EPL 24/25,BTTS,No,2.5,2.5,Loss,-2.5,33,Football,True,False
+eae27d77-ca20-db30-9e05-6e3d2dcd7d69,2025-04-20,Team,Wolves,Leicester,EPL 24/25,Full Time Result,Wolves,1.5,3,Win,1.5,34,Football,True,False
+7eabe3a1-649f-fa2b-3ff8-c02ebfd5659f,2025-04-26,Team,Southampton,Fulham,EPL 24/25,Full Time Result,Fulham,1.61,3,Win,1.85,34,Football,True,False
+69adc1e1-07f7-f7d0-35d7-baf04342e1ca,2025-04-26,Team,Chelsea,Everton,EPL 24/25,Full Time Result,Chelsea,1.45,3,Win,1.35,34,Football,True,False
+091d584f-ced3-01b4-4265-4dd8c23b3fc9,2025-04-26,Team,Brighton,West Ham,EPL 24/25,Draw No Bet,West Ham,3.5,1.5,Loss,-1.5,34,Football,True,False
+b1d10e7b-afa4-4212-18a5-1b1e1f1b0ba2,2025-04-26,Team,Palace,Villa,FA cup 2025,Draw No Bet,Palace,2.25,1.5,Win,1.88,34,Football,True,False
+6f3ef77a-c0e3-619e-9815-9e9b6febf557,2025-04-26,Team,Arsenal,PSG,Champions League 2025,Full Time Result,Arsenal,2.1,5,Loss,-5.0,,Football,True,False
+eb163727-917c-bba1-eea2-08541a643e74,2025-05-03,Team,Chelsea,Liverpool,EPL 24/25,BTTS,Yes,1.5,3,Win,1.5,35,Football,True,False
+1534b76d-325a-8f59-1b52-d302e7181331,2025-05-03,Team,Arsenal,Bournemouth,EPL 24/25,Full Time Result,Arsenal,1.9,3,Loss,-3.0,35,Football,True,False
+979d472a-8480-4b9f-647b-c185a877a8b5,2025-05-03,Team,Leicester,Southampton,EPL 24/25,Full Time Result,Leicester,2.5,3,Win,4.5,35,Football,True,False
+ca46c1b9-512a-7a83-15fa-3c5a946e8265,2025-05-03,Team,Everton,Ipswich,EPL 24/25,Full Time Result,Everton,1.5,3,Win,1.5,35,Football,True,False
+3b8a6142-26a9-53a8-cd95-26fca6fe9ba5,2025-05-03,Team,Villa,Fulham,EPL 24/25,Full Time Result,Villa,1.85,3,Win,2.55,35,Football,True,False
+45fbc6d3-e05e-bd93-369c-e542e8f2322d,2025-05-10,Team,Liverpool,Arsenal,EPL 24/25,BTTS,Yes,1.61,5,Win,3.08,36,Football,True,False
+63dc7ed1-010d-3c3b-8269-faf0ba7491d4,2025-05-10,Team,Forest,Leicester,EPL 24/25,BTTS,No,1.75,5,Loss,-5.0,36,Football,True,False
+e96ed478-dab8-595a-7dbd-a4cbcbee168f,2025-05-10,Team,Newcastle,Chelsea,EPL 24/25,Draw No Bet,Newcastle,1.57,5,Win,2.86,36,Football,True,False
+c0e190d8-267e-3670-8f95-5d7ab048990d,2025-05-10,Team,Wolves,Brighton,EPL 24/25,Draw No Bet,Brighton,1.8,5,Win,4.0,36,Football,True,False
+ec8ce6ab-b3e9-52a8-5b85-51ba726a1227,2025-05-10,Team,Southampton,Man City,EPL 24/25,Full Time Result,Man City,1.2,20,Loss,-20.0,36,Football,True,False
+060ad924-8994-7d41-0d89-7474079c1477,2025-05-10,Team,Ipswich,Brentford,EPL 24/25,Full Time Result,Brentford,1.53,5,Win,2.67,36,Football,True,False
+bcbe3365-e6ac-95ea-2c03-43a2395834dd,2025-05-17,Team,Palace,Man City,FA cup 2025,Winner,Palace,3.2,1,Win,2.2,,Football,True,False
+115f8950-3138-416a-242f-40fb7d7f338e,2025-05-17,Team,Palace,Man City,FA cup 2025,Method of Victory,Palace in ET,17,1,Loss,-1.0,,Football,True,False
+13fe9d84-310e-77f1-3a6d-184dbf1232f3,2025-05-17,Team,Arsenal,Newcastle,EPL 24/25,Draw No Bet,Arsenal,1.44,4,Win,1.78,37,Football,True,False
+d1c38a09-acc3-4845-c6be-3a127a5aacaf,2025-05-17,Team,Brentford,Fulham,EPL 24/25,Draw No Bet,Brentford,1.5,4,Loss,-4.0,37,Football,True,False
+9cfdf10e-8fc0-47a4-4b08-ed031e1f0ed1,2025-05-17,Team,West Ham,Forest,EPL 24/25,Draw No Bet,Forest,1.8,4,Win,3.2,37,Football,True,False
+705f2172-8346-6678-8607-efbfca35afb3,2025-05-17,Team,Everton,Southampton,EPL 24/25,Full Time Result,Everton,1.4,4,Win,1.6,37,Football,True,False
+74db120f-0a8e-5646-ef5a-30154e9f6deb,2025-05-17,Team,Man City,Bournemouth,EPL 24/25,Full Time Result,City,1.53,4,Win,2.14,37,Football,True,False
+57aeee35-c982-0509-1e18-d1140e9f38cf,2025-05-23,Team,Multiple,Multiple,A-League 2025,Multi,Multiple,1.18,5,Loss,-5.0,,Football,True,False
+6da9003b-743b-65f4-c0cc-d295cc484e57,2025-05-23,Team,Multiple,Multiple,A-League 2025,Multi,Multiple,2.07,5,Loss,-5.0,,Football,True,False
+9b04d152-845e-c0a3-7839-4003c96da594,2025-05-25,Team,Fulham,Man City,EPL 24/25,Full Time Result,Man City,1.57,3,Win,1.72,38,Football,True,False
+be83ab3e-cd0d-b773-eb2d-c1b0a17836a1,2025-05-25,Team,Man Utd,Villa,EPL 24/25,Full Time Result,Villa,1.72,3,Loss,-3.0,38,Football,True,False
+e1654211-10ba-0309-9a1c-0393373c5b43,2025-05-25,Team,Newcastle,Everton,EPL 24/25,Full Time Result,Newcastle,1.28,3,Loss,-3.0,38,Football,True,False
+289dff07-669d-7a23-de0e-f88d2f7129e7,2025-05-25,Team,Liverpool,Palace,EPL 24/25,Draw No Bet,Liverpool,1.18,3,Push,0.0,38,Football,True,False
+577ef115-4f32-40ad-5b9b-413aa7346a1e,2025-05-25,Team,Forest,Chelsea,EPL 24/25,Draw No Bet,Forest,2.37,3,Loss,-3.0,38,Football,True,False
+01161aaa-0b6d-1345-dd8f-e4e481144d84,2025-05-25,Team,Tottenham,Brighton,EPL 24/25,Draw No Bet,Tottenham,3.75,3,Loss,-3.0,38,Football,True,False
+539fd53b-59e3-bb12-d203-f45a912eeaf2,2025-05-25,Team,Multiple,Multiple,EPL 24/25,Multi,Multiple,3.61,1,Loss,-1.0,38,Football,True,False
+ac1dd209-cbcc-5e5d-1c6e-28598e8cbbe8,2025-05-25,Team,Multiple,Multiple,EPL 24/25,Multi,Multiple,10.52,1,Loss,-1.0,38,Football,True,False
+555d6702-c950-ecb7-29a9-66504af0a635,2025-05-25,Team,Multiple,Multiple,EPL 24/25,Multi,Multiple,36.73,1,Loss,-1.0,38,Football,True,False
+335f5352-088d-7d9b-f741-91e006d8e24c,2025-05-31,Team,Gyori Eto Women,Team Esbjerg Women,EHF Champions League Women 24/25,Draw No Bet,Gyori Eto,1.38,2,Win,0.76,,Handball,True,False
+f340f1b1-f65b-6df5-b5e3-f94d95b11daf,2025-05-31,Team,Metz Women,Odense Handbold Women,EHF Champions League Women 24/25,Draw No Bet,Metz Women,1.7,2,Push,0.0,,Handball,True,False
+e4a6222c-db5b-3437-5400-904f03d8e6a5,2025-06-01,Team,Gyori Eto Women,Odense Handbold Women,EHF Champions League Women 24/25,Draw No Bet,Gyori Eto,1.35,2,Win,0.7,,Handball,True,False
+cb70ab37-5662-576b-d1ac-5aaf16b3fca4,2025-06-01,Team,Team Esbjerg Women,Metz Women,EHF Champions League Women 24/25,Draw No Bet,Team Esbjerg Women,1.6,2,Win,1.2,,Handball,True,False
+9188905e-74c2-8e48-9b44-e954ec0b9bca,2025-06-07,Team,Turkey,Poland,VNL Women's 25,Full Time Result,Turkey,2.25,3,Win,3.75,,Volleyball,True,False
+0266e33d-3f54-6cb5-436a-10798e657d97,2025-06-15,Team,Inter Miami,Al Ahly Cairo,Club World Cup,Draw No Bet,Miami,1.53,2,Push,0.0,,Football,True,False
+38db3aed-920c-f82a-b059-bfccbd02be6a,2025-06-16,Team,PSG,Athletico Madrid,Club World Cup,Draw No Bet,PSG,1.44,2,Win,0.89,,Football,True,False
+3cec07e9-ba5f-5bb2-52d1-3f5f431e4bbb,2025-06-16,Team,Palmeiras,FC Porto,Club World Cup,Draw No Bet,Palmeiras,1.72,2,Push,0.0,,Football,True,False
+621bf66d-db7c-962a-a0d2-2ac97d69b793,2025-06-16,Team,Botafogo,Seattle,Club World Cup,Draw No Bet,Botafogo,1.5,2,Win,1.0,,Football,True,False
+077e29b1-1be8-0ab5-7e1a-2ecabb7da330,2025-06-16,Team,Multiple,Multiple,Club World Cup,Multi,Multiple,3.74,1,Win,1.17,,Football,True,False
+6c9882bb-ac1c-7093-bd25-041881277658,2025-06-17,Team,Chelsea,Los Angeles FC,Club World Cup,Full Time Result,Chelsea,1.18,2,Win,0.37,,Football,True,False
+19f3cd30-8f14-55b3-fa09-a282e0d496f4,2025-06-17,Team,Benfica,Boca Juniors ,Club World Cup,Draw No Bet,Benefica,1.28,2,Push,0.0,,Football,True,False
+03c6b069-52c7-5089-9bb0-3d998e631860,2025-06-17,Team,Flamengo ,Esperance de Tunis,Club World Cup,Full Time Result,Flamengo,1.33,2,Win,0.67,,Football,True,False
+c24cd76e-1ce4-1366-a4bb-e8a49b02a028,2025-06-17,Team,Multiple ,Multiple ,Club World Cup,Multi,Multiple,2.02,1,Win,0.58,,Football,True,False
+c52f1bd6-6cc1-9d05-628b-d8bf27af3ad6,2025-06-18,Team,Borussia Dortmund ,Fluminense ,Club World Cup,Draw No Bet,Borussia Dortmund,1.22,2,Push,0.0,,Football,True,False
+fe131d7f-5a6b-38b2-3cc9-67316c13dae2,2025-06-18,Team,River Plate,Urawa Red Diamonds ,Club World Cup,Draw No Bet,River Plate,1.25,2,Win,0.5,,Football,True,False
+f718499c-1c8c-ef67-30f9-fd03c8125cab,2025-06-18,Team,Mamelodi Sundowns ,Hyundai ,Club World Cup,Draw No Bet,Mamelodi Sundowns,1.66,2,Win,1.34,,Football,True,False
+d96409bf-8942-1768-6ba1-24d7356686c9,2025-06-18,Team,Monterrey ,Inter Milan,Club World Cup,Full Time Result,Inter Milan,1.38,2,Loss,-2.0,,Football,True,False
+502e4a16-930e-4141-07ee-22b6198c578f,2025-06-18,Team,Multiple ,Multiple ,Club World Cup,Multi,Multiple,3.51,1,Loss,-1.0,,Football,True,False
+cfa0860e-83a4-c3a7-63a7-e62d825349f7,2025-06-19,Team,Real Madrid,Al Hilal Riyadh,Club World Cup,Full Time Result,Real Madrid,1.3,2,Loss,-2.0,,Football,True,False
+a4f23670-e183-3f3f-db07-7ca70bbd5d66,2025-06-19,Team,Salzburg,Pachuca,Club World Cup,Draw No Bet,Salzburg,1.8,2,Win,1.6,,Football,True,False
+b1a59b31-5fc9-a300-2ce3-8bbe070ec3f5,2025-06-19,Team,Juventus ,Al Ain,Club World Cup,Full Time Result,Juventus,1.2,2,Win,0.4,,Football,True,False
+36660e59-856b-4de5-8a21-9bcf4e27eba3,2025-06-19,Team,Multiple ,Multiple ,Club World Cup,Multi,Multiple,2.8,1,Loss,-1.0,,Football,True,False
+8c19f571-e251-e61c-b8dd-3612f26d5ecf,2025-06-20,Team,Palmeiras,Al Ahly Cairo,Club World Cup,Draw No Bet,Palmeiras,1.2,2,Win,0.4,,Football,True,False
+d6baf65e-0b24-0ce1-77cf-70da146c8dc8,2025-06-20,Team,FC Porto,Inter Milan ,Club World Cup,Draw No Bet,FC Porto,1.3,2,Loss,-2.0,,Football,True,False
+e56954b4-f634-7e89-7f95-4495eab16a88,2025-06-20,Team,Athletico Madrid,Seattle,Club World Cup,Full Time Result,Athletico Madrid,1.3,2,Win,0.6,,Football,True,False
+f7664060-cc52-bc6f-3d62-0bcedc94a4b6,2025-06-20,Team,PSG,Botafoga ,Club World Cup,Full Time Result,PSG,1.22,2,Loss,-2.0,,Football,True,False
+eda80a3d-5b34-4bc4-0f3b-c04f65b7a357,2025-06-20,Team,Multiple ,Multiple ,Club World Cup,Multi,Multiple,2.47,1,Loss,-1.0,,Football,True,False
+8f121ce0-7d74-717e-0b1f-21d122e04521,2025-06-21,Team,Chelsea,Flamengo,Club World Cup,Draw No Bet,Chelsea,1.5,2,Loss,-2.0,,Football,True,False
+06138bc5-af60-2364-6ede-0e1f7c1eac75,2025-06-21,Team,Los Angeles FC,Esperance de Tunis,Club World Cup,Draw No Bet,Los Angeles FC,1.4,2,Loss,-2.0,,Football,True,False
+39059724-f73a-9969-845d-fe4146c5660e,2025-06-21,Team,Bayern Munich,Boca Juniors ,Club World Cup,Full Time Result,Bayern Munich,1.28,2,Win,0.58,,Football,True,False
+7f100b7b-3609-2fb9-b06d-fb4fac360931,2025-06-21,Team,Multiple ,Multiple ,Club World Cup,Multi,Multiple,2.7,1,Loss,-1.0,,Football,True,False
+7a614fd0-6c32-5499-f168-0b9896beedeb,2025-06-22,Team,Borussia Dortmund ,Mamelodi Sundowns ,Club World Cup,Full Time Result,Borussia Dortmund,1.48,2,Win,0.96,,Football,True,False
+4734ba6f-3de8-3d86-1c31-76a6273cac6d,2025-06-22,Team,Inter Milan,Urawa Red Diamonds ,Club World Cup,Full Time Result,Inter Milan,1.33,2,Win,0.67,,Football,True,False
+d947bf06-a885-db0d-477d-707121934ff8,2025-06-22,Team,Fluminense ,Hyundai ,Club World Cup,Draw No Bet,Fluminense,1.2,2,Win,0.4,,Football,True,False
+63923f49-e524-1343-aa7a-cb6a06a751e7,2025-06-22,Team,River Plate,Monterrey,Club World Cup,Draw No Bet,River Plate,1.36,2,Push,0.0,,Football,True,False
+db8e1af0-cb3a-ca1a-e2d0-018624204529,2025-06-22,Team,Multiple,Multiple,Club World Cup,Multi,Multiple,3.16,1,Win,1.32,,Football,True,False
+20f07591-c6fc-b220-ffe6-37cda29bb3f6,2025-06-23,Team,Juventus,Casablanca,Club World Cup,Full Time Result,Juventus,1.33,2,Win,0.67,,Football,True,False
+07cdfd23-373b-17c6-b337-251c22b7ea57,2025-06-23,Team,Real Madrid,Pachuca ,Club World Cup,Full Time Result,Real Madrid,1.33,2,Win,0.67,,Football,True,False
+d3957710-85aa-b052-44a4-fb8fd91bf4ee,2025-06-23,Team,RAl Hilal Riyadh,Salzburg ,Club World Cup,Draw No Bet,Al Hilal Riyadh,1.4,2,Push,0.0,,Football,True,False
+92c8c96e-4c37-1007-77c7-190b76d28233,2025-06-23,Team,Man City ,Al Ain,Club World Cup,Full Time Result,Man City,1.11,2,Win,0.23,,Football,True,False
+e3796ae8-3883-5da0-b6f6-ea37bcf8bcb7,2025-06-23,Team,Multiple,Multiple,Club World Cup,Multi,Multiple,2.69,1,Win,0.98,,Football,True,False
+6a9aeddf-c689-c1d0-e3b9-ccc3ab651bc5,2025-06-24,Team,PSG ,Seattle ,Club World Cup,Draw No Bet,PSG,1.04,2,Win,0.08,,Football,True,False
+0f49c89d-1e72-98bb-9930-789c8ed59d48,2025-06-24,Team,Athletico Madrid,Botafoga ,Club World Cup,Draw No Bet,Athletico Madrid,1.25,2,Win,0.5,,Football,True,False
+46ba9f2a-6976-570b-0353-203ec4474217,2025-06-24,Team,FC Porto ,Al Ahly Cairo,Club World Cup,Draw No Bet,FC Porto,1.28,2,Push,0.0,,Football,True,False
+0e01938f-c48a-2cfb-5f22-17fbfb00722d,2025-06-24,Team,Palmeiras ,Inter Miami ,Club World Cup,Draw No Bet,Palmeiras,1.36,2,Push,0.0,,Football,True,False
+16a5cdae-362b-8d27-a1d8-f8c7b78b4330,2025-06-24,Team,Multiple,Multiple,Club World Cup,Multi,Multiple,2.27,1,Win,0.3,,Football,True,False
+918317b5-7931-b6b7-a7d2-9490fe5ec9f9,2025-06-25,Team,Bayern Munich,Benfica ,Club World Cup,Draw No Bet,Bayern Munich,1.36,2,Loss,-2.0,,Football,True,False
+48aedb88-80ca-b8c4-5637-abc7493ecddd,2025-06-25,Team,Chelsea,Esperance de Tunis,Club World Cup,Draw No Bet,Chelsea,1.071,2,Win,0.15,,Football,True,False
+839ab468-20b5-24af-da05-122893c2fe8e,2025-06-25,Team,Flamengo ,Los Angeles FC,Club World Cup,Draw No Bet,Flamengo,1.28,2,Push,0.0,,Football,True,False
+f90f2aca-5c64-0289-d0a2-9417bcb63a37,2025-06-25,Team,Multiple,Multiple,Club World Cup,Multi,Multiple,1.87,1,Loss,-1.0,,Football,True,False
+9c838d2e-45b2-ad10-94d4-2f4ef36764f6,2025-06-26,Team,Borussia Dortmund ,Hyundai ,Club World Cup,Draw No Bet,Borussia Dortmund,1.062,2,Win,0.13,,Football,True,False
+17000029-63a4-9da1-3542-e0726b7bb758,2025-06-26,Team,Fluminense ,Mamelodi Sundowns ,Club World Cup,Draw No Bet,Fluminense,1.44,2,Push,0.0,,Football,True,False
+53c3bce6-6e43-be4f-2095-56518c2fcb54,2025-06-26,Team,Inter Milan,River Plate,Club World Cup,Draw No Bet,Inter Milan,1.5,2,Win,1.0,,Football,True,False
+6883966f-d8f9-18a4-aa29-be29d2c386fb,2025-06-26,Team,Monterrey,Urawa Red Diamonds ,Club World Cup,Draw No Bet,Monterrey,1.28,2,Win,0.58,,Football,True,False
+49182f81-e6a1-3cf5-eaa4-96d51fea6406,2025-06-26,Team,Multiple,Multiple,Club World Cup,Multi,Multiple,2.95,1,Win,1.05,,Football,True,False
+d296c101-daa8-8a51-f6ca-8cfc1ac79b50,2025-06-27,Team,Man City ,Juventus,Club World Cup,Draw No Bet,Man City,1.3,2,Win,0.6,,Football,True,False
+9fd81843-ad7f-202f-26c1-a174c7357585,2025-06-27,Team,Casablanca,Al Ain,Club World Cup,Draw No Bet,Casablanca,1.72,2,Loss,-2.0,,Football,True,False
+26e359e8-3860-db1d-11b6-acca57d8ea88,2025-06-27,Team,Al Hilal Riyadh,Pachuca,Club World Cup,Draw No Bet,Al Hilal Riyadh,1.25,2,Win,0.5,,Football,True,False
+ef0d3930-a7b6-c95b-d2b3-2ed45989c61f,2025-06-27,Team,Real Madrid,Salzburg,Club World Cup,Draw No Bet,Real Madrid,1.1,2,Win,0.2,,Football,True,False
+94f6d7e0-4a4d-4520-3530-0f18b984988c,2025-06-27,Team,Multiple,Multiple,Club World Cup,Multi,Multiple,3.08,1,Loss,-1.0,,Football,True,False
+34ed066d-f378-efac-c9b9-24ec161e7639,2025-06-28,Team,Palmeiras,Botafoga,Club World Cup,To Qualify,Palmeiras,1.61,3,Win,1.85,,Football,True,False
+577bcc91-4f9e-55d5-e4e4-f82f9f00e7d4,2025-06-28,Team,Chelsea,Benfica,Club World Cup,To Qualify,Chelsea,1.57,3,Win,1.72,,Football,True,False
+11b9842e-0a27-1ff2-52c1-903e7132cd68,2025-06-28,Team,Multiple,Multiple,Club World Cup,Multi,Multiple,2.535,2,Win,3.08,,Football,True,False
+37bc2f75-bf1b-cfe8-450a-1a41c200364c,2025-06-29,Team,PSG,Inter Miami,Club World Cup,To Qualify,PSG,1.1,3,Win,0.3,,Football,True,False
+496e05e1-aea0-a9c4-6558-00e8a7b9ea28,2025-06-29,Team,Bayern Munich,Flamengo,Club World Cup,To Qualify,Bayern Munich,1.33,3,Win,1.0,,Football,True,False
+b2eb7349-0357-5495-3b57-a32e2841bda5,2025-06-29,Team,Multiple,Multiple,Club World Cup,Multi,Multiple,1.465,2,Win,0.94,,Football,True,False
+8e98d81f-8217-3049-75cc-b23337bb5761,2025-06-30,Team,Inter Milan,Fluminense ,Club World Cup,To Qualify,Inter Milan,1.33,3,Loss,-3.0,,Football,True,False
+a8c88a00-55f6-36e4-a163-a5e3d16adab7,2025-06-30,Team,Man City,Al Hilal Riyadh,Club World Cup,To Qualify,Man City,1.16,3,Loss,-3.0,,Football,True,False
+eddea82a-d275-5b24-c4e1-68c5fc2ebd40,2025-06-30,Team,Multiple,Multiple,Club World Cup,Multi,Multiple,1.555,2,Loss,-2.0,,Football,True,False
+06eb61b8-39a0-cefe-e496-7c67ccb099dc,2025-07-01,Team,Real Madrid,Juventus,Club World Cup,To Qualify,Real Madrid,1.3,3,Win,0.9,,Football,True,False
+9dfcd5e5-58df-a04a-af37-f137a1d9d3e5,2025-07-01,Team,Dortmund,Monterrey,Club World Cup,To Qualify,Dortmund,1.36,3,Win,1.09,,Football,True,False
+950a4152-c2b4-aa3a-d78b-dd6b366cc179,2025-07-01,Team,Multiple,Multiple,Club World Cup,Multi,Multiple,1.77,2,Win,1.56,,Football,True,False
+158f3069-a435-b314-a80b-dcb024f8e422,2025-07-05,Team,Al Hilal Riyadh,Fluminense,Club World Cup,To Qualify,Al Hilal Riyadh,1.8,0,Loss,0.0,,Football,True,False
+75887499-8f5b-d0c3-93da-094e1967a72b,2025-07-05,Team,Chelsea,Palmeiras,Club World Cup,To Qualify,Chelsea,1.67,0,Win,23.85,,Football,True,False
+ad13a2a0-7ca4-b764-2959-dc0c4c740ab6,2025-07-06,Team,PSG,Bayern Munich,Club World Cup,To Qualify,PSG,1.53,0,Win,30.15,,Football,True,False
+3fe94a00-2317-b5f9-259f-82690aeea4cd,2025-07-06,Team,Real Madrid,Borussia Dortmund ,Club World Cup,To Qualify,Real Madrid,1.35,0,Win,15.75,,Football,True,False
+5b8add2a-5d98-b1a6-52ea-7fd72d942dac,2025-07-06,Team,Multiple,Multiple,Club World Cup,Multi,Multiple,6.2,0,Loss,0.0,,Football,True,False
+432aca3a-1e34-5e33-9f35-a30c8f65edce,2025-07-09,Team,Chelsea,Fluminense,Club World Cup,To Qualify,Chelsea,1.3,6,Win,1.8,,Football,True,False
+8d3bba74-25e7-c98c-50f5-2ca1b52d3735,2025-07-10,Team,PSG,Real Madrid,Club World Cup,To Qualify,PSG,1.75,6,Win,4.5,,Football,True,False
+32072254-9d17-51cf-3f24-7855f937b982,2025-07-10,Team,Multiple,Multiple,Club World Cup,Multi,Multiple,2.41,3,Win,3.83,,Football,True,False
+caf1a3df-b505-ffed-0d02-4130f58c5cfa,2025-07-13,Team,PSG,Chelsea,Club World Cup,Winner,PSG,1.36,16,Loss,-16.0,,Football,True,False
+5737c6ec-2e07-16f3-d8a7-a5c4e0de0d9a,2025-07-13,Team,Multiple,Multiple,Club World Cup,Multi,Multiple,2.78,4,Loss,-4.0,,Football,True,False
+bc6dc48b-743d-c5d0-13b1-abaebd2faed2,2025-08-17,Syndicate,,,Deposit,Deposit,Deposit,1,0,Deposit,75.0,,,False,True
+f2fc9902-65c7-12c4-9d51-a18a32b39f0c,2025-08-17,John,Brighton,Fulham,EPL 25/26,Draw No Bet,Brighton,1.4,5,Push,-1.25,1,Football,True,False
+89f0fd5c-927d-466d-6ec9-a21b9ac34ffa,2025-08-17,Richard,Tottenham,Burnley,EPL 25/26,Full Time Result,Tottenham,1.35,5,Win,1.75,1,Football,True,False
+a666587a-fda6-e89a-ec27-4a3657558a27,2025-08-17,Xander,Leeds,Everton,EPL 25/26,Draw No Bet,Everton,1.95,5,Loss,-5.0,1,Football,True,False
+b83aac23-b952-8732-c23c-c7352950e880,2025-08-23,John,Bournemouth,Wolves,EPL 25/26,Draw No Bet,Bournemouth,1.33,5,Win,1.65,2,Football,True,False
+cd00692c-3bfe-5926-7d5e-cfac5310286c,2025-08-23,Richard,Arsenal,Leeds,EPL 25/26,Handicap,Arsenal-1,1.73,5,Win,3.65,2,Football,True,False
+6faa8040-da20-ef39-9b63-a72d0e4ab575,2025-08-24,Xander,Palace,Forest,EPL 25/26,Draw No Bet,Palace,1.53,5,Push,0.0,2,Football,True,False
+fe73f687-e5bc-5280-214e-0486b273a5f9,2025-08-30,Richard,Sunderland,Brentford,EPL 25/26,Draw No Bet,Brentford,1.83,5,Loss,-5.0,3,Football,True,False
+6da37dd3-139a-a4d9-aa55-b8d237ec5d4a,2025-08-30,Xander,Tottenham,Bournemouth,EPL 25/26,Full Time Result,Tottenham,1.67,5,Loss,-5.0,3,Football,True,False
+c042f4db-68f2-3406-c6ce-cf84a7ebb0fe,2025-08-30,John,Chelsea,Fulham,EPL 25/26,Full Time Result,Chelsea,1.52,5,Win,1.35,3,Football,True,False
+310dcbbf-4cce-62f7-62a2-aaa148d556bd,2025-09-05,Team,Australia,New Zealand,International Football,Draw No Bet,Australia,1.2,5,Win,1.0,,Football,True,False
+2f2b2656-25d7-6a67-04b0-8093c652fd79,2025-09-09,Team,New Zealand,Australia,International Football,Draw No Bet,New Zealand,2.1,5,Loss,-5.0,,Football,True,False
+f9b902fc-3289-af4d-d08d-e5d1de54f68f,2025-09-13,John,Arsenal,Forest,EPL 25/26,Full Time Result,Arsenal,1.4,5,Win,2.0,4,Football,True,False
+6855456e-2fe4-6a9d-49d3-d3af4f57443d,2025-09-13,Richard,Arsenal,Forest,EPL 25/26,Full Time Result,Arsenal,1.4,5,Win,2.0,4,Football,True,False
+357a6fdf-7642-bf81-5a88-822c447d9dc4,2025-09-14,Xander,Palace,Sunderland,EPL 25/26,Full Time Result,Palace,1.62,5,Loss,-5.0,4,Football,True,False
+819f46e5-2c25-763a-55cc-642422644317,2025-09-21,Xander,Liverpool,Everton,EPL 25/26,Full Time Result,Liverpool,1.48,5,Win,2.4,5,Football,True,False
+04025959-b191-f8f9-de3f-924f0940515f,2025-09-22,John,Arsenal,Man City,EPL 25/26,BTTS,Yes,1.67,5,Win,3.35,5,Football,True,False
+40008b9a-5380-fcac-ce39-76bf7c08af5b,2025-09-22,Richard,Arsenal,Man City,EPL 25/26,BTTS,Yes,1.67,5,Win,3.35,5,Football,True,False
+3dd48ab3-1d01-6ffc-bf33-14df2b3cb9ce,2025-09-28,Richard,Chelsea,Brighton,EPL 25/26,Full Time Result,Chelsea,1.8,5,Loss,-5.0,6,Football,True,False
+58238e9a-e2dd-305d-79c2-ebc8c1883422,2025-09-28,John,Tottenham,Wolves,EPL 25/26,BTTS,No,1.91,5,Loss,-5.0,6,Football,True,False
+3ad7c2eb-b96f-cba7-cda0-cf54a2e802f5,2025-09-29,Xander,Newcastle,Arsenal,EPL 25/26,Draw No Bet,Arsenal,1.55,5,Win,2.75,6,Football,True,False
+b3967a0e-938d-c2a6-340e-258630febd5a,2025-10-05,John,Arsenal,West Ham,EPL 25/26,Handicap,Arsenal-1,1.67,5,Win,3.35,7,Football,True,False
+d81f9c1b-e2e0-8964-bf9f-24b15f0e4900,2025-10-06,Richard,Villa,Burnley,EPL 25/26,Full Time Result,Villa,1.53,5,Win,2.65,7,Football,True,False
+13f9896d-f612-79c9-28f1-9721878fac41,2025-10-06,Xander,Everton,Palace,EPL 25/26,Draw No Bet,Palace,2,5,Loss,-5.0,7,Football,True,False
+c5ff2543-b53f-4cc0-ad38-19a36752467b,2025-10-10,Team,Poland,New Zealand,International Football,To Score,New Zealand,2.5,5,Loss,-5.0,,Football,True,False
+01386bd6-d8e0-91c2-ab4c-7c7de644d37b,2025-10-19,John,Forest,Chelsea,EPL 25/26,Draw No Bet,Chelsea,1.4,5,Win,2.0,8,Football,True,False
+0bb4aec1-7105-21c1-2ee7-6289d9440817,2025-10-19,Richard,Man City,Everton,EPL 25/26,Full Time Result,City,1.4,5,Win,2.0,8,Football,True,False
+9de6d14f-ff98-06d4-bcd1-ef555be766cd,2025-10-20,Xander,Liverpool,Man Utd,EPL 25/26,Full Time Result,Liverpool,1.6,5,Loss,-5.0,8,Football,True,False
+efe93778-0e95-5742-50da-be07151bdc23,2025-10-26,Xander,Brentford,Liverpool,EPL 25/26,BTTS,Yes,1.55,5,Win,4.0,9,Football,True,False
+371bce7d-c838-17b7-893b-cdeed13799b5,2025-10-27,John,Arsenal,Palace,EPL 25/26,Full Time Result,Arsenal,1.44,5,Win,2.2,9,Football,True,False
+138bb069-6595-b338-afba-b333c555292a,2025-10-27,Richard,Arsenal,Palace,EPL 25/26,Full Time Result,Arsenal,1.44,5,Win,2.2,9,Football,True,False
+8dd48d6a-2e2c-ad21-3179-a3992c0be53c,2025-11-02,Richard,Fulham,Wolves,EPL 25/26,Full Time Result,Fulham,1.8,5,Win,4.0,10,Football,True,False
+82cec960-96d4-281b-7c95-cd7e74623496,2025-11-02,John,Forest,Man Utd,EPL 25/26,Draw No Bet,Man Utd,1.53,5,Push,0.0,10,Football,True,False
+6c524f9d-5d70-2745-4a78-3c841250ba71,2025-11-03,Xander,Man City,Bournemouth,EPL 25/26,Full Time Result,Man City,1.5,5,Win,2.5,10,Football,True,False
+fb7b9ffa-5462-084c-5f4e-7e85a093e6d7,2025-11-09,John,Sunderland,Arsenal,EPL 25/26,Full Time Result,Arsenal,1.4,5,Loss,-5.0,11,Football,True,False
+aa942ab2-bfa6-ebda-4840-e7360ce6e7ef,2025-11-09,Richard,Chelsea,Wolves,EPL 25/26,Full Time Result,Chelsea,1.36,5,Win,1.8,11,Football,True,False
+c058f544-c737-782d-eace-fa532d9add4c,2025-11-10,Xander,Palace,Brighton,EPL 25/26,Draw No Bet,Palace,1.62,5,Push,0.0,11,Football,True,False
+e7b24b11-2a44-fdd9-ee93-bdf998c6ca0e,2025-11-23,John,Wolves,Palace,EPL 25/26,Draw No Bet,Palace,1.44,5,Win,2.2,12,Football,True,False
+52720e00-3547-c705-61bf-5e03b95aa99f,2025-11-23,Richard,Liverpool,Forest ,EPL 25/26,Full Time Result,Liverpool,1.4,5,Loss,-5.0,12,Football,True,False
+c3e878e2-7f52-e2a5-7ace-4d9a76fd9acf,2025-11-24,Xander,Leeds,Villa,EPL 25/26,Draw No Bet,Villa,1.62,5,Win,3.1,12,Football,True,False
+00411460-f7c9-2d21-24a6-7ea0f4cb5f85,2025-11-24,Team,Multiple,Multiple,EPL 25/26,Multi,Multiple,3.26,1,Loss,-1.0,12,Football,True,False
+bac9162b-47c5-6fc8-a4d2-a519803d51b3,2025-12-01,John,Chelsea,Arsenal,EPL 25/26,BTTS,Yes,2.4,5,Win,7.0,13,Football,True,False
+9be40cee-5b0e-ee14-62c8-2c6964087ff9,2025-12-01,Xander,Tottenham,Fulham,EPL 25/26,Draw No Bet,Tottenham,1.55,5,Loss,-5.0,13,Football,True,False
+5ef698cd-9fe6-5092-3ea3-31c15af3b160,2025-12-01,Richard,Villa,Wolves,EPL 25/26,Full Time Result,Villa,1.52,5,Win,2.6,13,Football,True,False
+05049e90-fa4f-5039-a8ca-dc6acbb4b2cc,2025-12-01,Team,Multiple,Multiple,EPL 25/26,Multi,Multiple,4.1,1,Loss,-1.0,13,Football,True,False
+cf004fdc-76fa-1a4f-25f6-2e0eb5261ca3,2025-12-07,Richard,Everton,Forest,EPL 25/26,Draw No Bet,Forest,2.4,5,Loss,-5.0,15,Football,True,False
+0c74b7f7-8409-a402-2a2c-4c5a5ca3ee19,2025-12-08,Xander,Fulham,Palace,EPL 25/26,BTTS,Yes,1.8,5,Win,4.0,15,Football,True,False
+d709f38e-f758-b506-6ef3-1b18039b8ce5,2025-12-09,John,Wolves,Man Utd,EPL 25/26,Full Time Result,Man Utd,1.78,5,Win,3.9,15,Football,True,False
+41f1f191-76d3-8348-0afa-65d325c06ed0,2025-12-09,Team,Multiple,Multiple,EPL 25/26,Multi,Multiple,7.96,1,Loss,-1.0,15,Football,True,False
+24b16fed-e9a6-7c92-51d3-e7c7161c83ac,2025-12-14,Richard,Chelsea,Everton,EPL 25/26,Draw No Bet,Chelsea,1.25,5,Win,1.25,16,Football,True,False
+ffd52f3c-7e12-435a-724a-8f30fddadd9c,2025-12-14,Xander,Burnley,Fulham,EPL 25/26,Full Time Result,Fulham,1.94,5,Win,4.7,16,Football,True,False
+ad972f10-e080-0b49-d76f-ed33a21f6698,2025-12-14,John,Arsenal,Wolves,EPL 25/26,Handicap,Arsenal-1,1.4,5,Loss,-5.0,16,Football,True,False
+f61d6947-467c-cd3a-a5af-24db320235dd,2025-12-14,Team,Multiple,Multiple,EPL 25/26,Multi,Multiple,3.46,1,Loss,-1.0,16,Football,True,False
+142949df-56ea-8ae0-be8b-5306971900a4,2025-12-21,John,Bournemouth,Burnley,EPL 25/26,Full Time Result,Bournemouth,1.48,5,Loss,-5.0,17,Football,True,False
+d34ab169-b70c-9dcd-35e6-2896010cd9ff,2025-12-21,Richard,Bournemouth,Burnley,EPL 25/26,Full Time Result,Bournemouth,1.48,5,Loss,-5.0,17,Football,True,False
+8bf1211f-d4b7-b945-2889-9de0a43b9fb3,2025-12-21,Xander,Leeds,Palace,EPL 25/26,Full Time Result,Palace,1.85,5,Loss,-5.0,17,Football,True,False
+a02ffd91-ece5-e7ef-eb46-db8f10a74059,2025-12-27,Xander,Man Utd,Newcastle,EPL 25/26,BTTS,Yes,2,5,Loss,-5.0,18,Football,True,False
+bca82e41-ee7b-0833-5883-99b1fcd177c7,2025-12-28,John,Arsenal,Brighton,EPL 25/26,Full Time Result,Arsenal,1.4,5,Win,2.0,18,Football,True,False
+00ec53c4-682d-36f5-c435-9f4ae7bd7ba1,2025-12-28,Richard,Arsenal,Brighton,EPL 25/26,Full Time Result,Arsenal,1.4,5,Win,2.0,18,Football,True,False
+4f6ffe13-a5d7-5b2d-6a39-23922b3922e5,2025-12-31,John,Chelsea,Bournemouth,EPL 25/26,Full Time Result,Chelsea,1.58,5,Loss,-5.0,19,Football,True,False
+beed1360-2b9b-0e6e-cb5b-568ff5058f07,2025-12-31,Xander,West Ham,Brighton,EPL 25/26,Draw No Bet,Brighton,1.57,5,Push,0.0,19,Football,True,False
+0584ce56-5c82-4b7b-7f50-282d9a19945b,2025-12-31,Richard,Arsenal,Villa,EPL 25/26,BTTS,Yes,2.15,5,Win,5.75,19,Football,True,False
+dc912a25-3d1e-9ba4-0e2c-597ed2376640,2025-12-31,Team,Multiple,Multiple,EPL 25/26,Multi,Multiple,3.39,1,Loss,-1.0,19,Football,True,False
+39461a19-e9ed-dfb3-85ea-76b26521ea48,2026-01-04,Richard,Villa,Forest,EPL 25/26,Full Time Result,Villa,1.78,5,Win,3.9,20,Football,True,False
+8efb100a-295c-0c69-0931-222ff4467bb8,2026-01-04,John,Bournemouth,Arsenal,EPL 25/26,BTTS,Yes,1.8,5,Win,4.0,20,Football,True,False
+d9fc5b73-a8d7-8fad-3d6d-ffe419384e70,2026-01-05,Xander,Newcastle,Palace,EPL 25/26,Handicap,Palace +2,1.44,5,Loss,-5.0,20,Football,True,False
+c86a7ee3-d8ef-0b55-1ed5-8e354a836f2b,2026-01-05,Team,Multiple,Multiple,EPL 25/26,Multi,Multiple,4.72,1,Loss,-1.0,20,Football,True,False
+a01a0380-ca3c-6142-8c26-a231f0e49a09,2026-01-08,Richard,Everton,Wolves,EPL 25/26,Draw No Bet,Everton,1.29,5,Push,0.0,21,Football,True,False
+5a4b25aa-ed25-c2ee-1b74-de72dc03c14e,2026-01-08,John,Fulham,Chelsea,EPL 25/26,BTTS,Yes,1.67,5,Win,3.35,21,Football,True,False
+f73b76ce-8949-fe29-bf2a-537cfa420e8f,2026-01-08,Xander,Burnley,Man Utd,EPL 25/26,Draw No Bet,Burnley,3.25,5,Push,0.0,21,Football,True,False
+70c639df-5e30-bdee-440e-4cdf599fec2b,2026-01-08,Team,Multiple,Multiple,EPL 25/26,Multi,Multiple,7.24,1,Win,0.7,21,Football,True,False
+28f0b864-598a-1291-557b-ed248a998d4e,2026-01-11,Team,Everton,Sunderland,FA cup 2026,To Qualify,Sunderland,2.25,3,Win,3.75,,Football,True,False
+1543843a-4723-ed2a-b08e-18053ae6dc5b,2026-01-11,Team,Macclesfield,Palace,FA cup 2026,To Qualify,Palace,1.11,1,Loss,-1.0,,Football,True,False
+f8c1f23d-6a8d-8d79-04fc-0ea8e066b3bb,2026-01-11,Team,Wolves,Shrewsbury Town,FA cup 2026,To Qualify,Wolves,1.08,1,Win,0.08,,Football,True,False
+e46de7e1-bcaa-ced9-a54f-1e9d0d2f800d,2026-01-11,Team,Sheffield Wednesday,Brentford,FA cup 2026,To Qualify,Brentford,1.09,1,Win,0.09,,Football,True,False
+b7b16ecf-8ca5-3723-5938-94116071700c,2026-01-11,Team,Man City,Exeter City,FA cup 2026,To Qualify,Man City,1.03,1,Win,0.03,,Football,True,False
+352fe25d-af68-6bdb-4edc-a223c921acea,2026-01-11,Team,Charlton Athletic,Chelsea,FA cup 2026,To Qualify,Chelsea,1.17,1,Win,0.17,,Football,True,False
+18d80423-86b7-9e2c-279f-d162df0205c8,2026-01-11,Team,Multiple,Multiple,FA cup 2026,Multi,Multiple,1.59,1,Loss,-1.0,,Football,True,False
+816b112c-6105-b3eb-d537-828a39af4818,2026-01-12,Team,Portsmouth,Arsenal,FA cup 2026,To Qualify,Arsenal,1.2,5,Win,1.0,,Football,True,False
+69cb3ea3-17a3-2c4e-6143-e665fdb20b14,2026-01-12,Team,Liverpool,Barnsley,FA cup 2026,To Qualify,Liverpool,1.2,5,Win,1.0,,Football,True,False
+bbf94b34-eb32-268a-da57-a3be5062fe7d,2026-01-12,Team,Multiple,Multiple,FA cup 2026,Multi,Multiple,1.45,2.12,Win,0.95,,Football,True,False
+4f4adcbf-8c6f-66dc-fc8a-3282ac2bf10a,2026-01-18,John,Forest,Arsenal,EPL 25/26,Full Time Result,Arsenal,1.55,5,Loss,-5.0,22,Football,True,False
+bbcbff5c-1f1d-ed46-c25d-28119a85c6c2,2026-01-18,Xander,Leeds,Fulham,EPL 25/26,Draw No Bet,Fulham,2.25,5,Loss,-5.0,22,Football,True,False
+8cb22bdd-0b7b-a1ab-13d7-42e22eed8da2,2026-01-19,Richard,Villa,Everton,EPL 25/26,Full Time Result,Villa,1.67,5,Loss,-5.0,22,Football,True,False
+f4f6dce2-f3a0-f9da-da0c-2b5b66452017,2026-01-19,Team,Multiple,Multiple,EPL 25/26,Multi,Multiple,5.96,1,Loss,-1.0,22,Football,True,False
+0d0fd7c6-e093-f7b8-04fa-0150b875b868,2026-01-26,Richard,Brentford,Forest,EPL 25/26,Draw No Bet,Brentford,1.4,5,Loss,-5.0,23,Football,True,False
+a96b65a7-21e5-61e1-e3de-768ac819ffbb,2026-01-26,Xander,Newcastle,Villa,EPL 25/26,Draw No Bet,Villa,2.63,5,Win,8.15,23,Football,True,False
+1068c6e4-c805-1cfd-4e9e-a8072e3189e2,2026-01-26,John,Palace,Chelsea,EPL 25/26,Draw No Bet,Chelsea,1.48,5,Win,2.4,23,Football,True,False
+17d63b16-25c8-16c2-2647-a73e1482372b,2026-01-26,Team,Multiple,Multiple,EPL 25/26,Multi,Multiple,5.58,1,Loss,-1.0,23,Football,True,False
+b9228e09-62a7-8b84-f3d5-d92f4faa000b,2026-02-01,John,Wolves,Bournemouth,EPL 25/26,Full Time Result,Bournemouth,2.25,5,Win,6.25,24,Football,True,False
+0deb1c54-8143-05ca-9ad2-66f53bc82511,2026-02-02,Richard,Man Utd,Fulham,EPL 25/26,Full Time Result,Man Utd,1.62,5,Win,3.1,24,Football,True,False
+66808e32-7dc7-9d13-5ba1-8e051673d906,2026-02-03,Xander,Sunderland,Burnley,EPL 25/26,Draw No Bet,Burnley,3.3,5,Loss,-5.0,24,Football,True,False
+42e7aaa8-8b48-137a-16a1-acd04ed91125,2026-02-03,Team,Multiple,Multiple,EPL 25/26,Multi,Multiple,12.53,1,Loss,-1.0,24,Football,True,False
+8fe0093b-b30d-6f8c-3147-4bd0764e6ac0,2026-02-08,Richard,Arsenal,Sunderland,EPL 25/26,Full Time Result,Arsenal,1.24,5,Win,1.2,25,Football,True,False
+41ae36ec-b9b3-eee6-09d0-5b90c14222fb,2026-02-08,John,Wolves,Chelsea,EPL 25/26,Full Time Result,Chelsea,1.7,5,Win,3.5,25,Football,True,False
+d1f255a3-73a3-cef7-2e03-aa9d980c7eca,2026-02-08,Xander,Burnley,West Ham,EPL 25/26,Draw No Bet,Burnley,2.3,5,Loss,-5.0,25,Football,True,False
+7eacb532-570f-f685-8afd-2723755ff790,2026-02-08,Team,Multiple,Multiple,EPL 25/26,Multi,Multiple,4.97,1,Loss,-1.0,25,Football,True,False
+b6f0479a-e87d-2449-7543-9c6124592772,2026-02-09,Team,New England Patriots,Seattle Seahawks,Superbowl 60,Full Time Result,Seahawks,1.44,5,Win,2.2,,NFL,True,False
+e0c64119-5b27-425b-b056-ac56f8953d24,2026-02-11,John,Everton,Bournemouth,EPL 25/26,BTTS,Yes,1.67,5,Win,3.35,26,Football,True,False
+f85454e8-279b-e180-185c-ac7d243c5eb3,2026-02-11,Richard,Chelsea,Leeds,EPL 25/26,Full Time Result,Chelsea,1.55,5,Loss,-5.0,26,Football,True,False
+faa9afea-49ef-2ff0-29a8-33cccc778fd0,2026-02-12,Xander,Villa,Brighton,EPL 25/26,Draw No Bet,Villa,1.4,5,Win,2.0,26,Football,True,False
+3c7781a3-6bcd-6cf0-8c11-a970fbe0e2a6,2026-02-12,Team,Multiple,Multiple,EPL 25/26,Multi,Multiple,3.46,1,Loss,-1.0,26,Football,True,False
+25b2822c-2f5a-3230-abfa-dd476e8b04c9,2026-02-15,Team,Multiple,Multiple,FA cup 2026,FA Cup Multi,Multiple,2.98,2,Loss,-2.0,,Football,True,False
+6ecbdd6e-c859-d284-dc13-885a37ce8d81,2026-02-15,Team,Multiple,Multiple,FA cup 2026,FA Cup Multi,Multiple,3.13,2,Loss,-2.0,,Football,True,False
+18997733-ec25-8a9f-caf2-39cc55d53363,2026-02-15,Team,Multiple,Multiple,FA cup 2026,FA Cup Multi,Multiple,5.79,2,Loss,-2.0,,Football,True,False
+8d7d8ee0-69cb-0cbb-f816-bbb65d56947e,2026-02-15,Team,Multiple,Multiple,FA cup 2026,FA Cup Multi,Multiple,9.75,2,Loss,-2.0,,Football,True,False
+75fc093c-0ee7-42f6-ddda-a13fff98f104,2026-02-22,Xander,West Ham,Bournemouth,EPL 25/26,Draw No Bet,Bournemouth,1.95,5,Push,0.0,27,Football,True,False
+f74909ac-e68e-5189-1440-e4da0b65a70c,2026-02-22,Richard,Villa,Leeds,EPL 25/26,Full Time Result,Villa,1.85,5,Loss,-5.0,27,Football,True,False
+66368270-ffd5-1418-ec58-bd793f2d9b1b,2026-02-23,John,Tottenham,Arsenal,EPL 25/26,Full Time Result,Arsenal,1.55,5,Win,2.75,27,Football,True,False
+248e8443-3679-7ec9-8478-f85e7626de4a,2026-02-23,Team,Multiple,Multiple,EPL 25/26,Multi,Multiple,2.86,1,Loss,-1.0,27,Football,True,False
+019d385e-b676-32a7-e958-e23f24bd07d7,2026-02-28,Xander,Wolves,Villa,EPL 25/26,Draw No Bet,Villa,1.36,5,Loss,-5.0,28,Football,True,False
+a49e9411-d64f-f53e-ccfd-d09ad10a15b3,2026-03-01,John,Bournemouth,Sunderland,EPL 25/26,Draw No Bet,Bournemouth,1.35,5,Push,0.0,28,Football,True,False
+ddb30680-a691-d157-187e-e1cf9e896d03,2026-03-01,Richard,Liverpool,West Ham,EPL 25/26,Full Time Result,Liverpool,1.4,5,Win,2.0,28,Football,True,False
+2421fcb1-263b-9530-df88-f7f002e78ea5,2026-03-01,Team,Multiple,Multiple,EPL 25/26,Multi,Multiple,2.61,1,Loss,-1.0,28,Football,True,False
+fccb60fb-512d-13df-5083-790d64c4d5dd,2026-03-04,John,Wolves,Liverpool,EPL 25/26,Full Time Result,Liverpool,1.52,5,Loss,-5.0,29,Football,True,False
+1651cf0d-2f73-7d7a-deab-84d339dbabd3,2026-03-04,Richard,Man City,Forest,EPL 25/26,Full Time Result,Man City,1.4,5,Loss,-5.0,29,Football,True,False
+eed5af6a-dd95-a9a6-f125-2739b1ad8c24,2026-03-05,Xander,Fulham,West Ham,EPL 25/26,Draw No Bet,Fulham,1.53,5,Loss,-5.0,29,Football,True,False
+a8abb4bb-284b-5b27-aa7c-b790dc20f80b,2026-03-16,John,Forest,Fulham,EPL 25/26,Handicap,Fulham +1,1.7,5,Win,3.5,30,Football,True,False
+15d4e891-d784-977c-acbf-cbb00c48f133,2026-03-16,Richard,Palace,Leeds,EPL 25/26,Draw No Bet,Palace,1.7,5,Push,0.0,30,Football,True,False
+c203d8a1-5161-2acf-1245-7e4d67635a95,2026-03-16,Xander,Palace,Leeds,EPL 25/26,Draw No Bet,Palace,1.7,5,Push,0.0,30,Football,True,False
+13f3cf8c-5319-52d7-2e58-47c4183e6910,2026-03-18,Syndicate,,,Reconciliation,Reconciliation,Reconciliation,1,2,Reconciliation,-1.27,,,False,True
+28b064ae,2026-03-22,John,Everton,Chelsea,EPL 25/26,BTTS,Yes,1.65,5,Pending,0.0,,Football,True,False
+8c5655e8,2026-03-22,Richard,Fulham,Burnley,EPL 25/26,Full Time Result,Fulham,1.53,5,Pending,0.0,,Football,True,False
+8f641dfc,2026-03-23,Xander,Villa,West Ham,EPL 25/26,Full Time Result,Villa,1.95,5,Pending,0.0,,Football,True,False

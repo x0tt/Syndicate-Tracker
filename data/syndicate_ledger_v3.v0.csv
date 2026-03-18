@@ -1,0 +1,443 @@
+uuid,date,user,event,market,selection,odds,stake,status,actual_winnings
+c4ca4238,2024-08-17,Team,Man Utd vs Fulham,Full Time Result,Man Utd,1.57,2.0,Win,1.15
+c81e728d,2024-08-18,Team,Arsenal vs Wolves,Asian Handicap,Arsenal-1.5,1.625,2.0,Win,1.25
+eccbc87e,2024-08-18,Team,West Ham vs Villa,Full Time Result,Draw,3.5,2.0,Loss,-2.0
+a87ff679,2024-08-19,Team,Brentford vs Palace,Double Chance,Palace or Draw,1.57,2.0,Loss,-2.0
+e4da3b7f,2024-08-20,Team,Leicester vs Tottenham,Full Time Result,Tottenham,1.6,2.0,Loss,-2.0
+1679091c,2024-08-25,Team,Brighton vs Man Utd,Draw No Bet,Man Utd,1.83,1.5,Loss,-1.5
+8f14e45f,2024-08-25,Team,Palace vs West Ham,Draw No Bet,Palace,1.53,0.5,Loss,-0.5
+c9f0f895,2024-08-25,Team,Fulham vs Leicester,Draw No Bet,Fulham,1.33,1.5,Win,0.5
+45c48cce,2024-08-25,Team,Man City vs Ipswich,Handicap,Man City -1,1.3,3.0,Win,0.9
+d3d94468,2024-08-25,Team,Tottenham vs Everton,Full Time Result,Tottenham,1.45,0.5,Win,0.23
+6512bd43,2024-08-26,Team,Bournemouth vs Newcastle,Handicap,Bournemouth +2,1.22,1.5,Win,0.34
+c20ad4d7,2024-08-26,Team,Liverpool vs Brentford,Handicap,Liverpool -1,1.66,1.5,Win,1.0
+c51ce410,2024-08-31,Xanderdu middle debut,Arsenal vs Brighton,Full Time Result,Arsenal,1.33,2.0,Loss,-2.0
+aab32389,2024-08-31,Xanderdu middle debut,Arsenal vs Brighton,Handicap,Brighton +3,1.33,2.0,Win,0.67
+9bf31c7f,2024-09-01,Xanderdu middle 2 electric boogaloo,Ipswich vs Fulham,Handicap,Ipswich +2,1.2,0.5,Win,0.1
+c74d97b0,2024-09-01,Xanderdu middle 2 electric boogaloo,Ipswich vs Fulham,Handicap,Fulham +1,1.36,0.5,Win,0.19
+70efdf2e,2024-09-01,Team,West Ham vs Man City,Handicap,Man City -1,1.9,2.0,Win,1.82
+6f4922f4,2024-09-01,Team,Chelsea vs Palace,Full Time Result,Chelsea,1.61,3.0,Loss,-3.0
+1f0e3dad,2024-09-01,Taken with the intent of cashing out at $4.80 or after 6 weeks,Multiple vs Multiple,Relegation,Everton,3.0,4.0,Loss,-1.0
+98f13708,2024-09-08,Team,Mexico vs New Zealand,Double Chance,New Zealand or Draw,3.0,1.0,Loss,-1.0
+3c59dc04,2024-09-15,Team,Villa vs Everton,Full Time Result,Villa,1.5,2.0,Win,1.0
+b6d767d2,2024-09-15,Team,Man City vs Brentford,Handicap,Man City -1,1.5,2.0,Loss,-2.0
+37693cfc,2024-09-15,Team,Liverpool vs Forest,Handicap,Liverpool -1,1.61,2.0,Loss,-2.0
+1ff1de77,2024-09-15,Team,Palace vs Leicester,Full Time Result,Palace,1.61,2.0,Loss,-2.0
+8e296a06,2024-09-16,Team,Wolves vs Newcastle,Double Chance,Newcastle or Draw,1.3,2.0,Win,0.6
+4e732ced,2024-09-22,Team,Villa vs Wolves,Full Time Result,Villa,1.57,2.0,Win,1.15
+02e74f10,2024-09-22,Team,Tottenham vs Brentford,Full Time Result,Tottenham,1.5,2.0,Win,1.0
+33e75ff0,2024-09-22,Team,Leicester vs Everton,Handicap,Leicester +1,1.4,2.0,Win,0.8
+6ea9ab1b,2024-09-22,Team,Palace vs Man Utd,Handicap,Man Utd +1,1.4,2.0,Win,0.8
+34173cb3,2024-09-23,Team,Man City vs Arsenal,BTTS,Yes,1.8,2.0,Win,1.6
+c16a5320,2024-09-29,Team,Everton vs Palace,Handicap,Everton +1,1.5,2.0,Win,1.0
+6364d3f0,2024-09-29,Team,Arsenal vs Leicester,Handicap,Arsenal-1,1.53,2.0,Win,1.07
+182be0c5,2024-09-29,Team,Wolves vs Liverpool,Full Time Result,Liverpool,1.38,2.0,Win,0.76
+e369853d,2024-09-30,Team,Ipswich vs Villa,Full Time Result,Villa,1.83,2.0,Loss,-2.0
+1c383cd3,2024-09-30,Team,Man Utd vs Tottenham,Handicap,Man Utd +1,1.4,2.0,Loss,-2.0
+19ca14e7,2024-10-06,Team,Palace vs Liverpool,Full Time Result,Liverpool,1.5,2.0,Win,1.0
+a5bfc9e0,2024-10-06,Team,Arsenal vs Southampton,Handicap,Arsenal-1,1.4,2.0,Win,0.8
+a5771bce,2024-10-06,Team,Man City vs Fulham,Handicap,Man City -1,1.66,2.0,Loss,-2.0
+d67d8ab4,2024-10-07,Team,Villa vs Man Utd,Handicap,Villa +1,1.4,2.0,Win,0.8
+d645920e,2024-10-07,Team,Chelsea vs Forest,Full Time Result,Chelsea,1.48,2.0,Loss,-2.0
+3416a75f,2024-10-07,Team,Brighton vs Tottenham,BTTS,Yes,1.36,2.0,Win,0.73
+a1d0c6e8,2024-10-11,Team,New Zealand vs Tahiti,Handicap,New Zealand -2,1.36,2.0,Win,0.73
+17e62166,2024-10-11,Team,New Zealand vs Tahiti,Handicap,New Zealand -4,2.75,1.0,Loss,-1.0
+f7177163,2024-10-14,Team,New Zealand vs Malaysia,Full Time Result,New Zealand,1.42,2.0,Win,0.84
+6c8349cc,2024-10-20,Team,Fulham vs Villa,BTTS,Yes,1.61,2.0,Win,1.24
+d9d4f495,2024-10-20,Team,Man Utd vs Brentford,Handicap,Brentford +2,1.44,2.0,Win,0.89
+67c6a1e7,2024-10-20,Team,Bournemouth vs Arsenal,Full Time Result,Arsenal,1.66,2.0,Loss,-2.0
+642e92ef,2024-10-20,Team,Wolves vs Man City,Full Time Result,Man City,1.33,4.0,Win,1.34
+f457c545,2024-10-27,Team,Villa vs Bournemouth,Draw No Bet,Villa,1.44,1.5,Push,0.0
+c0c7c76d,2024-10-27,Team,Brentford vs Ipswich,Handicap,Brentford +1,1.22,1.5,Win,0.34
+2838023a,2024-10-27,Team,Brighton vs Wolves,Full Time Result,Brighton,1.6,1.5,Win,0.9
+9a115815,2024-10-27,Team,Man City vs Southampton,Handicap,Southampton +4,1.36,1.5,Win,0.55
+d82c8d16,2024-10-27,Team,Man City vs Southampton,Handicap,Man City -1,1.36,1.5,Loss,-1.5
+a684ecee,2024-10-28,Team,Chelsea vs Newcastle,Full Time Result,Chelsea,1.8,1.0,Win,0.8
+b53b3a3d,2024-10-28,Team,Arsenal vs Liverpool,Draw No Bet,Arsenal,1.72,1.5,Push,0.0
+9f61408e,2024-11-02,Team,Newcastle vs Arsenal,Draw No Bet,Arsenal,1.44,1.5,Loss,-1.5
+72b32a1f,2024-11-02,Team,Liverpool vs Brighton,Full Time Result,Liverpool,1.42,1.5,Win,0.63
+66f041e1,2024-11-02,Team,Bournemouth vs Man City,Full Time Result,Man City,1.55,2.0,Loss,-2.0
+093f65e0,2024-11-02,Team,Southampton vs Everton,Handicap,Everton +1,1.5,1.0,Loss,-1.0
+072b030b,2024-11-02,Team,Forest vs West Ham,Draw No Bet,Forest,1.53,1.5,Win,0.8
+7f39f831,2024-11-02,Team,Wolves vs Palace,Handicap,Palace +1,1.44,1.0,Win,0.45
+44f683a8,2024-11-03,Team,Man Utd vs Chelsea,BTTS,Yes,1.4,1.5,Win,0.6
+03afdbd6,2024-11-09,Team,Palace vs Fulham,BTTS,Yes,1.7,2.0,Loss,-2.0
+ea5d2f1c,2024-11-09,Team,Brighton vs Man City,Handicap,Brighton +2,1.4,2.0,Win,0.8
+fc490ca4,2024-11-09,Team,Liverpool vs Villa,Full Time Result,Liverpool,1.44,2.0,Win,0.89
+3295c76a,2024-11-10,Team,Man Utd vs Leicester,Full Time Result,Man Utd,1.38,2.0,Win,0.76
+735b90b4,2024-11-10,Team,Forest vs Newcastle,Handicap,Forest +1,1.5,2.0,Loss,-2.0
+a3f390d8,2024-11-10,Team,Tottenham vs Ipswich,Handicap,Tottenham -1,1.66,2.0,Loss,-2.0
+14bfa6bb,2024-11-15,Team,New Zealand vs Vanuatu,BTTS,No,1.28,5.0,Loss,-5.0
+7cbbc409,2024-11-18,Team,New Zealand vs Samoa,Goal Line,Over 8.5 goals,1.85,5.0,Loss,-5.0
+e2c420d9,2024-11-24,Team,Leicester vs Chelsea,Full Time Result,Chelsea,1.45,1.5,Win,0.68
+32bb90e8,2024-11-24,Team,Fulham vs Wolves,Full Time Result,Fulham,1.55,1.5,Loss,-1.5
+d2ddea18,2024-11-24,Team,Everton vs Brentford,Handicap,Brentford +1,1.57,1.5,Win,0.86
+ad61ab14,2024-11-24,Team,Arsenal vs Forest,Full Time Result,Arsenal,1.4,1.5,Win,0.63
+d09bf415,2024-11-24,Team,Bournemouth vs Brighton,BTTS,Yes,1.44,1.5,Win,0.58
+fbd7939d,2024-11-24,Team,Villa vs Palace,Full Time Result,Villa,1.65,1.5,Loss,-1.5
+28dd2c79,2024-11-25,Team,Southampton vs Liverpool,Full Time Result,Liverpool,1.28,1.5,Win,0.46
+35f4a8d4,2024-11-30,Team,Brighton vs Southampton,Full Time Result,Brighton,1.38,2.0,Loss,-2.0
+d1fe173d,2024-12-01,Team,Brentford vs Leicester,Full Time Result,Brentford,1.65,2.0,Win,1.3
+f033ab37,2024-12-02,Team,Chelsea vs Villa,Full Time Result,Chelsea,1.7,2.0,Win,1.4
+43ec517d,2024-12-02,Team,Man Utd vs Everton,Full Time Result,Man Utd,1.53,2.0,Win,1.07
+9778d5d2,2024-12-02,Team,Liverpool vs Man City,Full Time Result,Liverpool,2.1,2.0,Win,2.2
+fe9fc289,2024-12-04,Team,Villa vs Brentford,Full Time Result,Villa,1.83,2.0,Win,1.67
+68d30a95,2024-12-04,Team,Arsenal vs Man Utd,Full Time Result,Arsenal,1.4,2.0,Win,1.03
+3ef81541,2024-12-05,Team,Newcastle vs Liverpool,Full Time Result,Liverpool,1.8,2.0,Loss,-2.0
+93db85ed,2024-12-05,Team,Man City vs Forest,BTTS,Yes,1.8,2.0,Loss,-2.0
+c7e1249f,2024-12-05,Team,Everton vs Wolves,Handicap,Everton +1,1.3,2.0,Win,0.6
+2a38a4a9,2024-12-08,Team,Villa vs Southampton,Handicap,Villa -1,1.8,2.0,Loss,-2.0
+8613985e,2024-12-08,Team,Palace vs Man City,Full Time Result,Man City,1.57,2.0,Loss,-2.0
+54229abf,2024-12-09,Team,Fulham vs Arsenal,Full Time Result,Arsenal,1.57,2.0,Loss,-2.0
+92cc2275,2024-12-09,Team,Leicester vs Brighton,BTTS,Yes,1.61,2.0,Win,1.24
+98dce83d,2024-12-09,Team,Tottenham vs Chelsea,Full Time Result,Tottenham,3.3,1.0,Win,2.3
+f4b9ec30,2024-12-15,Team,Multiple vs Multiple,Accumulator,"Arsenal, Newcastle, Liverpool, Man City, Chelsea",4.68,1.0,Loss,-1.0
+812b4ba2,2024-12-15,Team,Multiple vs Multiple,Accumulator,"Arsenal, Newcastle, Liverpool, Man City",3.43,1.0,Loss,-1.0
+26657d5f,2024-12-15,Team,Multiple vs Multiple,Accumulator,"Arsenal, Newcastle, Liverpool, Chelsea",2.82,1.0,Loss,-1.0
+e2ef524f,2024-12-15,Team,Multiple vs Multiple,Accumulator,"Arsenal, Newcastle, Man City, Chelsea",3.56,1.0,Loss,-1.0
+ed3d2c21,2024-12-15,Team,Multiple vs Multiple,Accumulator,"Arsenal, Liverpool, Man City, Chelsea",3.56,1.0,Loss,-1.0
+ac627ab1,2024-12-15,Team,Multiple vs Multiple,Accumulator,"Newcastle, Liverpool, Man City, Chelsea",3.75,1.0,Loss,-1.0
+f899139d,2024-12-15,Team,Multiple vs Multiple,Accumulator,"Arsenal, Newcastle, Liverpool",2.07,1.0,Loss,-1.0
+38b3eff8,2024-12-15,Team,Multiple vs Multiple,Accumulator,"Arsenal, Newcastle, Chelsea",2.15,1.0,Loss,-1.0
+ec895663,2024-12-15,Team,Multiple vs Multiple,Accumulator,"Arsenal, Liverpool, Chelsea",2.15,1.0,Loss,-1.0
+6974ce5a,2024-12-15,Team,Multiple vs Multiple,Accumulator,"Newcastle, Liverpool, Chelsea",2.26,1.0,Loss,-1.0
+c9e1074f,2024-12-22,Team,Villa vs Man City,Draw No Bet,Man City,1.61,2.0,Loss,-2.0
+65b9eea6,2024-12-22,Team,Brentford vs Forest,Handicap,Forest +1,1.53,2.0,Win,1.07
+f0935e4c,2024-12-22,Team,Ipswich vs Newcastle,Full Time Result,Newcastle,1.65,2.0,Win,1.3
+a97da629,2024-12-22,Team,Palace vs Arsenal,BTTS,Yes,1.95,2.0,Win,1.9
+a3c65c29,2024-12-23,Team,Everton vs Chelsea,Full Time Result,Chelsea,1.61,2.0,Loss,-2.0
+2723d092,2024-12-23,Team,Man Utd vs Bournemouth,Full Time Result,Man Utd,1.8,2.0,Loss,-2.0
+5f93f983,2024-12-27,Team,Forest vs Tottenham,BTTS,Yes,1.4,2.0,Loss,-2.0
+698d51a1,2024-12-27,Team,Newcastle vs Villa,BTTS,Yes,1.57,2.0,Loss,-2.0
+7f6ffaa6,2024-12-27,Team,Man City vs Everton,BTTS,No,1.9,2.0,Loss,-2.0
+73278a4a,2024-12-27,Team,Bournemouth vs Palace,Full Time Result,Bournemouth,2.0,2.0,Loss,-2.0
+5fd0b37c,2024-12-27,Team,Liverpool vs Leicester,Handicap,Liverpool -1,1.22,2.0,Win,-0.78
+2b44928a,2024-12-28,Team,Arsenal vs Ipswich,Full Time Result,Arsenal,1.14,5.0,Win,0.72
+c45147de,2024-12-30,Team,Everton vs Forest,Draw No Bet,Forest,1.83,2.0,Win,1.67
+eb160de1,2024-12-30,Team,Tottenham vs Wolves,Full Time Result,Tottenham,1.66,2.0,Loss,-2.0
+5ef05993,2024-12-30,Team,West Ham vs Liverpool,Full Time Result,Liverpool,1.38,2.0,Win,1.76
+07e1cd7d,2024-12-31,Team,Man Utd vs Newcastle,Full Time Result,Newcastle,2.6,2.0,Win,3.2
+da4fb5c6,2024-12-31,Team,Ipswich vs Chelsea,Full Time Result,Chelsea,1.38,2.0,Loss,-2.0
+4c56ff4c,2025-01-04,Team,Liverpool vs Man Utd,Handicap,Liverpool -1,1.72,2.0,Loss,-2.0
+a0a080f4,2025-01-05,Team,Southampton vs Brentford,Draw No Bet,Brentford,1.57,2.0,Win,1.15
+202cb962,2025-01-05,Team,Brighton vs Arsenal,Full Time Result,Arsenal,1.8,2.0,Loss,-2.0
+c8ffe9a5,2025-01-05,Team,Villa vs Leicester,Full Time Result,Villa,1.33,2.0,Win,0.67
+3def184a,2025-01-05,Team,Tottenham vs Newcastle,Full Time Result,Newcastle,1.83,2.0,Win,1.67
+069059b7,2025-01-06,Team,Wolves vs Forest,Full Time Result,Forest,2.3,2.0,Win,2.6
+ec5decca,2025-01-11,Team,Multiple vs Multiple,Accumulator,"Liverpool, Tottenham, Newcastle, Bournemouth",1.9575696,1.0,Loss,-1.0
+76dc611d,2025-01-11,Team,Multiple vs Multiple,Accumulator,"Liverpool, Tottenham, City, Newcastle, Brentford",1.74783,1.0,Loss,-1.0
+d1f491a4,2025-01-11,Team,Multiple vs Multiple,Accumulator,"Liverpool, Tottenham, Newcastle, City, Forest",2.01350016,1.0,Loss,-1.0
+9b861925,2025-01-11,Team,Multiple vs Multiple,Accumulator,"Liverpool, Tottenham, City, Newcastle, Leeds, Bournemouth, Brentford, Forest, Chelsea",3.798990112,1.0,Loss,-1.0
+1afa34a7,2025-01-11,Team,Multiple vs Multiple,Accumulator,"Liverpool, Forest, City, Newcastle,",2.04,1.0,Loss,-1.0
+65ded535,2025-01-18,Team,Chelsea vs Wolves,Full Time Result,Chelsea,1.36,2.0,Win,0.73
+9fc3d715,2025-01-18,Team,Forest vs Southampton,Full Time Result,Forest,1.38,4.0,Win,1.52
+02522a2b,2025-01-18,Team,Brentford vs Liverpool,Full Time Result,Liverpool,1.45,2.0,Win,0.9
+7f1de29e,2025-01-18,Team,Newcastle vs Bournemouth,Full Time Result,Newcastle,1.57,2.0,Loss,-2.0
+42a0e188,2025-01-25,Team,Villa vs West Ham,Full Time Result,Villa,1.53,2.0,Loss,-2.0
+3988c7f8,2025-01-25,Team,Palace vs Brentford,BTTS,Yes,1.61,2.0,Win,1.24
+013d4071,2025-01-25,Team,Wolves vs Arsenal,Full Time Result,Arsenal,1.5,2.0,Win,1.0
+e00da03b,2025-01-25,Team,Liverpool vs Ipswich,Handicap,Liverpool -1,1.3,3.0,Win,0.9
+1385974e,2025-01-25,Team,Brighton vs Everton,Full Time Result,Brighton,1.66,2.0,Loss,-2.0
+0f28b5d4,2025-01-25,Team,Bournemouth vs Forest,Full Time Result,Forest,3.3,1.0,Loss,-1.0
+a8baa565,2025-01-25,Team,Bournemouth vs Forest,Handicap,Forest +1,1.72,1.0,Loss,-1.0
+903ce922,2025-02-01,Team,Chelsea vs West Ham,Full Time Result,Chelsea,1.33,2.0,Win,0.67
+0a09c884,2025-02-01,Team,Wolves vs Villa,Full Time Result,Villa,2.0,2.0,Loss,-2.0
+2b24d495,2025-02-02,Team,Ipswich vs Southampton,Full Time Result,Ipswich,2.05,2.0,Loss,-2.0
+a5e00132,2025-02-02,Team,Bournemouth vs Liverpool,Full Time Result,Liverpool,1.7,2.0,Win,1.4
+8d5e957f,2025-02-02,Team,Forest vs Brighton,Handicap,Forest +1,1.4,2.0,Win,0.8
+47d1e990,2025-02-08,Team,Multiple vs Multiple,Accumulator,"City, Newcastle, Liverpool, Forest",2.91,5.0,Loss,-5.0
+f2217062,2025-02-15,Team,Southampton vs Bournemouth,Full Time Result,Bournemouth,1.45,2.0,Win,0.9
+7ef605fc,2025-02-15,Team,Fulham vs Forest,Handicap,Forest +1,1.66,2.0,Loss,-2.0
+a8f15eda,2025-02-15,Team,Villa vs Ipswich,Full Time Result,Villa,1.48,2.0,Loss,-2.0
+37a749d8,2025-02-15,Team,Leicester vs Arsenal,Full Time Result,Arsenal,1.3,2.0,Win,0.6
+b3e3e393,2025-02-17,Team,Liverpool vs Wolves,Handicap,Liverpool -1,1.57,2.0,Loss,-2.0
+1d7f7abc,2025-02-17,Team,Liverpool vs Wolves,Handicap,Liverpool -2,2.37,1.0,Loss,-1.0
+2a79ea27,2025-02-22,Team,Leicester vs Brentford,Full Time Result,Brentford,1.95,2.0,Win,1.9
+1c9ac015,2025-02-22,Team,Arsenal vs West Ham,Full Time Result,Arsenal,1.27,2.0,Loss,-2.0
+6c4b761a,2025-02-23,Team,Bournemouth vs Wolves,Full Time Result,Bournemouth,1.6,2.0,Loss,-2.0
+06409663,2025-02-23,Team,Newcastle vs Forest,Full Time Result,Forest,4.1,2.0,Loss,-2.0
+140f6969,2025-02-23,Team,Southampton vs Brighton,Full Time Result,Brighton,1.53,2.0,Win,1.07
+b73ce398,2025-02-28,Team,West Ham vs Leicester,Full Time Result,West Ham,1.61,2.0,Win,1.24
+bd4c9ab7,2025-02-28,Team,Man Utd vs Ipswich,Full Time Result,Man Utd,1.53,2.0,Win,1.07
+82aa4b0a,2025-02-28,Team,Brentford vs Everton,Full Time Result,Brentford,2.0,2.0,Loss,-2.0
+0777d5c1,2025-02-28,Team,Palace vs Villa,Handicap,Villa (+1),1.53,2.0,Loss,-2.0
+fa7cdfad,2025-03-02,Team,Multiple vs Multiple,Accumulator,"Palace, City, Forest",2.22,5.0,Loss,-5.0
+9766527f,2025-03-02,Team,Multiple vs Multiple,Accumulator,"Palace, Bournemouth, City, Forest",3.822,5.0,Loss,-5.0
+7e7757b1,2025-03-10,Team,Man Utd vs Arsenal,Full Time Result,Arsenal,1.7,2.0,Loss,-2.0
+5878a7ab,2025-03-10,Team,Multiple vs Multiple,Accumulator,"Chelsea +1, Liverpool",1.18,2.0,Win,0.37
+006f52e9,2025-03-10,Team,Palace vs Ipswich,Full Time Result,Palace,1.55,5.0,Win,2.75
+36366388,2025-03-10,Team,Brighton vs Fulham,Handicap,Brighton +1,1.28,2.0,Win,0.58
+149e9677,2025-03-10,Team,Forest vs Man City,BTTS,Yes,1.53,2.0,Loss,-2.0
+a4a042cf,2025-03-16,Team,Ipswich vs Forest,To Score Anytime,Chris Wook,2.4,1.0,Loss,-1.0
+1ff8a7b5,2025-03-16,Team,Ipswich vs Forest,Full Time Result,Forest,2.0,2.0,Win,2.0
+f7e6c855,2025-03-16,Team,Man City vs Brighton,Draw No Bet,Man City,1.3,4.0,Push,0.0
+bf822969,2025-03-16,Team,Southampton vs Wolves,Draw No Bet,Wolves,1.33,4.0,Win,1.34
+82161242,2025-03-16,Team,Bournemouth vs Brentford,Full Time Result,Bournemouth,1.7,2.0,Loss,-2.0
+38af8613,2025-03-17,Team,Arsenal vs Chelsea,Draw No Bet,Arsenal,1.33,4.0,Win,1.34
+96da2f59,2025-03-17,Team,Fulham vs Tottenham,Full Time Result,Tottenham,3.6,1.0,Loss,-1.0
+8f855179,2025-03-17,Team,Leicester vs Man Utd,Full Time Result,Man Utd,1.83,2.0,Win,1.67
+8f53295a,2025-03-21,Team,New Zealand vs Fiji,Bet Builder,"1st half NZ, 2nd half NZ",1.44,3.0,Win,1.34
+045117b0,2025-03-21,Team,New Zealand vs Fiji,Total Goals,Over 3.5,1.57,3.0,Win,1.72
+fc221309,2025-03-21,Team,New Zealand vs Fiji,1st Half Goal Line,Over 1.5,1.75,3.0,Win,2.25
+4c5bde74,2025-03-21,Team,New Zealand vs Fiji,Accumulator,"1st half NZ, 2nd Half NZ, over 1 goal in 1st half, over 3 goals",2.3,3.0,Win,3.9
+cedebb6e,2025-03-30,Team,Preston vs Villa,Full Time Result,Villa,1.48,5.0,Win,2.4
+6cdd60ea,2025-03-30,Team,Bournemouth vs Man City,To Qualify,Man City,1.66,5.0,Win,3.34
+eecca5b6,2025-04-02,Team,Multiple vs Multiple,Accumulator,"Bournemouth, City, Palace",2.6,3.0,Loss,-3.0
+9872ed9f,2025-04-02,Team,Southampton vs Palace,Full Time Result,Palace,1.57,3.0,Loss,-3.0
+31fefc0e,2025-04-02,Team,Man City vs Leicester,Full Time Result,Man City,1.2,3.0,Win,0.6
+9dcb88e0,2025-04-02,Team,Bournemouth vs Ipswich,Full Time Result,Bournemouth,1.38,3.0,Loss,-3.0
+a2557a7b,2025-04-06,Team,Villa vs Forest,Full Time Result,Forest,4.0,3.0,Loss,-3.0
+cfecdb27,2025-04-06,Team,Leicester vs Newcastle,Full Time Result,Newcastle,1.5,3.0,Win,1.5
+0aa1883c,2025-04-06,Team,Man Utd vs Man City,Draw No Bet,Man City,1.5,3.0,Push,0.0
+58a2fc6e,2025-04-06,Team,Tottenham vs Southampton,Full Time Result,Tottenham,1.4,3.0,Win,1.2
+bd686fd6,2025-04-06,Team,Fulham vs Liverpool,Draw No Bet,Liverpool,1.33,3.0,Loss,-3.0
+a597e505,2025-04-12,Team,Multiple vs Multiple,Accumulator,"Brighton, Chelsea, Newcastle, City",3.27,3.0,Loss,-3.0
+0336dcba,2025-04-12,Team,Liverpool vs West Ham,Full Time Result,Liverpool,1.3,3.0,Win,0.9
+084b6fbb,2025-04-12,Team,Arsenal vs Brentford,Full Time Result,Arsenal,1.61,3.0,Loss,-3.0
+85d8ce59,2025-04-12,Team,Southampton vs Villa,Full Time Result,Villa,1.53,3.0,Win,1.6
+0e65972d,2025-04-12,Team,Forest vs Everton,Full Time Result,Forest,1.95,3.0,Loss,-3.0
+84d9ee44,2025-04-13,Team,Everton vs Man City,Full Time Result,City,1.9,2.5,Win,2.25
+3644a684,2025-04-20,Team,Ipswich vs Arsenal,Full Time Result,Arsenal,1.42,2.5,Win,1.05
+757b505c,2025-04-20,Team,Leicester vs Liverpool,Full Time Result,Liverpool,1.2,2.5,Win,0.5
+854d6fae,2025-04-20,Team,Palace vs Bournemouth,BTTS,Yes,1.61,2.5,Loss,-2.5
+e2c0be24,2025-04-20,Team,Villa vs Newcastle,BTTS,Yes,1.57,2.5,Win,1.43
+274ad478,2025-04-20,Team,Tottenham vs Forest,BTTS,No,2.5,2.5,Loss,-2.5
+eae27d77,2025-04-20,Team,Wolves vs Leicester,Full Time Result,Wolves,1.5,3.0,Win,1.5
+7eabe3a1,2025-04-26,Team,Southampton vs Fulham,Full Time Result,Fulham,1.61,3.0,Win,1.85
+69adc1e1,2025-04-26,Team,Chelsea vs Everton,Full Time Result,Chelsea,1.45,3.0,Win,1.35
+091d584f,2025-04-26,Team,Brighton vs West Ham,Draw No Bet,West Ham,3.5,1.5,Loss,-1.5
+b1d10e7b,2025-04-26,Team,Palace vs Villa,Draw No Bet,Palace,2.25,1.5,Win,1.88
+6f3ef77a,2025-04-26,Team,Arsenal vs PSG,Full Time Result,Arsenal,2.1,5.0,Loss,-5.0
+eb163727,2025-05-03,Team,Chelsea vs Liverpool,BTTS,Yes,1.5,3.0,Win,1.5
+1534b76d,2025-05-03,Team,Arsenal vs Bournemouth,Full Time Result,Arsenal,1.9,3.0,Loss,-3.0
+979d472a,2025-05-03,Team,Leicester vs Southampton,Full Time Result,Leicester,2.5,3.0,Win,4.5
+ca46c1b9,2025-05-03,Team,Everton vs Ipswich,Full Time Result,Everton,1.5,3.0,Win,1.5
+3b8a6142,2025-05-03,Team,Villa vs Fulham,Full Time Result,Villa,1.85,3.0,Win,2.55
+45fbc6d3,2025-05-10,Team,Liverpool vs Arsenal,BTTS,Yes,1.61,5.0,Win,3.08
+63dc7ed1,2025-05-10,Team,Forest vs Leicester,BTTS,No,1.75,5.0,Loss,-5.0
+e96ed478,2025-05-10,Team,Newcastle vs Chelsea,Draw No Bet,Newcastle,1.57,5.0,Win,2.86
+c0e190d8,2025-05-10,Team,Wolves vs Brighton,Draw No Bet,Brighton,1.8,5.0,Win,4.0
+ec8ce6ab,2025-05-10,Team,Southampton vs Man City,Full Time Result,Man City,1.2,20.0,Loss,-20.0
+060ad924,2025-05-10,Team,Ipswich vs Brentford,Full Time Result,Brentford,1.53,5.0,Win,2.67
+bcbe3365,2025-05-17,Team,Palace vs Man City,Winner,Palace,3.2,1.0,Win,2.2
+115f8950,2025-05-17,Team,Palace vs Man City,Method of Victory,Palace in ET,17.0,1.0,Loss,-1.0
+13fe9d84,2025-05-17,Team,Arsenal vs Newcastle,Draw No Bet,Arsenal,1.44,4.0,Win,1.78
+d1c38a09,2025-05-17,Team,Brentford vs Fulham,Draw No Bet,Brentford,1.5,4.0,Loss,-4.0
+9cfdf10e,2025-05-17,Team,West Ham vs Forest,Draw No Bet,Forest,1.8,4.0,Win,3.2
+705f2172,2025-05-17,Team,Everton vs Southampton,Full Time Result,Everton,1.4,4.0,Win,1.6
+74db120f,2025-05-17,Team,Man City vs Bournemouth,Full Time Result,City,1.53,4.0,Win,2.14
+57aeee35,2025-05-23,Team,Multiple vs Multiple,Accumulator,"Auckland FC to qualify, Melbourne City to qualify",1.18,5.0,Loss,-5.0
+6da9003b,2025-05-23,Team,Multiple vs Multiple,Accumulator,"Auckland FC DNB, Melbourne City DNB",2.07,5.0,Loss,-5.0
+9b04d152,2025-05-25,Team,Fulham vs Man City,Full Time Result,Man City,1.57,3.0,Win,1.72
+be83ab3e,2025-05-25,Team,Man Utd vs Villa,Full Time Result,Villa,1.72,3.0,Loss,-3.0
+e1654211,2025-05-25,Team,Newcastle vs Everton,Full Time Result,Newcastle,1.28,3.0,Loss,-3.0
+289dff07,2025-05-25,Team,Liverpool vs Palace,Draw No Bet,Liverpool,1.18,3.0,Push,0.0
+577ef115,2025-05-25,Team,Forest vs Chelsea,Draw No Bet,Forest,2.37,3.0,Loss,-3.0
+01161aaa,2025-05-25,Team,Tottenham vs Brighton,Draw No Bet,Tottenham,3.75,3.0,Loss,-3.0
+539fd53b,2025-05-25,Team,Multiple vs Multiple,Accumulator,"Man CIty, Villa, Newcastle",3.61,1.0,Loss,-1.0
+ac1dd209,2025-05-25,Team,Multiple vs Multiple,Accumulator,"DNB Liverpool, Forest, Tottenham",10.52,1.0,Loss,-1.0
+555d6702,2025-05-25,Team,Multiple vs Multiple,Accumulator,"Man CIty, Villa, Newcastle to win, DNB Liverpool, Forest, Tottenham",36.73,1.0,Loss,-1.0
+335f5352,2025-05-31,Team,Gyori Eto Women vs Team Esbjerg Women,Draw No Bet,Gyori Eto,1.38,2.0,Win,0.76
+f340f1b1,2025-05-31,Team,Metz Women vs Odense Handbold Women,Draw No Bet,Metz Women,1.7,2.0,Push,0.0
+e4a6222c,2025-06-01,Team,Gyori Eto Women vs Odense Handbold Women,Draw No Bet,Gyori Eto,1.35,2.0,Win,0.7
+cb70ab37,2025-06-01,Team,Team Esbjerg Women vs Metz Women,Draw No Bet,Team Esbjerg Women,1.6,2.0,Win,1.2
+9188905e,2025-06-07,Team,Turkey vs Poland,Full Time Result,Turkey,2.25,3.0,Win,3.75
+0266e33d,2025-06-15,Team,Inter Miami vs Al Ahly Cairo,Draw No Bet,Miami,1.53,2.0,Push,0.0
+38db3aed,2025-06-16,Team,PSG vs Athletico Madrid,Draw No Bet,PSG,1.44,2.0,Win,0.89
+3cec07e9,2025-06-16,Team,Palmeiras vs FC Porto,Draw No Bet,Palmeiras,1.72,2.0,Push,0.0
+621bf66d,2025-06-16,Team,Botafogo vs Seattle,Draw No Bet,Botafogo,1.5,2.0,Win,1.0
+077e29b1,2025-06-16,Team,Multiple vs Multiple,Accumulator,"PSG dnb, Palmeiras dnb, Botafogo dnb",3.74,1.0,Win,1.17
+6c9882bb,2025-06-17,Team,Chelsea vs Los Angeles FC,Full Time Result,Chelsea,1.18,2.0,Win,0.37
+19f3cd30,2025-06-17,Team,Benfica vs Boca Juniors ,Draw No Bet,Benefica,1.28,2.0,Push,0.0
+03c6b069,2025-06-17,Team,Flamengo  vs Esperance de Tunis,Full Time Result,Flamengo,1.33,2.0,Win,0.67
+c24cd76e,2025-06-17,Team,Multiple  vs Multiple ,Accumulator,"Chelsea, Benefica DNB, Flamengo",2.02,1.0,Win,0.58
+c52f1bd6,2025-06-18,Team,Borussia Dortmund  vs Fluminense ,Draw No Bet,Borussia Dortmund,1.22,2.0,Push,0.0
+fe131d7f,2025-06-18,Team,River Plate vs Urawa Red Diamonds ,Draw No Bet,River Plate,1.25,2.0,Win,0.5
+f718499c,2025-06-18,Team,Mamelodi Sundowns  vs Hyundai ,Draw No Bet,Mamelodi Sundowns,1.66,2.0,Win,1.34
+d96409bf,2025-06-18,Team,Monterrey  vs Inter Milan,Full Time Result,Inter Milan,1.38,2.0,Loss,-2.0
+502e4a16,2025-06-18,Team,Multiple  vs Multiple ,Accumulator,"Dortmund DNB, River Plate DNB, Mamelodi DNB, Inter to win",3.51,1.0,Loss,-1.0
+cfa0860e,2025-06-19,Team,Real Madrid vs Al Hilal Riyadh,Full Time Result,Real Madrid,1.3,2.0,Loss,-2.0
+a4f23670,2025-06-19,Team,Salzburg vs Pachuca,Draw No Bet,Salzburg,1.8,2.0,Win,1.6
+b1a59b31,2025-06-19,Team,Juventus  vs Al Ain,Full Time Result,Juventus,1.2,2.0,Win,0.4
+36660e59,2025-06-19,Team,Multiple  vs Multiple ,Accumulator,"Real Madrid, Salzburg, Juventus",2.8,1.0,Loss,-1.0
+8c19f571,2025-06-20,Team,Palmeiras vs Al Ahly Cairo,Draw No Bet,Palmeiras,1.2,2.0,Win,0.4
+d6baf65e,2025-06-20,Team,FC Porto vs Inter Milan ,Draw No Bet,FC Porto,1.3,2.0,Loss,-2.0
+e56954b4,2025-06-20,Team,Athletico Madrid vs Seattle,Full Time Result,Athletico Madrid,1.3,2.0,Win,0.6
+f7664060,2025-06-20,Team,PSG vs Botafoga ,Full Time Result,PSG,1.22,2.0,Loss,-2.0
+eda80a3d,2025-06-20,Team,Multiple  vs Multiple ,Accumulator,"Palmeiras, Porto, Atletico Madrid, PSG",2.47,1.0,Loss,-1.0
+8f121ce0,2025-06-21,Team,Chelsea vs Flamengo,Draw No Bet,Chelsea,1.5,2.0,Loss,-2.0
+06138bc5,2025-06-21,Team,Los Angeles FC vs Esperance de Tunis,Draw No Bet,Los Angeles FC,1.4,2.0,Loss,-2.0
+39059724,2025-06-21,Team,Bayern Munich vs Boca Juniors ,Full Time Result,Bayern Munich,1.28,2.0,Win,0.58
+7f100b7b,2025-06-21,Team,Multiple  vs Multiple ,Accumulator,"Chelsea, Los Angeles FC, Bayern Munich",2.7,1.0,Loss,-1.0
+7a614fd0,2025-06-22,Team,Borussia Dortmund  vs Mamelodi Sundowns ,Full Time Result,Borussia Dortmund,1.48,2.0,Win,0.96
+4734ba6f,2025-06-22,Team,Inter Milan vs Urawa Red Diamonds ,Full Time Result,Inter Milan,1.33,2.0,Win,0.67
+d947bf06,2025-06-22,Team,Fluminense  vs Hyundai ,Draw No Bet,Fluminense,1.2,2.0,Win,0.4
+63923f49,2025-06-22,Team,River Plate vs Monterrey,Draw No Bet,River Plate,1.36,2.0,Push,0.0
+db8e1af0,2025-06-22,Team,Multiple vs Multiple,Accumulator,"Borussia Dortmund, Inter MIlan, Fluminense, River Plate",3.16,1.0,Win,1.32
+20f07591,2025-06-23,Team,Juventus vs Casablanca,Full Time Result,Juventus,1.33,2.0,Win,0.67
+07cdfd23,2025-06-23,Team,Real Madrid vs Pachuca ,Full Time Result,Real Madrid,1.33,2.0,Win,0.67
+d3957710,2025-06-23,Team,RAl Hilal Riyadh vs Salzburg ,Draw No Bet,Al Hilal Riyadh,1.4,2.0,Push,0.0
+92c8c96e,2025-06-23,Team,Man City  vs Al Ain,Full Time Result,Man City,1.11,2.0,Win,0.23
+e3796ae8,2025-06-23,Team,Multiple vs Multiple,Accumulator,"Juventus, Real  Madrid, Riyadh, Man City",2.69,1.0,Win,0.98
+6a9aeddf,2025-06-24,Team,PSG  vs Seattle ,Draw No Bet,PSG,1.04,2.0,Win,0.08
+0f49c89d,2025-06-24,Team,Athletico Madrid vs Botafoga ,Draw No Bet,Athletico Madrid,1.25,2.0,Win,0.5
+46ba9f2a,2025-06-24,Team,FC Porto  vs Al Ahly Cairo,Draw No Bet,FC Porto,1.28,2.0,Push,0.0
+0e01938f,2025-06-24,Team,Palmeiras  vs Inter Miami ,Draw No Bet,Palmeiras,1.36,2.0,Push,0.0
+16a5cdae,2025-06-24,Team,Multiple vs Multiple,Accumulator,"PSG, Athletico Madrid,",2.27,1.0,Win,0.3
+918317b5,2025-06-25,Team,Bayern Munich vs Benfica ,Draw No Bet,Bayern Munich,1.36,2.0,Loss,-2.0
+48aedb88,2025-06-25,Team,Chelsea vs Esperance de Tunis,Draw No Bet,Chelsea,1.071,2.0,Win,0.15
+839ab468,2025-06-25,Team,Flamengo  vs Los Angeles FC,Draw No Bet,Flamengo,1.28,2.0,Push,0.0
+f90f2aca,2025-06-25,Team,Multiple vs Multiple,Accumulator,Multiple,1.87,1.0,Loss,-1.0
+9c838d2e,2025-06-26,Team,Borussia Dortmund  vs Hyundai ,Draw No Bet,Borussia Dortmund,1.062,2.0,Win,0.13
+17000029,2025-06-26,Team,Fluminense  vs Mamelodi Sundowns ,Draw No Bet,Fluminense,1.44,2.0,Push,0.0
+53c3bce6,2025-06-26,Team,Inter Milan vs River Plate,Draw No Bet,Inter Milan,1.5,2.0,Win,1.0
+6883966f,2025-06-26,Team,Monterrey vs Urawa Red Diamonds ,Draw No Bet,Monterrey,1.28,2.0,Win,0.58
+49182f81,2025-06-26,Team,Multiple vs Multiple,Accumulator,Multiple,2.95,1.0,Win,1.05
+d296c101,2025-06-27,Team,Man City  vs Juventus,Draw No Bet,Man City,1.3,2.0,Win,0.6
+9fd81843,2025-06-27,Team,Casablanca vs Al Ain,Draw No Bet,Casablanca,1.72,2.0,Loss,-2.0
+26e359e8,2025-06-27,Team,Al Hilal Riyadh vs Pachuca,Draw No Bet,Al Hilal Riyadh,1.25,2.0,Win,0.5
+ef0d3930,2025-06-27,Team,Real Madrid vs Salzburg,Draw No Bet,Real Madrid,1.1,2.0,Win,0.2
+94f6d7e0,2025-06-27,Team,Multiple vs Multiple,Accumulator,Multiple,3.08,1.0,Loss,-1.0
+34ed066d,2025-06-28,Team,Palmeiras vs Botafoga,To Qualify,Palmeiras,1.61,3.0,Win,1.85
+577bcc91,2025-06-28,Team,Chelsea vs Benfica,To Qualify,Chelsea,1.57,3.0,Win,1.72
+11b9842e,2025-06-28,Team,Multiple vs Multiple,Accumulator,"Palmeiras, Chelsea",2.535,2.0,Win,3.08
+37bc2f75,2025-06-29,Team,PSG vs Inter Miami,To Qualify,PSG,1.1,3.0,Win,0.3
+496e05e1,2025-06-29,Team,Bayern Munich vs Flamengo,To Qualify,Bayern Munich,1.33,3.0,Win,1.0
+b2eb7349,2025-06-29,Team,Multiple vs Multiple,Accumulator,"PSG, Bayern Munich",1.465,2.0,Win,0.94
+8e98d81f,2025-06-30,Team,Inter Milan vs Fluminense ,To Qualify,Inter Milan,1.33,3.0,Loss,-3.0
+a8c88a00,2025-06-30,Team,Man City vs Al Hilal Riyadh,To Qualify,Man City,1.16,3.0,Loss,-3.0
+eddea82a,2025-06-30,Team,Multiple vs Multiple,Accumulator,"Inter Milan, Man City",1.555,2.0,Loss,-2.0
+06eb61b8,2025-07-01,Team,Real Madrid vs Juventus,To Qualify,Real Madrid,1.3,3.0,Win,0.9
+9dfcd5e5,2025-07-01,Team,Dortmund vs Monterrey,To Qualify,Dortmund,1.36,3.0,Win,1.09
+950a4152,2025-07-01,Team,Multiple vs Multiple,Accumulator,"Real Madrid, Dortmund",1.77,2.0,Win,1.56
+158f3069,2025-07-05,Team,Al Hilal Riyadh vs Fluminense,To Qualify,Al Hilal Riyadh,1.8,0.0,Loss,0.0
+75887499,2025-07-05,Team,Chelsea vs Palmeiras,To Qualify,Chelsea,1.67,0.0,Win,23.85
+ad13a2a0,2025-07-06,Team,PSG vs Bayern Munich,To Qualify,PSG,1.53,0.0,Win,30.15
+3fe94a00,2025-07-06,Team,Real Madrid vs Borussia Dortmund ,To Qualify,Real Madrid,1.35,0.0,Win,15.75
+5b8add2a,2025-07-06,Team,Multiple vs Multiple,Accumulator,Multiple,6.2,0.0,Loss,0.0
+432aca3a,2025-07-09,Team,Chelsea vs Fluminense,To Qualify,Chelsea,1.3,6.0,Win,1.8
+8d3bba74,2025-07-10,Team,PSG vs Real Madrid,To Qualify,PSG,1.75,6.0,Win,4.5
+32072254,2025-07-10,Team,Multiple vs Multiple,Accumulator,Multiple,2.41,3.0,Win,3.83
+caf1a3df,2025-07-13,Team,PSG vs Chelsea,Winner,PSG,1.36,16.0,Loss,-16.0
+5737c6ec,2025-07-13,Team,Multiple vs Multiple,Accumulator,"PSG full time winner, BTTS No",2.78,4.0,Loss,-4.0
+bc6dc48b,2025-08-17,Syndicate,Bank Top-Up,Deposit,Deposit,1.0,0.0,Deposit,75.0
+f2fc9902,2025-08-17,John,Brighton vs Fulham,Draw No Bet,Brighton,1.4,5.0,Push,-1.25
+89f0fd5c,2025-08-17,Richard,Tottenham vs Burnley,Full Time Result,Tottenham,1.35,5.0,Win,1.75
+a666587a,2025-08-17,Xander,Leeds vs Everton,Draw No Bet,Everton,1.95,5.0,Loss,-5.0
+b83aac23,2025-08-23,John,Bournemouth vs Wolves,Draw No Bet,Bournemouth,1.33,5.0,Win,1.65
+cd00692c,2025-08-23,Richard,Arsenal vs Leeds,Handicap,Arsenal-1,1.73,5.0,Win,3.65
+6faa8040,2025-08-24,Xander,Palace vs Forest,Draw No Bet,Palace,1.53,5.0,Push,0.0
+fe73f687,2025-08-30,Richard,Sunderland vs Brentford,Draw No Bet,Brentford,1.83,5.0,Loss,-5.0
+6da37dd3,2025-08-30,Xander,Tottenham vs Bournemouth,Full Time Result,Tottenham,1.67,5.0,Loss,-5.0
+c042f4db,2025-08-30,John,Chelsea vs Fulham,Full Time Result,Chelsea,1.52,5.0,Win,1.35
+310dcbbf,2025-09-05,Team,Australia vs New Zealand,Draw No Bet,Australia,1.2,5.0,Win,1.0
+2f2b2656,2025-09-09,Team,New Zealand vs Australia,Draw No Bet,New Zealand,2.1,5.0,Loss,-5.0
+f9b902fc,2025-09-13,John,Arsenal vs Forest,Full Time Result,Arsenal,1.4,5.0,Win,2.0
+6855456e,2025-09-13,Richard,Arsenal vs Forest,Full Time Result,Arsenal,1.4,5.0,Win,2.0
+357a6fdf,2025-09-14,Xander,Palace vs Sunderland,Full Time Result,Palace,1.62,5.0,Loss,-5.0
+819f46e5,2025-09-21,Xander,Liverpool vs Everton,Full Time Result,Liverpool,1.48,5.0,Win,2.4
+04025959,2025-09-22,John,Arsenal vs Man City,BTTS,Yes,1.67,5.0,Win,3.35
+40008b9a,2025-09-22,Richard,Arsenal vs Man City,BTTS,Yes,1.67,5.0,Win,3.35
+3dd48ab3,2025-09-28,Richard,Chelsea vs Brighton,Full Time Result,Chelsea,1.8,5.0,Loss,-5.0
+58238e9a,2025-09-28,John,Tottenham vs Wolves,BTTS,No,1.91,5.0,Loss,-5.0
+3ad7c2eb,2025-09-29,Xander,Newcastle vs Arsenal,Draw No Bet,Arsenal,1.55,5.0,Win,2.75
+b3967a0e,2025-10-05,John,Arsenal vs West Ham,Handicap,Arsenal-1,1.67,5.0,Win,3.35
+d81f9c1b,2025-10-06,Richard,Villa vs Burnley,Full Time Result,Villa,1.53,5.0,Win,2.65
+13f9896d,2025-10-06,Xander,Everton vs Palace,Draw No Bet,Palace,2.0,5.0,Loss,-5.0
+c5ff2543,2025-10-10,Team,Poland vs New Zealand,To Score,New Zealand,2.5,5.0,Loss,-5.0
+01386bd6,2025-10-19,John,Forest vs Chelsea,Draw No Bet,Chelsea,1.4,5.0,Win,2.0
+0bb4aec1,2025-10-19,Richard,Man City vs Everton,Full Time Result,City,1.4,5.0,Win,2.0
+9de6d14f,2025-10-20,Xander,Liverpool vs Man Utd,Full Time Result,Liverpool,1.6,5.0,Loss,-5.0
+efe93778,2025-10-26,Xander,Brentford vs Liverpool,BTTS,Yes,1.55,5.0,Win,4.0
+371bce7d,2025-10-27,John,Arsenal vs Palace,Full Time Result,Arsenal,1.44,5.0,Win,2.2
+138bb069,2025-10-27,Richard,Arsenal vs Palace,Full Time Result,Arsenal,1.44,5.0,Win,2.2
+8dd48d6a,2025-11-02,Richard,Fulham vs Wolves,Full Time Result,Fulham,1.8,5.0,Win,4.0
+82cec960,2025-11-02,John,Forest vs Man Utd,Draw No Bet,Man Utd,1.53,5.0,Push,0.0
+6c524f9d,2025-11-03,Xander,Man City vs Bournemouth,Full Time Result,Man City,1.5,5.0,Win,2.5
+fb7b9ffa,2025-11-09,John,Sunderland vs Arsenal,Full Time Result,Arsenal,1.4,5.0,Loss,-5.0
+aa942ab2,2025-11-09,Richard,Chelsea vs Wolves,Full Time Result,Chelsea,1.36,5.0,Win,1.8
+c058f544,2025-11-10,Xander,Palace vs Brighton,Draw No Bet,Palace,1.62,5.0,Push,0.0
+e7b24b11,2025-11-23,John,Wolves vs Palace,Draw No Bet,Palace,1.44,5.0,Win,2.2
+52720e00,2025-11-23,Richard,Liverpool vs Forest ,Full Time Result,Liverpool,1.4,5.0,Loss,-5.0
+c3e878e2,2025-11-24,Xander,Leeds vs Villa,Draw No Bet,Villa,1.62,5.0,Win,3.1
+00411460,2025-11-24,Team,Multiple vs Multiple,Round 12 multi,Multiple,3.26,1.0,Loss,-1.0
+bac9162b,2025-12-01,John,Chelsea vs Arsenal,BTTS,Yes,2.4,5.0,Win,7.0
+9be40cee,2025-12-01,Xander,Tottenham vs Fulham,Draw No Bet,Tottenham,1.55,5.0,Loss,-5.0
+5ef698cd,2025-12-01,Richard,Villa vs Wolves,Full Time Result,Villa,1.52,5.0,Win,2.6
+05049e90,2025-12-01,Team,Multiple vs Multiple,Round 13 multi,Multiple,4.1,1.0,Loss,-1.0
+cf004fdc,2025-12-07,Richard,Everton vs Forest,Draw No Bet,Forest,2.4,5.0,Loss,-5.0
+0c74b7f7,2025-12-08,Xander,Fulham vs Palace,BTTS,Yes,1.8,5.0,Win,4.0
+d709f38e,2025-12-09,John,Wolves vs Man Utd,Full Time Result,Man Utd,1.78,5.0,Win,3.9
+41f1f191,2025-12-09,Team,Multiple vs Multiple,Round 15 multi,Multiple,7.96,1.0,Loss,-1.0
+24b16fed,2025-12-14,Richard,Chelsea vs Everton,Draw No Bet,Chelsea,1.25,5.0,Win,1.25
+ffd52f3c,2025-12-14,Xander,Burnley vs Fulham,Full Time Result,Fulham,1.94,5.0,Win,4.7
+ad972f10,2025-12-14,John,Arsenal vs Wolves,Handicap,Arsenal-1,1.4,5.0,Loss,-5.0
+f61d6947,2025-12-14,Team,Multiple vs Multiple,Round 16 multi,Multiple,3.46,1.0,Loss,-1.0
+142949df,2025-12-21,John,Bournemouth vs Burnley,Full Time Result,Bournemouth,1.48,5.0,Loss,-5.0
+d34ab169,2025-12-21,Richard,Bournemouth vs Burnley,Full Time Result,Bournemouth,1.48,5.0,Loss,-5.0
+8bf1211f,2025-12-21,Xander,Leeds vs Palace,Full Time Result,Palace,1.85,5.0,Loss,-5.0
+a02ffd91,2025-12-27,Xander,Man Utd vs Newcastle,BTTS,Yes,2.0,5.0,Loss,-5.0
+bca82e41,2025-12-28,John,Arsenal vs Brighton,Full Time Result,Arsenal,1.4,5.0,Win,2.0
+00ec53c4,2025-12-28,Richard,Arsenal vs Brighton,Full Time Result,Arsenal,1.4,5.0,Win,2.0
+4f6ffe13,2025-12-31,John,Chelsea vs Bournemouth,Full Time Result,Chelsea,1.58,5.0,Loss,-5.0
+beed1360,2025-12-31,Xander,West Ham vs Brighton,Draw No Bet,Brighton,1.57,5.0,Push,0.0
+0584ce56,2025-12-31,Richard,Arsenal vs Villa,BTTS,Yes,2.15,5.0,Win,5.75
+dc912a25,2025-12-31,Team,Multiple vs Multiple,Round 19 Multi,Multiple,3.39,1.0,Loss,-1.0
+39461a19,2026-01-04,Richard,Villa vs Forest,Full Time Result,Villa,1.78,5.0,Win,3.9
+8efb100a,2026-01-04,John,Bournemouth vs Arsenal,BTTS,Yes,1.8,5.0,Win,4.0
+d9fc5b73,2026-01-05,Xander,Newcastle vs Palace,Handicap,Palace +2,1.44,5.0,Loss,-5.0
+c86a7ee3,2026-01-05,Team,Multiple vs Multiple,Round 20 Multi,Multiple,4.72,1.0,Loss,-1.0
+a01a0380,2026-01-08,Richard,Everton vs Wolves,Draw No Bet,Everton,1.29,5.0,Push,0.0
+5a4b25aa,2026-01-08,John,Fulham vs Chelsea,BTTS,Yes,1.67,5.0,Win,3.35
+f73b76ce,2026-01-08,Xander,Burnley vs Man Utd,Draw No Bet,Burnley,3.25,5.0,Push,0.0
+70c639df,2026-01-08,Team,Multiple vs Multiple,Round 21 Multi,Multiple,7.24,1.0,Win,0.7
+28f0b864,2026-01-11,Team,Everton vs Sunderland,To Qualify,Sunderland,2.25,3.0,Win,3.75
+1543843a,2026-01-11,Team,Macclesfield vs Palace,To Qualify,Palace,1.11,1.0,Loss,-1.0
+f8c1f23d,2026-01-11,Team,Wolves vs Shrewsbury Town,To Qualify,Wolves,1.08,1.0,Win,0.08
+e46de7e1,2026-01-11,Team,Sheffield Wednesday vs Brentford,To Qualify,Brentford,1.09,1.0,Win,0.09
+b7b16ecf,2026-01-11,Team,Man City vs Exeter City,To Qualify,Man City,1.03,1.0,Win,0.03
+352fe25d,2026-01-11,Team,Charlton Athletic vs Chelsea,To Qualify,Chelsea,1.17,1.0,Win,0.17
+18d80423,2026-01-11,Team,Multiple vs Multiple,FA Cup Multi,Multiple,1.59,1.0,Loss,-1.0
+816b112c,2026-01-12,Team,Portsmouth vs Arsenal,To Qualify,Arsenal,1.2,5.0,Win,1.0
+69cb3ea3,2026-01-12,Team,Liverpool vs Barnsley,To Qualify,Liverpool,1.2,5.0,Win,1.0
+bbf94b34,2026-01-12,Team,Multiple vs Multiple,FA Cup Multi,Multiple,1.45,2.12,Win,0.95
+4f4adcbf,2026-01-18,John,Forest vs Arsenal,Full Time Result,Arsenal,1.55,5.0,Loss,-5.0
+bbcbff5c,2026-01-18,Xander,Leeds vs Fulham,Draw No Bet,Fulham,2.25,5.0,Loss,-5.0
+8cb22bdd,2026-01-19,Richard,Villa vs Everton,Full Time Result,Villa,1.67,5.0,Loss,-5.0
+f4f6dce2,2026-01-19,Team,Multiple vs Multiple,Round 22 Multi,Multiple,5.96,1.0,Loss,-1.0
+0d0fd7c6,2026-01-26,Richard,Brentford vs Forest,Draw No Bet,Brentford,1.4,5.0,Loss,-5.0
+a96b65a7,2026-01-26,Xander,Newcastle vs Villa,Draw No Bet,Villa,2.63,5.0,Win,8.15
+1068c6e4,2026-01-26,John,Palace vs Chelsea,Draw No Bet,Chelsea,1.48,5.0,Win,2.4
+17d63b16,2026-01-26,Team,Multiple vs Multiple,Round 23 Multi,Multiple,5.58,1.0,Loss,-1.0
+b9228e09,2026-02-01,John,Wolves vs Bournemouth,Full Time Result,Bournemouth,2.25,5.0,Win,6.25
+0deb1c54,2026-02-02,Richard,Man Utd vs Fulham,Full Time Result,Man Utd,1.62,5.0,Win,3.1
+66808e32,2026-02-03,Xander,Sunderland vs Burnley,Draw No Bet,Burnley,3.3,5.0,Loss,-5.0
+42e7aaa8,2026-02-03,Team,Multiple vs Multiple,Round 24 Multi,Multiple,12.53,1.0,Loss,-1.0
+8fe0093b,2026-02-08,Richard,Arsenal vs Sunderland,Full Time Result,Arsenal,1.24,5.0,Win,1.2
+41ae36ec,2026-02-08,John,Wolves vs Chelsea,Full Time Result,Chelsea,1.7,5.0,Win,3.5
+d1f255a3,2026-02-08,Xander,Burnley vs West Ham,Draw No Bet,Burnley,2.3,5.0,Loss,-5.0
+7eacb532,2026-02-08,Team,Multiple vs Multiple,Round 25 Multi,Multiple,4.97,1.0,Loss,-1.0
+b6f0479a,2026-02-09,Team,New England Patriots vs Seattle Seahawks,Full Time Result,Seahawks,1.44,5.0,Win,2.2
+e0c64119,2026-02-11,John,Everton vs Bournemouth,BTTS,Yes,1.67,5.0,Win,3.35
+f85454e8,2026-02-11,Richard,Chelsea vs Leeds,Full Time Result,Chelsea,1.55,5.0,Loss,-5.0
+faa9afea,2026-02-12,Xander,Villa vs Brighton,Draw No Bet,Villa,1.4,5.0,Win,2.0
+3c7781a3,2026-02-12,Team,Multiple vs Multiple,Round 26 Multi,Multiple,3.46,1.0,Loss,-1.0
+25b2822c,2026-02-15,Team,Multiple vs Multiple,FA Cup Multi,Multiple,2.98,2.0,Loss,-2.0
+6ecbdd6e,2026-02-15,Team,Multiple vs Multiple,FA Cup Multi,Multiple,3.13,2.0,Loss,-2.0
+18997733,2026-02-15,Team,Multiple vs Multiple,FA Cup Multi,Multiple,5.79,2.0,Loss,-2.0
+8d7d8ee0,2026-02-15,Team,Multiple vs Multiple,FA Cup Multi,Multiple,9.75,2.0,Loss,-2.0
+75fc093c,2026-02-22,Xander,West Ham vs Bournemouth,Draw No Bet,Bournemouth,1.95,5.0,Push,0.0
+f74909ac,2026-02-22,Richard,Villa vs Leeds,Full Time Result,Villa,1.85,5.0,Loss,-5.0
+66368270,2026-02-23,John,Tottenham vs Arsenal,Full Time Result,Arsenal,1.55,5.0,Win,2.75
+248e8443,2026-02-23,Team,Multiple vs Multiple,Round 27 Multi,Multiple,2.86,1.0,Loss,-1.0
+019d385e,2026-02-28,Xander,Wolves vs Villa,Draw No Bet,Villa,1.36,5.0,Loss,-5.0
+a49e9411,2026-03-01,John,Bournemouth vs Sunderland,Draw No Bet,Bournemouth,1.35,5.0,Push,0.0
+ddb30680,2026-03-01,Richard,Liverpool vs West Ham,Full Time Result,Liverpool,1.4,5.0,Win,2.0
+2421fcb1,2026-03-01,Team,Multiple vs Multiple,Round 28 Multi,Multiple,2.61,1.0,Loss,-1.0
+fccb60fb,2026-03-04,John,Wolves vs Liverpool,Full Time Result,Liverpool,1.52,5.0,Loss,-5.0
+1651cf0d,2026-03-04,Richard,Man City vs Forest,Full Time Result,Man City,1.4,5.0,Loss,-5.0
+eed5af6a,2026-03-05,Xander,Fulham vs West Ham,Draw No Bet,Fulham,1.53,5.0,Loss,-5.0
+a8abb4bb,2026-03-16,John,Forest vs Fulham,Handicap,Fulham +1,1.7,5.0,Win,3.5
+15d4e891,2026-03-16,Richard,Palace vs Leeds,Draw No Bet,Palace,1.7,5.0,Push,0.0
+c203d8a1,2026-03-16,Xander,Palace vs Leeds,Draw No Bet,Palace,1.7,5.0,Push,0.0
+13f3cf8c,2026-03-18,Syndicate,Balance Reconciliation,Reconciliation,Reconciliation,1.0,2.0,Reconciliation,-2.0

@@ -1,0 +1,35 @@
+# Secrets and Credentials
+# REASON: These are private keys and passwords. Never commit them.
+.env
+credentials.json
+
+# Python Virtual Environment
+# REASON: This folder contains all the installed libraries (like pandas, streamlit)
+# for your specific machine. It can be huge and is not portable.
+# Someone else will recreate it using a requirements.txt file.
+.venv/
+venv/
+
+# Python Cache Files
+# REASON: Python generates these automatically to run your code faster.
+# They are not source code and will be regenerated.
+__pycache__/
+*.pyc
+
+# IDE and Notebook Checkpoints
+# REASON: Specific to your code editor or Jupyter.
+.ipynb_checkpoints/
+
+# Generated Data & Cache
+# REASON: These folders are created by your scripts when they run.
+# They are not part of the original source.
+cache/
+logs/
+reports/
+
+# Generated Database File
+# REASON: Your db.py script creates ledger.db from the source CSV.
+# We commit the source (the CSV), but not the generated database.
+data/ledger.db
+*.db
+*.sqlite3
