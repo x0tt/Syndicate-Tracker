@@ -560,7 +560,8 @@ def needs_report(last_run_state: dict) -> tuple:
     if last_run_state.get('last_report_date') is None or last_run_state.get('last_report_date') < str(today): return True, today
     return False, today
 
-def run_chronicler(df: pd.DataFrame, df_roi: pd.DataFrame, df_free: pd.DataFrame, force: bool = False) -> str | None:
+# In syndicate_core.py (around line 352)
+def run_chronicler(df: pd.DataFrame, df_roi: pd.DataFrame, df_free: pd.DataFrame, force: bool = False, auto_send: bool = True) -> str | None:
     state = load_last_run()
     should_run, rep_date = needs_report(state)
     if not should_run and not force: return None
@@ -568,9 +569,13 @@ def run_chronicler(df: pd.DataFrame, df_roi: pd.DataFrame, df_free: pd.DataFrame
     persona = get_report_persona(rep_date)
     summary = build_weekly_summary(df, df_roi, df_free, w_start, w_end)
     text = _call_gemini(CHRONICLER_SYSTEM_TEMPLATE.format(persona_name=persona['name'], persona_instruction=persona['instruction'], summary_json=json.dumps(summary, indent=2)), thinking_level=CHRONICLER_THINKING_LEVEL)
-    if CHRONICLER_LIVE:
+    
+    # Only broadcast automatically if auto_send is True
+    if CHRONICLER_LIVE and auto_send:
         if not send_telegram(text): save_report_locally(text, rep_date)
-    else: save_report_locally(text, rep_date)
+    else: 
+        save_report_locally(text, rep_date)
+        
     state['last_report_date'] = str(rep_date); state['last_report_persona'] = persona['name']; save_last_run(state)
     return text
 

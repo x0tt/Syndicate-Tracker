@@ -161,11 +161,13 @@ def _route_message(text: str, chat_id: str, sender_id: str,
             f"Betbot: {betbot_state} | Chronicler: {chronicler_state} | Grading{dry}"
         )
 
+# In bot_runner.py (around line 102)
     def _report_reply() -> str:
         log.info(f"[COMMAND] On-demand Chronicler report requested by {asker_name}")
         try:
             fresh_df, fresh_roi, fresh_free, _, _ = core.load_ledger()
-            report = core.run_chronicler(fresh_df, fresh_roi, fresh_free, force=True)
+            # Pass auto_send=False so it doesn't blast the group chat
+            report = core.run_chronicler(fresh_df, fresh_roi, fresh_free, force=True, auto_send=False)
             return report if report else "Couldn't generate the report — check the logs."
         except Exception as e:
             log.error(f"[COMMAND] On-demand report failed: {e}")

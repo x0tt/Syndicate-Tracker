@@ -913,7 +913,21 @@ def main():
         pc(chart_anim_win_rate_evolution(df))
 
     with t_inbox:
-        # PENDING BETS
+        # --- NEW DATA SYNC SECTION ---
+        st.subheader("Data Management")
+        if st.button("🔄 Pull Latest from Google Sheets", use_container_width=True):
+            with st.spinner("Downloading ledger from Google Sheets..."):
+                success = core.sync_local_csv()
+                if success:
+                    st.cache_data.clear() # Dump the old cached data
+                    st.success("Ledger synced successfully!")
+                    st.rerun() # Reload the UI with the fresh data
+                else:
+                    st.error("Sync failed — check your API limits or credentials.")
+                    
+        st.divider()
+
+        # --- EXISTING PENDING BETS SECTION ---
         st.subheader("Pending Bets")
         if len(df_pending) == 0:
             st.success("No pending bets — all caught up.")
@@ -937,6 +951,7 @@ def main():
                             format="%.2f", key=f"winnings_{row['uuid']}",
                         )
                     with col3:
+# ... the rest continues as normal ...
                         st.write(""); st.write("")
                         if st.button("Commit", key=f"commit_{row['uuid']}", type="primary", use_container_width=True):
                             if new_status == "Pending":
