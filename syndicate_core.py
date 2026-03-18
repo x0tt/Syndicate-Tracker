@@ -604,8 +604,19 @@ def load_last_run() -> dict: return json.loads(LAST_RUN_JSON.read_text()) if LAS
 def save_last_run(state: dict): CACHE_DIR.mkdir(parents=True, exist_ok=True); LAST_RUN_JSON.write_text(json.dumps(state, indent=2))
 def get_worksheet():
     import gspread
+    import streamlit as st
+    import json
     from google.oauth2.service_account import Credentials
-    return gspread.authorize(Credentials.from_service_account_file(str(GOOGLE_CREDS_PATH), scopes=['https://www.googleapis.com/auth/spreadsheets'])).open_by_key(GSHEET_ID).worksheet(GSHEET_TAB)
+    
+    # If running on Streamlit Cloud, use the Secret string
+    if "gcp_service_account" in st.secrets:
+        creds_info = json.loads(st.secrets["gcp_service_account"])
+        creds = Credentials.from_service_account_info(creds_info, scopes=['https://www.googleapis.com/auth/spreadsheets'])
+    # Otherwise, look for your local file
+    else:
+        creds = Credentials.from_service_account_file(str(GOOGLE_CREDS_PATH), scopes=['https://www.googleapis.com/auth/spreadsheets'])
+        
+    return gspread.authorize(creds).open_by_key(GSHEET_ID).worksheet(GSHEET_TAB)
 
 def _log_failed_write(record: dict):
     with open(FAILED_WRITES, 'a') as f: f.write(json.dumps(record) + '\n')
