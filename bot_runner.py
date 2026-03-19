@@ -266,29 +266,23 @@ def _run_chronicler_if_due(df, df_roi, df_free) -> None:
 
 def _startup_catchup(df, df_roi, df_free, df_pending, kpis) -> None:
     """
-    On startup: check last_run.json and catch up on anything missed
-    while the PC was off.
-    - Grading: run immediately if last_run was > 0 days ago and there are pending bets.
-    - Chronicler: run immediately if a Wednesday report was missed.
+    On startup: Only catch up on grading and failed writes.
+    The Chronicler (weekly report) is now strictly handled by the 
+    Wednesday scheduler or manual '? report' command.
     """
-    log.info("[STARTUP] Running catch-up checks...")
-    state = core.load_last_run()
-
-    # Chronicler catch-up
-    _run_chronicler_if_due(df, df_roi, df_free)
-
-    # Grading catch-up — run if there are pending bets regardless of last_run time
+    log.info("[STARTUP] Running minimalist catch-up...")
+    
+    # 1. Grading catch-up — run if there are pending bets
     if len(df_pending) > 0:
-        log.info(f"[STARTUP] {len(df_pending)} pending bet(s) found — running grading now.")
+        log.info(f"[STARTUP] {len(df_pending)} pending bet(s) found — grading now.")
         _run_grading(df, df_roi, df_free, df_pending, kpis)
     else:
         log.info("[STARTUP] No pending bets.")
 
-    # Replay any failed writes
+    # 2. Replay any failed writes to Google Sheets
     pending_writes = core.replay_failed_writes()
     if pending_writes:
-        log.warning(f"[STARTUP] {pending_writes} failed write(s) still pending — "
-                    f"review {core.FAILED_WRITES}")
+        log.warning(f"[STARTUP] {pending_writes} failed write(s) pending.")
     else:
         log.info("[STARTUP] Failed writes log: clear.")
 

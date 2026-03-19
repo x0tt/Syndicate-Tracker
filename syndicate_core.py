@@ -556,8 +556,19 @@ def save_report_locally(text: str, report_date: date) -> Path:
     return path
 
 def needs_report(last_run_state: dict) -> tuple:
+    """
+    Returns True only if today is Wednesday AND no report has 
+    been recorded in last_run.json for today's date.
+    """
     today = date.today()
-    if last_run_state.get('last_report_date') is None or last_run_state.get('last_report_date') < str(today): return True, today
+    is_wednesday = today.weekday() == CHRONICLER_WEEKDAY
+    
+    last_report_date_str = last_run_state.get('last_report_date')
+    already_run_today = (last_report_date_str == str(today))
+
+    if is_wednesday and not already_run_today:
+        return True, today
+        
     return False, today
 
 def run_chronicler(df: pd.DataFrame, df_roi: pd.DataFrame, df_free: pd.DataFrame, force: bool = False, auto_send: bool = True) -> str | None:

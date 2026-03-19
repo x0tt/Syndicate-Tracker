@@ -33,3 +33,15 @@ reports/
 data/ledger.db
 *.db
 *.sqlite3
+
+# Migration source (CSV is now the source of truth)
+data/*.xlsx
+data/*.xls
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Local environment extras
+.vscode/
+.idea/
