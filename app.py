@@ -5,7 +5,7 @@ app.py — Syndicate Tracker v6.4
 ================================
 Streamlit UI. Mobile-optimised, tab-based, Plotly-powered.
 Includes advanced calibration, matchday tracking, ghost-chart fix,
-and "Information is Beautiful" visual upgrades.
+and "Information is Beautiful" visual upgrades with Logic Expanders.
 """
 
 import streamlit as st
@@ -104,11 +104,8 @@ def stat_card(label: str, value: str, sub: str = "", color: str = None, border_c
 # ─────────────────────────────────────────────────────────────────────────────
 @st.cache_data(ttl=300)
 def load_data():
-    # 1. Force a sync with Google Sheets before doing anything else
     if core.USE_GSHEETS_LIVE:
         core.sync_local_csv()
-        
-    # 2. Now load the data (which is guaranteed to be fresh)
     df, df_roi, df_free, df_pending, kpis = core.load_ledger()
     return df, df_roi, df_free, df_pending, kpis
 
@@ -213,29 +210,23 @@ def chart_cumulative_bankroll(df: pd.DataFrame, opening: float = 0.00, bankroll_
 
     fig = go.Figure()
     
-    # Smooth Bankroll Line with a gradient fill below it
     fig.add_trace(go.Scatter(
         x=df2["date_str"], y=df2["bankroll"], mode="lines", 
         line=dict(color=ACCENT, width=3, shape='spline', smoothing=1.3), 
         fill="tozeroy", fillcolor="rgba(86,180,233,0.08)", name="Bankroll"
     ))
     
-    # Find points of interest for direct labeling
     if not df2.empty:
         ath_idx = df2["bankroll"].idxmax()
         ath_row = df2.loc[ath_idx]
         dd_idx = df2["drawdown"].idxmax()
         dd_row = df2.loc[dd_idx]
         
-        # ATH Annotation
         fig.add_annotation(x=ath_row["date_str"], y=ath_row["bankroll"], text=f"All-Time High<br>${ath_row['bankroll']:.0f}", showarrow=True, arrowhead=2, arrowcolor=WIN_COLOR, ax=0, ay=-40, font=dict(color=WIN_COLOR, size=11))
-        # Max Drawdown Annotation
         if dd_row["drawdown"] > 0:
             fig.add_annotation(x=dd_row["date_str"], y=dd_row["bankroll"], text=f"Max Drawdown<br>-${dd_row['drawdown']:.0f}", showarrow=True, arrowhead=2, arrowcolor=LOSS_COLOR, ax=0, ay=40, font=dict(color=LOSS_COLOR, size=11))
 
     fig.add_hline(y=total_invested, line_dash="dash", line_color=GRID_CLR, annotation_text=f"Invested ${total_invested:.0f}", annotation_font_color=GRID_CLR, annotation_position="bottom right")
-    
-    # Strip away the Y-axis to make it look clean and modern
     fig.update_yaxes(visible=False, showgrid=False)
     fig.update_xaxes(showgrid=False)
     
@@ -277,7 +268,6 @@ def chart_pl_by_matchday(df: pd.DataFrame) -> go.Figure:
     d = df.dropna(subset=["matchday"]).copy()
     if d.empty: return go.Figure().update_layout(title="No Matchday Data")
     d["aw_num"] = pd.to_numeric(d["actual_winnings"], errors="coerce").fillna(0)
-    # Extract just the numbers for proper sorting if formatted like "Round 12"
     d["md_num"] = d["matchday"].astype(str).str.extract(r'(\d+)').astype(float)
     d = d.sort_values(["md_num", "matchday"])
     
@@ -325,29 +315,51 @@ def chart_member_win_rate(df: pd.DataFrame) -> go.Figure:
     fig = go.Figure(go.Bar(y=MEMBERS, x=wrs, orientation="h", marker_color=[MEMBER_COLORS[m] for m in MEMBERS], text=[f"{w:.1f}%" for w in wrs], textposition="inside"))
     return apply_layout(fig, title="🎯 Win Rate by Member", height=260, showlegend=False)
 
-
-def chart_member_odds_beeswarm(df: pd.DataFrame, member: str) -> go.Figure:
+def chart_member_odds_violin(df: pd.DataFrame, member: str) -> go.Figure:
     sub = df[(df["user"] == member) & (df["status"].isin(["Win", "Loss"]))].copy()
     if sub.empty: return go.Figure().update_layout(title="No odds data")
     
     sub["aw_num"] = pd.to_numeric(sub["actual_winnings"], errors="coerce").fillna(0)
     
-    # Plotly Express strip plot creates the perfect jittered beeswarm
-    fig = px.strip(
-        sub, x="odds", y="status", color="status", 
-        stripmode="overlay", # Overlays the jitter points beautifully
+    fig = px.violin(
+        sub, x="status", y="odds", color="status", 
+        box=True, points="all", 
         color_discrete_map={"Win": WIN_COLOR, "Loss": LOSS_COLOR},
         hover_data=["event", "selection", "stake", "aw_num"]
     )
     
-    fig.update_traces(marker=dict(size=8, opacity=0.7, line=dict(width=0)))
+    fig.update_traces(
+        marker=dict(size=5, opacity=0.7, line=dict(width=0)), 
+        meanline_visible=True,
+        pointpos=0,
+        jitter=0.5
+    )
     
-    # Custom Hover Template
-    fig.update_traces(hovertemplate="<b>%{customdata[0]}</b><br>%{customdata[1]}<br>Odds: %{x}<br>Stake: $%{customdata[2]:.2f}<br>P/L: $%{customdata[3]:.2f}<extra></extra>")
-    
-    fig.update_yaxes(title="")
-    return apply_layout(fig, title=f"🐝 {member} — Every Bet Placed (Odds)", height=320, showlegend=False)
+    fig.update_traces(hovertemplate="<b>%{customdata[0]}</b><br>%{customdata[1]}<br>Odds: %{y}<br>Stake: $%{customdata[2]:.2f}<br>P/L: $%{customdata[3]:.2f}<extra></extra>")
+    fig.update_xaxes(title="")
+    return apply_layout(fig, title=f"🎻 {member} — Odds Distribution (Violin)", height=340, showlegend=False)
 
+def chart_global_odds_beeswarm(df: pd.DataFrame) -> go.Figure:
+    sub = df[df["status"].isin(["Win", "Loss"])].copy()
+    if sub.empty: return go.Figure().update_layout(title="No odds data")
+    
+    sub["aw_num"] = pd.to_numeric(sub["actual_winnings"], errors="coerce").fillna(0)
+    
+    fig = px.strip(
+        sub, x="odds", y="status", color="status", 
+        stripmode="overlay", 
+        color_discrete_map={"Win": WIN_COLOR, "Loss": LOSS_COLOR},
+        hover_data=["event", "selection", "stake", "aw_num", "user"]
+    )
+    
+    fig.update_traces(
+        marker=dict(size=18, opacity=0.65, line=dict(width=1, color=BG_DARK)),
+        jitter=0.99
+    )
+    
+    fig.update_traces(hovertemplate="<b>%{customdata[0]}</b> (%{customdata[4]})<br>%{customdata[1]}<br>Odds: %{x}<br>Stake: $%{customdata[2]:.2f}<br>P/L: $%{customdata[3]:.2f}<extra></extra>")
+    fig.update_yaxes(title="")
+    return apply_layout(fig, title="🐝 Every Bet Placed (Odds Beeswarm)", height=360, showlegend=False)
 
 def chart_member_market_breakdown(df: pd.DataFrame, member: str) -> go.Figure:
     sub = df[df["user"] == member]
@@ -379,45 +391,39 @@ def chart_bet_type_roi_bars(df: pd.DataFrame) -> go.Figure:
 
 
 def chart_flow_of_money_sankey(df: pd.DataFrame) -> go.Figure:
-    # Filter only closed bets
     d = df[df["status"].isin(["Win", "Loss", "Push"])].copy()
     if d.empty: return go.Figure().update_layout(title="No data for Flow of Money")
     
-    # We are mapping: Sport -> Bet Type -> Status based on Stake volume
     sports = d["sport"].unique().tolist()
     bet_types = d["bet_type"].unique().tolist()
     statuses = ["Win", "Loss", "Push"]
     
-    # Create master node list and indices
     labels = sports + bet_types + statuses
     node_dict = {label: i for i, label in enumerate(labels)}
     
     source, target, value, link_color = [], [], [], []
     
-    # Link 1: Sport -> Bet Type
     sport_mkt = d.groupby(["sport", "bet_type"])["stake"].sum().reset_index()
     for _, row in sport_mkt.iterrows():
         source.append(node_dict[row["sport"]])
         target.append(node_dict[row["bet_type"]])
         value.append(row["stake"])
-        link_color.append("rgba(255, 255, 255, 0.05)") # Subtle grey flow
+        link_color.append("rgba(255, 255, 255, 0.05)")
         
-    # Link 2: Bet Type -> Status
     mkt_stat = d.groupby(["bet_type", "status"])["stake"].sum().reset_index()
     for _, row in mkt_stat.iterrows():
         source.append(node_dict[row["bet_type"]])
         target.append(node_dict[row["status"]])
         value.append(row["stake"])
         
-        # Color the final outcome flows!
         c = WIN_COLOR if row["status"] == "Win" else (LOSS_COLOR if row["status"] == "Loss" else PUSH_COLOR)
-        link_color.append(c.replace("rgb", "rgba").replace(")", ", 0.4)")) # Add opacity to hex/rgb
+        link_color.append(c.replace("rgb", "rgba").replace(")", ", 0.4)"))
 
     fig = go.Figure(data=[go.Sankey(
         node = dict(
             pad = 20, thickness = 15, line = dict(color = GRID_CLR, width = 0.5),
             label = labels,
-            color = "#16213e" # Dark nodes to blend in, letting the flow colors pop
+            color = "#16213e"
         ),
         link = dict(source = source, target = target, value = value, color = link_color)
     )])
@@ -466,24 +472,21 @@ def chart_weekday_bubble(df: pd.DataFrame) -> go.Figure:
     d = df[df["status"].isin(["Win", "Loss", "Push"])].copy()
     d["aw_num"] = pd.to_numeric(d["actual_winnings"], errors="coerce").fillna(0)
     
-    # Group to get volume (bets) and profit (aw_num)
     grp = d.groupby(["month", "weekday"]).agg(bets=("uuid", "count"), pl=("aw_num", "sum")).reset_index()
     
-    # Ensure proper weekday ordering
     days_order = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
     grp["weekday"] = pd.Categorical(grp["weekday"], categories=days_order, ordered=True)
     grp = grp.sort_values(["month", "weekday"])
 
     fig = go.Figure()
     
-    # Create the bubbles
     colors = [WIN_COLOR if p > 0 else (LOSS_COLOR if p < 0 else PUSH_COLOR) for p in grp["pl"]]
     fig.add_trace(go.Scatter(
         x=grp["month"], y=grp["weekday"], 
         mode="markers",
         marker=dict(
             size=grp["bets"], 
-            sizemode="area", sizeref=2.*max(grp["bets"])/(40.**2), sizemin=4, # Scales bubbles nicely
+            sizemode="area", sizeref=2.*max(grp["bets"])/(40.**2), sizemin=4, 
             color=colors,
             opacity=0.8,
             line=dict(width=1, color=BG_DARK)
@@ -492,7 +495,6 @@ def chart_weekday_bubble(df: pd.DataFrame) -> go.Figure:
         hovertemplate="<b>%{x} %{y}</b><br>%{text}<extra></extra>"
     ))
 
-    # Strip the grid to let the bubbles float
     fig.update_xaxes(showgrid=False)
     fig.update_yaxes(showgrid=False)
     
@@ -718,7 +720,6 @@ def main():
     df, bankroll_df = get_enriched(df_raw)
     opening = float(core.OPENING_BANK)
 
-    # 🚨 STRUCTURAL FINANCIAL TRUTHS 🚨
     banking_mask = df_raw["status"].isin(["Reconciliation", "Deposit", "Withdrawal"]) | (df_raw["user"].astype(str).str.lower() == "syndicate")
     df_banking = df_raw[banking_mask]
     df_bets = df_raw[~banking_mask]
@@ -746,7 +747,6 @@ def main():
         </div>''', unsafe_allow_html=True)
     st.divider()
 
-    # The New 7-Tab Architecture
     t_home, t_people, t_markets, t_timeline, t_analytics, t_extremes, t_anim, t_inbox, t_ledger = st.tabs([
         "🏠 Home", "👤 People", "📈 Markets", "📆 Timeline", "📐 Analytics", "🎯 Extremes", "🎬 Anim", "📥 Inbox", "📒 Ledger"
     ])
@@ -760,8 +760,13 @@ def main():
         roast(f'Worst bet: {event_label(worst)} @ {worst["odds"]:.2f} — ${worst["actual_winnings"]:.2f}')
         st.divider()
         ca, cb = cols(2)
-        with ca: pc(chart_cumulative_bankroll(df, opening, bankroll_df))
-        with cb: pc(chart_cumulative_roi(df)) 
+        with ca: 
+            pc(chart_cumulative_bankroll(df, opening, bankroll_df))
+        with cb: 
+            pc(chart_cumulative_roi(df)) 
+            with st.expander("📐 Show Logic: Cumulative ROI"):
+                st.latex(r"ROI_t = \left( \frac{\sum_{i=1}^{t} Profit_i}{\sum_{i=1}^{t} Stake_i} \right) \times 100")
+        
         c3, c4 = cols(2)
         with c3: pc(chart_win_loss_donut(df))
         with c4: pc(chart_waterfall(df))
@@ -777,7 +782,12 @@ def main():
             with c2: pc(chart_member_roi_bars(df))
             c3, c4 = cols(2)
             with c3: pc(chart_member_win_rate(df))
-            with c4: pc(chart_member_radar(df))
+            with c4: 
+                pc(chart_member_radar(df))
+                with st.expander("📐 Show Logic: Radar Normalization"):
+                    st.markdown("Metrics are normalized so the lowest value is mapped to 20 and the highest to 100 to fit the radar scale.")
+                    st.latex(r"Norm(x) = 20 + 80 \times \left( \frac{x - \min}{\max - \min} \right)")
+            
             pc(chart_longest_streaks(df))
             pc(chart_team_vs_individual(df))
         else:
@@ -800,9 +810,13 @@ def main():
             with c1: pc(chart_win_loss_donut(mdf, f"{m}'s Record"))
             with c2: pc(chart_member_monthly_pl(df, m))
             c3, c4 = cols(2)
-            with c3: pc(chart_member_odds_beeswarm(df, m)) # NEW Beeswarm
+            with c3: pc(chart_member_odds_violin(df, m))
             with c4: pc(chart_member_market_breakdown(df, m))
+            
             pc(chart_ev_proxy(mdf, title=f"📐 {m} — Odds Calibration (Actual vs Implied)"))
+            with st.expander("📐 Show Logic: EV Proxy (Edge)"):
+                st.latex(r"\text{Implied Win \%} = \left( \frac{1}{\text{Avg Odds}} \right) \times 100")
+                st.caption("If Actual Win % > Implied Win %, it suggests a potential mathematical edge against the bookmaker.")
 
     # 3. MARKETS
     with t_markets:
@@ -812,7 +826,7 @@ def main():
         c3, c4 = cols(2)
         with c3: pc(chart_bet_type_roi_bars(df))
         with c4: pc(chart_pl_by_selection(df))
-        pc(chart_flow_of_money_sankey(df)) # NEW Sankey Flow
+        pc(chart_flow_of_money_sankey(df)) 
         pc(chart_top_teams(df))
 
     # 4. TIMELINE
@@ -821,18 +835,38 @@ def main():
         c1, c2 = cols(2)
         with c1: pc(chart_monthly_pl(df))
         with c2: pc(chart_monthly_volatility(df))
-        pc(chart_weekday_bubble(df)) # NEW Bubble Calendar
+        pc(chart_weekday_bubble(df))
         pc(chart_year_on_year(df))
 
     # 5. ANALYTICS
     with t_analytics:
+        pc(chart_global_odds_beeswarm(df))
+        
         pc(chart_cumulative_win_rate(df))
+        with st.expander("📐 Show Logic: Cumulative Win %"):
+            st.latex(r"\text{Win \%} = \left( \frac{\text{Cumulative Wins}}{\text{Resolved Bets}} \right) \times 100")
+            st.caption("Resolved Bets = Wins + Losses (Pushes and Voids are excluded).")
+            
         pc(chart_odds_correlations(df))
+        
         pc(chart_ev_proxy(df, title="📐 Global Edge Proxy — Actual vs Implied"))
+        with st.expander("📐 Show Logic: Edge & Implied Probability"):
+            st.latex(r"\text{Implied Win \%} = \left( \frac{1}{\text{Avg Odds}} \right) \times 100")
+            st.caption("A positive gap between Actual and Implied Win % suggests a profitable edge over the bookmaker's margin.")
+
         c1, c2 = cols(2)
-        with c1: pc(chart_odds_bucket_roi(df))
-        with c2: pc(chart_longshot_vs_fav(df))
+        with c1: 
+            pc(chart_odds_bucket_roi(df))
+            with st.expander("📐 Show Logic: ROI & Win Rate"):
+                st.latex(r"ROI = \left( \frac{\sum \text{Profit}}{\sum \text{Stake}} \right) \times 100")
+                st.caption("Pushes are excluded from Win Rate calculations, but included in ROI stakes.")
+        with c2: 
+            pc(chart_longshot_vs_fav(df))
+            
         pc(chart_roi_rollercoaster(df))
+        with st.expander("📐 Show Logic: 20-Bet Rolling ROI"):
+            st.latex(r"Rolling\ ROI_n = \left( \frac{\sum_{i=n-19}^{n} Profit_i}{\sum_{i=n-19}^{n} Stake_i} \right) \times 100")
+            
         pc(chart_voting_success(df))
 
     # 6. EXTREMES
