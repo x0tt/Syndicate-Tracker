@@ -34,7 +34,9 @@ VIEWS = [
                 2
             )                                                       AS win_rate_pct
         FROM bets
-        WHERE status NOT IN ('Reconciliation')
+        WHERE status IN ('Win', 'Loss', 'Push')
+        AND stake > 0
+        AND LOWER(COALESCE(user,'')) != 'syndicate'
         """,
     ),
     (
@@ -55,7 +57,9 @@ VIEWS = [
                 2
             )                                                       AS win_rate_pct
         FROM bets
-        WHERE status NOT IN ('Reconciliation')
+        WHERE status IN ('Win', 'Loss', 'Push')
+        AND stake > 0
+        AND LOWER(COALESCE(user,'')) != 'syndicate'
         GROUP BY bet_type
         ORDER BY total_pl DESC
         """,
@@ -78,7 +82,9 @@ VIEWS = [
                 2
             )                                                       AS win_rate_pct
         FROM bets
-        WHERE status NOT IN ('Reconciliation')
+        WHERE status IN ('Win', 'Loss', 'Push')
+        AND stake > 0
+        AND LOWER(COALESCE(user,'')) != 'syndicate'
         GROUP BY competition
         ORDER BY total_pl DESC
         """,
@@ -101,7 +107,9 @@ VIEWS = [
                 2
             )                                                       AS win_rate_pct
         FROM bets
-        WHERE status NOT IN ('Reconciliation')
+        WHERE status IN ('Win', 'Loss', 'Push')
+        AND stake > 0
+        AND LOWER(COALESCE(user,'')) != 'syndicate'
         GROUP BY user
         ORDER BY total_pl DESC
         """,
@@ -119,7 +127,9 @@ VIEWS = [
             ROUND(SUM(actual_winnings), 2)                         AS monthly_pl,
             ROUND(SUM(actual_winnings) / NULLIF(SUM(stake),0)*100, 2) AS roi_pct
         FROM bets
-        WHERE status NOT IN ('Reconciliation')
+        WHERE status IN ('Win', 'Loss', 'Push')
+        AND stake > 0
+        AND LOWER(COALESCE(user,'')) != 'syndicate'
         GROUP BY month
         ORDER BY month
         """,
@@ -143,10 +153,10 @@ VIEWS = [
             )                                                       AS win_rate_pct
         FROM (
             SELECT home_team AS team, status, stake, actual_winnings FROM bets
-            WHERE home_team != 'Multiple' AND status NOT IN ('Reconciliation')
+            WHERE home_team != 'Multiple' AND status IN ('Win','Loss','Push') AND stake > 0 AND LOWER(COALESCE(user,'')) != 'syndicate'
             UNION ALL
             SELECT away_team AS team, status, stake, actual_winnings FROM bets
-            WHERE away_team != 'Multiple' AND status NOT IN ('Reconciliation')
+            WHERE away_team != 'Multiple' AND status IN ('Win','Loss','Push') AND stake > 0 AND LOWER(COALESCE(user,'')) != 'syndicate'
         )
         GROUP BY team
         ORDER BY total_pl DESC
@@ -165,7 +175,9 @@ VIEWS = [
             ROUND(SUM(actual_winnings), 2)                         AS total_pl,
             ROUND(SUM(actual_winnings) / NULLIF(SUM(stake),0)*100, 2) AS roi_pct
         FROM bets
-        WHERE status NOT IN ('Reconciliation')
+        WHERE status IN ('Win', 'Loss', 'Push')
+        AND stake > 0
+        AND LOWER(COALESCE(user,'')) != 'syndicate'
           AND selection != 'Multiple'
         GROUP BY selection
         ORDER BY total_pl DESC
@@ -180,7 +192,8 @@ VIEWS = [
             actual_winnings,
             ROUND(SUM(actual_winnings) OVER (ORDER BY date, rowid), 2) AS running_pl
         FROM bets
-        WHERE status NOT IN ('Reconciliation')
+        WHERE status IN ('Win', 'Loss', 'Push')
+        AND LOWER(COALESCE(user,'')) != 'syndicate'
         ORDER BY date, rowid
         """,
     ),

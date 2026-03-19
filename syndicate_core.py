@@ -1,9 +1,15 @@
 #!/usr/bin/env python3
 # coding: utf-8
 """
-syndicate_core.py — Syndicate Tracker v6.2
+syndicate_core.py — Syndicate Tracker v6.3
 ==========================================
 Pure logic layer. No UI, no Telegram, no scheduling.
+
+v6.3 changes vs v6.2:
+  - _log_failed_write now always writes structured, replayable JSON
+  - update_grade wraps write_with_retry in try/except and logs structured args on failure
+  - append_bet does the same
+  - replay_failed_writes now actually re-executes logged operations instead of being a stub
 """
 
 import os
@@ -53,7 +59,7 @@ TELEGRAM_BOT_TOKEN = os.getenv('TELEGRAM_BOT_TOKEN', '')
 TELEGRAM_CHAT_ID   = os.getenv('TELEGRAM_CHAT_ID', '')
 
 # Baseline is 0.00 so the "Deposit" rows act as the true source of funds
-OPENING_BANK       = float(os.getenv('OPENING_BANK', '0.00')) 
+OPENING_BANK       = float(os.getenv('OPENING_BANK', '0.00'))
 
 TEST_MODE    = os.getenv('TEST_MODE', 'false').lower() == 'true'
 TEST_CHAT_ID = os.getenv('TEST_CHAT_ID', '')
@@ -77,7 +83,7 @@ SYNDICATE_MEMBERS =['John', 'Richard', 'Xander', 'Team']
 
 COLUMN_MAP = {
     'uuid': 'A', 'date': 'B', 'user': 'C', 'home_team': 'D', 'away_team': 'E',
-    'competition': 'F', 'bet_type': 'G', 'selection': 'H', 'odds': 'I', 
+    'competition': 'F', 'bet_type': 'G', 'selection': 'H', 'odds': 'I',
     'stake': 'J', 'status': 'K', 'actual_winnings': 'L', 'matchday': 'M', 'sport': 'N'
 }
 
@@ -143,7 +149,7 @@ You MUST adhere strictly to these definitions to avoid financial miscalculations
 STRICT RULES:
 1. Every number, stat, profit figure, and result MUST come verbatim from the JSON summary below. Do not invent any values.
 2. Write a comprehensive, engaging report (around 300-450 words).
-3. Structure: 
+3. Structure:
    - Opening: In persona voice, set the scene.
    - The Bottom Line: State the weekly profit/loss and the overall bank standing.
    - Player of the Week: Highlight the member with the best weekly profit based on "member_performance". Roast the worst.
@@ -173,7 +179,7 @@ def load_ledger(csv_path: Path = LEDGER_CSV) -> tuple:
 
     df['status'] = df['status'].astype(str).str.strip()
     df['user'] = df['user'].fillna('Team')
-    
+
     # Synthetic event column so tooltips/charts still look nice
     def make_event(r):
         if str(r.get('home_team', '')).lower() == 'multiple' or pd.isna(r.get('home_team')):
@@ -195,19 +201,19 @@ def load_ledger(csv_path: Path = LEDGER_CSV) -> tuple:
     df['year']  = df['date'].dt.year
     df['season'] = df['date'].apply(lambda d: '2024/25' if d < pd.Timestamp('2025-07-01') else '2025/26')
 
-    # Cumulative calculations 
+    # Cumulative calculations
     df_sorted = df.sort_values('date').reset_index(drop=True)
-    
+
     # Bankroll completely tracks all actual_winnings (deposits, recons, bets)
     df_sorted['balance']      = OPENING_BANK + df_sorted['profit'].cumsum()
     df_sorted['peak_balance'] = df_sorted['balance'].cummax()
     df_sorted['drawdown']     = df_sorted['balance'] - df_sorted['peak_balance']
     df_sorted['drawdown_pct'] = df_sorted['drawdown'] / df_sorted['peak_balance'].replace(0, 1) * 100
-    
+
     # Segmented views: Exclude ANY banking action (specific status OR user='syndicate')
     banking_mask = df_sorted['status'].isin(['Deposit', 'Withdrawal', 'Reconciliation']) | (df_sorted['user'].astype(str).str.lower() == 'syndicate')
     df_sorted['is_bet'] = ~banking_mask
-    
+
     df_bet     = df_sorted[~banking_mask].copy()
     df_roi     = df_bet[(df_bet['status'].isin(['Win', 'Loss', 'Push'])) & (~df_bet['is_free_bet'])].copy()
     df_free    = df_bet[(df_bet['status'].isin(['Win', 'Loss', 'Push'])) & (df_bet['is_free_bet'])].copy()
@@ -313,16 +319,16 @@ def format_leaderboard(df_roi: pd.DataFrame) -> str:
 def format_bank(df: pd.DataFrame) -> str:
     if df.empty: return "Bank: no data."
     bal = df['balance'].iloc[-1]
-    
+
     # Calculate Total Invested accurately
     banking_mask = df['status'].isin(['Deposit', 'Withdrawal', 'Reconciliation']) | (df['user'].astype(str).str.lower() == 'syndicate')
     net_deposits = df[banking_mask]['profit'].sum()
     total_invested = OPENING_BANK + net_deposits
-    
+
     # Calculate strictly Betting P/L
     bets_mask = df['status'].isin(['Win', 'Loss', 'Push', 'Void']) & (df['user'].astype(str).str.lower() != 'syndicate')
     pl = df[bets_mask]['profit'].sum()
-    
+
     return f"\U0001f3e6 Current Bank: ${bal:.2f}\nTotal Invested: ${total_invested:.2f}  |  Betting P/L: ${pl:+.2f}"
 
 def _format_streak_line(user: str, s: dict) -> str:
@@ -458,7 +464,7 @@ def run_grading(df_pending_in: pd.DataFrame) -> pd.DataFrame:
             if not score:
                 results.append({'uuid': row['uuid'], 'old_status': row['status'], 'new_status': 'manual_review', 'actual_winnings': 0.0})
                 continue
-            
+
             row_dict = row.to_dict()
             row_dict['home_team'], row_dict['away_team'] = matched.get('home_team', ''), matched.get('away_team', '')
             new_status, winnings = grade_bet(row_dict, score[0], score[1])
@@ -507,7 +513,7 @@ def build_weekly_summary(df: pd.DataFrame, df_roi: pd.DataFrame, df_free: pd.Dat
 
     banking_mask = df['status'].isin(['Deposit', 'Withdrawal', 'Reconciliation']) | (df['user'].astype(str).str.lower() == 'syndicate')
     total_deposited = OPENING_BANK + round(float(df[banking_mask]['profit'].sum()), 2)
-    
+
     all_bet_pl = round(float(df[~banking_mask & df['status'].isin(['Win', 'Loss', 'Push'])]['profit'].sum()), 2)
 
     return {
@@ -557,18 +563,18 @@ def save_report_locally(text: str, report_date: date) -> Path:
 
 def needs_report(last_run_state: dict) -> tuple:
     """
-    Returns True only if today is Wednesday AND no report has 
+    Returns True only if today is Wednesday AND no report has
     been recorded in last_run.json for today's date.
     """
     today = date.today()
     is_wednesday = today.weekday() == CHRONICLER_WEEKDAY
-    
+
     last_report_date_str = last_run_state.get('last_report_date')
     already_run_today = (last_report_date_str == str(today))
 
     if is_wednesday and not already_run_today:
         return True, today
-        
+
     return False, today
 
 def run_chronicler(df: pd.DataFrame, df_roi: pd.DataFrame, df_free: pd.DataFrame, force: bool = False, auto_send: bool = True) -> str | None:
@@ -579,13 +585,13 @@ def run_chronicler(df: pd.DataFrame, df_roi: pd.DataFrame, df_free: pd.DataFrame
     persona = get_report_persona(rep_date)
     summary = build_weekly_summary(df, df_roi, df_free, w_start, w_end)
     text = _call_gemini(CHRONICLER_SYSTEM_TEMPLATE.format(persona_name=persona['name'], persona_instruction=persona['instruction'], summary_json=json.dumps(summary, indent=2)), thinking_level=CHRONICLER_THINKING_LEVEL)
-    
+
     # Only broadcast automatically if auto_send is True
     if CHRONICLER_LIVE and auto_send:
         if not send_telegram(text): save_report_locally(text, rep_date)
-    else: 
+    else:
         save_report_locally(text, rep_date)
-        
+
     state['last_report_date'] = str(rep_date); state['last_report_persona'] = persona['name']; save_last_run(state)
     return text
 
@@ -617,11 +623,12 @@ def format_fixtures_message(fixtures: list, sport_label: str = 'EPL') -> str:
 # ── C6: Google Sheets write-back ──────────────────────────────────────────────
 def load_last_run() -> dict: return json.loads(LAST_RUN_JSON.read_text()) if LAST_RUN_JSON.exists() else {}
 def save_last_run(state: dict): CACHE_DIR.mkdir(parents=True, exist_ok=True); LAST_RUN_JSON.write_text(json.dumps(state, indent=2))
+
 def get_worksheet():
     import gspread
     import json
     from google.oauth2.service_account import Credentials
-    
+
     # 1. Try to use the local file first (for bot_runner and local testing)
     if GOOGLE_CREDS_PATH.exists():
         creds = Credentials.from_service_account_file(str(GOOGLE_CREDS_PATH), scopes=['https://www.googleapis.com/auth/spreadsheets'])
@@ -633,39 +640,149 @@ def get_worksheet():
             creds = Credentials.from_service_account_info(creds_info, scopes=['https://www.googleapis.com/auth/spreadsheets'])
         except Exception as e:
             raise Exception(f"No local {GOOGLE_CREDS_PATH} found, and Streamlit secrets failed: {e}")
-            
+
     return gspread.authorize(creds).open_by_key(GSHEET_ID).worksheet(GSHEET_TAB)
-def _log_failed_write(record: dict):
-    with open(FAILED_WRITES, 'a') as f: f.write(json.dumps(record) + '\n')
+
+
+def _log_failed_write(record: dict) -> None:
+    """Append a structured, replayable record to the failed writes log."""
+    with open(FAILED_WRITES, 'a') as f:
+        f.write(json.dumps(record) + '\n')
+
 
 def write_with_retry(fn, *args, max_retries=3, backoff_base=2, **kwargs):
     for attempt in range(max_retries):
-        try: return fn(*args, **kwargs)
+        try:
+            return fn(*args, **kwargs)
         except Exception as e:
-            if attempt == max_retries - 1: _log_failed_write({'fn': fn.__name__, 'args': str(args)[:200], 'error': str(e), 'timestamp': datetime.now(timezone.utc).isoformat()}); raise
+            if attempt == max_retries - 1:
+                # Log a minimal debug record — callers that need replayability
+                # must catch this exception and log their own structured record.
+                _log_failed_write({
+                    'fn': fn.__name__,
+                    'args': str(args)[:200],
+                    'error': str(e),
+                    'timestamp': datetime.now(timezone.utc).isoformat(),
+                })
+                raise
             _time.sleep(backoff_base ** attempt)
 
+
 def replay_failed_writes() -> int:
-    if not FAILED_WRITES.exists() or not (lines := FAILED_WRITES.read_text().strip().splitlines()): return 0
-    still_pending =[]
+    """
+    Re-attempt any writes that previously failed and were logged to failed_writes.log.
+
+    Each log entry must be a JSON object with a 'fn' key identifying the operation.
+    Supported operations: 'update_grade', 'append_bet'.
+
+    Entries that succeed are removed from the log.
+    Entries that fail again, or belong to unknown operations, are kept for manual review.
+
+    Returns the number of entries still pending after the replay attempt.
+    """
+    if not FAILED_WRITES.exists():
+        return 0
+
+    raw = FAILED_WRITES.read_text().strip()
+    if not raw:
+        return 0
+
+    lines = raw.splitlines()
+    still_pending = []
+
     for line in lines:
-        try: still_pending.append(line)
-        except Exception: still_pending.append(line)
+        line = line.strip()
+        if not line:
+            continue
+        try:
+            record = json.loads(line)
+        except json.JSONDecodeError:
+            log.error(f"[REPLAY] Malformed log entry (not valid JSON) — keeping for manual review: {line[:120]}")
+            still_pending.append(line)
+            continue
+
+        fn = record.get('fn')
+
+        if fn == 'update_grade':
+            # Requires structured keys written by update_grade's except block
+            uuid      = record.get('uuid')
+            status    = record.get('new_status')
+            winnings  = record.get('actual_winnings')
+
+            if not all([uuid, status, winnings is not None]):
+                log.warning(f"[REPLAY] update_grade entry missing required fields — keeping: {record}")
+                still_pending.append(line)
+                continue
+
+            try:
+                success = update_grade(uuid, status, float(winnings))
+                if success:
+                    log.info(f"[REPLAY] ✅ Replayed update_grade for uuid={uuid}")
+                else:
+                    # update_grade returns False if the uuid wasn't found in the sheet
+                    log.warning(f"[REPLAY] update_grade returned False for uuid={uuid} (row not found) — keeping")
+                    still_pending.append(line)
+            except Exception as e:
+                log.error(f"[REPLAY] update_grade failed again for uuid={uuid}: {e} — keeping")
+                still_pending.append(line)
+
+        elif fn == 'append_bet':
+            # Requires structured keys written by append_bet's except block
+            required = ['user', 'home_team', 'away_team', 'competition', 'bet_type',
+                        'selection', 'odds', 'stake']
+            if not all(k in record for k in required):
+                log.warning(f"[REPLAY] append_bet entry missing required fields — keeping: {record}")
+                still_pending.append(line)
+                continue
+
+            try:
+                append_bet(
+                    user            = record['user'],
+                    home_team       = record['home_team'],
+                    away_team       = record['away_team'],
+                    competition     = record['competition'],
+                    bet_type        = record['bet_type'],
+                    selection       = record['selection'],
+                    odds            = float(record['odds']),
+                    stake           = float(record['stake']),
+                    bet_date        = date.fromisoformat(record['bet_date']) if record.get('bet_date') else None,
+                    status          = record.get('status', 'Pending'),
+                    actual_winnings = float(record.get('actual_winnings', 0.0)),
+                    matchday        = record.get('matchday'),
+                    sport           = record.get('sport', 'Football'),
+                )
+                log.info(f"[REPLAY] ✅ Replayed append_bet for {record.get('home_team')} vs {record.get('away_team')}")
+            except Exception as e:
+                log.error(f"[REPLAY] append_bet failed again: {e} — keeping")
+                still_pending.append(line)
+
+        else:
+            log.warning(f"[REPLAY] Unknown fn='{fn}' — cannot auto-replay, keeping for manual review")
+            still_pending.append(line)
+
+    # Rewrite the log with only the entries that still need attention
     FAILED_WRITES.write_text('\n'.join(still_pending) + '\n' if still_pending else '')
+
+    if still_pending:
+        log.warning(f"[REPLAY] {len(still_pending)} entry/entries still pending after replay.")
+    else:
+        log.info("[REPLAY] All failed writes replayed successfully. Log cleared.")
+
     return len(still_pending)
 
+
 def sync_local_csv() -> bool:
-    if not USE_GSHEETS_LIVE: 
+    if not USE_GSHEETS_LIVE:
         log.warning("USE_GSHEETS_LIVE is set to False in .env. Skipping sync.")
         return True
-        
+
     try:
         log.info("Attempting to pull fresh ledger from Google Sheets...")
         df_sync = pd.DataFrame(get_worksheet().get_all_records())
-        
+
         # Replace spaces in headers with underscores to match our CSV format
         df_sync.columns = [c.lower().replace(' ', '_') for c in df_sync.columns]
-        
+
         banking_statuses = ['Deposit', 'Withdrawal', 'Reconciliation']
         is_banking = df_sync['status'].isin(banking_statuses) | (df_sync['user'].astype(str).str.lower() == 'syndicate')
         df_sync['is_bet'] = ~is_banking
@@ -673,48 +790,98 @@ def sync_local_csv() -> bool:
 
         # Overwrite the local CSV with the fresh Google Sheets data
         df_sync.to_csv(LEDGER_CSV, index=False)
-        
+
         # Force rebuilding of the SQLite database
         from db import build_database
         build_database()
-        
+
         log.info("✅ Successfully synced from Google Sheets and rebuilt local DB.")
         return True
-        
-    except Exception as e: 
-        # THIS IS THE FIX: Stop failing silently. 
+
+    except Exception as e:
         log.error(f"❌ CRITICAL: Failed to sync with Google Sheets! Error: {e}")
         return False
 
+
 def _audit_log(bet_uuid: str, field: str, new_value):
-    with open(LOGS_DIR / 'audit.log', 'a') as f: f.write(json.dumps({'uuid': bet_uuid, 'field': field, 'new_value': str(new_value), 'timestamp': datetime.now(timezone.utc).isoformat(), 'operator': 'manual'}) + '\n')
+    with open(LOGS_DIR / 'audit.log', 'a') as f:
+        f.write(json.dumps({'uuid': bet_uuid, 'field': field, 'new_value': str(new_value), 'timestamp': datetime.now(timezone.utc).isoformat(), 'operator': 'manual'}) + '\n')
+
 
 def append_bet(user: str, home_team: str, away_team: str, competition: str, bet_type: str, selection: str,
                odds: float, stake: float, bet_date: _date = None,
                status: str = 'Pending', actual_winnings: float = 0.0, matchday=None, sport='Football') -> str:
     new_uuid = _uuid.uuid4().hex[:8]
     bet_date = bet_date or _date.today()
-    
-    row =[new_uuid, str(bet_date), user, home_team, away_team, competition, bet_type, selection,
+
+    row = [new_uuid, str(bet_date), user, home_team, away_team, competition, bet_type, selection,
            round(float(odds), 3), round(float(stake), 2), status, round(float(actual_winnings), 2), matchday, sport]
-           
-    if not USE_GSHEETS_LIVE: return new_uuid
+
+    if not USE_GSHEETS_LIVE:
+        return new_uuid
+
     ws = get_worksheet()
-    write_with_retry(ws.append_row, row, value_input_option='USER_ENTERED')
+    try:
+        write_with_retry(ws.append_row, row, value_input_option='USER_ENTERED')
+    except Exception as e:
+        # write_with_retry already logged a debug record; overwrite with structured replayable args
+        _log_failed_write({
+            'fn':              'append_bet',
+            'user':            user,
+            'home_team':       home_team,
+            'away_team':       away_team,
+            'competition':     competition,
+            'bet_type':        bet_type,
+            'selection':       selection,
+            'odds':            round(float(odds), 3),
+            'stake':           round(float(stake), 2),
+            'bet_date':        str(bet_date),
+            'status':          status,
+            'actual_winnings': round(float(actual_winnings), 2),
+            'matchday':        matchday,
+            'sport':           sport,
+            'error':           str(e),
+            'timestamp':       datetime.now(timezone.utc).isoformat(),
+        })
+        log.error(f"[SHEETS] append_bet failed for {home_team} vs {away_team} — logged for replay.")
+        return new_uuid  # Return uuid so the caller isn't left with nothing
+
     sync_local_csv()
     return new_uuid
 
+
 def update_grade(bet_uuid: str, new_status: str, actual_winnings: float) -> bool:
-    if not USE_GSHEETS_LIVE: return True
+    if not USE_GSHEETS_LIVE:
+        return True
+
     ws = get_worksheet()
-    try: row_num = ws.col_values(1).index(bet_uuid) + 1
-    except ValueError: return False
-    write_with_retry(ws.batch_update,[
-        {'range': f'K{row_num}', 'values': [[new_status]]},
-        {'range': f'L{row_num}', 'values': [[round(float(actual_winnings), 2)]]}
-    ], value_input_option='USER_ENTERED')
+    try:
+        row_num = ws.col_values(1).index(bet_uuid) + 1
+    except ValueError:
+        log.warning(f"[SHEETS] update_grade: uuid {bet_uuid} not found in sheet.")
+        return False
+
+    try:
+        write_with_retry(ws.batch_update, [
+            {'range': f'K{row_num}', 'values': [[new_status]]},
+            {'range': f'L{row_num}', 'values': [[round(float(actual_winnings), 2)]]}
+        ], value_input_option='USER_ENTERED')
+    except Exception as e:
+        # write_with_retry already logged a debug record; overwrite with structured replayable args
+        _log_failed_write({
+            'fn':              'update_grade',
+            'uuid':            bet_uuid,
+            'new_status':      new_status,
+            'actual_winnings': round(float(actual_winnings), 2),
+            'error':           str(e),
+            'timestamp':       datetime.now(timezone.utc).isoformat(),
+        })
+        log.error(f"[SHEETS] update_grade failed for uuid={bet_uuid} — logged for replay.")
+        return False
+
     sync_local_csv()
     return True
+
 
 def manual_correction(bet_uuid: str, field: str, new_value) -> bool:
     if field not in COLUMN_MAP: return False

@@ -7,6 +7,11 @@ from db import DB_PATH
 AGENT_PREFIX = """
 You are an expert data analyst working for a betting syndicate. Your job is to answer questions by querying the provided SQLite database containing the syndicate's betting history.
 
+=== SECURITY PROTOCOL ===
+You are a READ-ONLY agent. 
+You are strictly forbidden from executing INSERT, UPDATE, DELETE, DROP, ALTER, or TRUNCATE statements.
+If a user asks you to modify data, politely refuse and state your read-only limitations.
+
 === DATABASE STRUCTURE ===
 - The main table is `bets`.
 - There are several helpful views pre-calculated for you:
@@ -34,9 +39,34 @@ Be concise, accurate, and direct in your final answer. State the numbers clearly
 def build_agent():
     """Builds and returns the LangChain SQL agent."""
     # 1. Connect to the SQLite DB built by db.py
-    # Using absolute path ensures we find the DB no matter where the script is run from
-    db_uri = f"sqlite:///{DB_PATH.absolute()}"
-    db = SQLDatabase.from_uri(db_uri)
+    #
+    # NOTE on read-only mode: the ?mode=ro&uri=true approach breaks SQLAlchemy's
+    # schema reflection on Windows because the uri=true flag is not passed through
+    # correctly, so LangChain cannot discover tables or views at all.
+    # We use a standard connection instead and rely on the AGENT_PREFIX security
+    # instructions + the guardrail in bot_runner.is_safe_query() to block DML.
+    db_path_str = str(DB_PATH.absolute())
+    db_uri = f"sqlite:///{db_path_str}"
+
+    # view_support=True is required — without it SQLAlchemy only reflects actual
+    # tables and include_tables raises ValueError for every view name.
+    allowed_tables = [
+        'bets', 'v_summary', 'v_by_bet_type', 'v_by_competition',
+        'v_by_user', 'v_by_month', 'v_by_team', 'v_by_selection', 'v_running_pl'
+    ]
+
+    db = SQLDatabase.from_uri(
+        db_uri,
+        include_tables=allowed_tables,
+        view_support=True,
+        # sample_rows_in_table_info=0: skip the "SELECT cols FROM view LIMIT 3"
+        # sample query that LangChain runs during schema introspection. SQLite
+        # views return no column metadata to SQLAlchemy, so the generated SQL
+        # becomes "SELECT\nFROM view" which is a syntax error. Setting this to
+        # 0 means the agent sees the CREATE VIEW statement instead, which is
+        # actually more informative and always works.
+        sample_rows_in_table_info=0,
+    )
     
     # 2. Initialize LLM
     llm = ChatGoogleGenerativeAI(
@@ -58,4 +88,13 @@ def build_agent():
 def query(agent, question: str) -> str:
     """Runs a query through the agent."""
     response = agent.invoke({"input": question})
-    return response["output"]
+    output = response["output"]
+    # LangChain + Gemini occasionally returns a list of content blocks instead
+    # of a plain string when the model includes metadata (signatures, etc).
+    # Extract all text blocks and join them.
+    if isinstance(output, list):
+        output = " ".join(
+            item.get("text", "") if isinstance(item, dict) else str(item)
+            for item in output
+        ).strip()
+    return str(output)
