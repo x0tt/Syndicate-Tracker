@@ -391,44 +391,107 @@ def chart_bet_type_roi_bars(df: pd.DataFrame) -> go.Figure:
 
 
 def chart_flow_of_money_sankey(df: pd.DataFrame) -> go.Figure:
-    d = df[df["status"].isin(["Win", "Loss", "Push"])].copy()
-    if d.empty: return go.Figure().update_layout(title="No data for Flow of Money")
+    # Restrict to the 3 individuals and resolved bets
+    users_to_track = ["John", "Richard", "Xander"]
+    d = df[df["user"].isin(users_to_track) & df["status"].isin(["Win", "Loss", "Push"])].copy()
     
-    sports = d["sport"].unique().tolist()
-    bet_types = d["bet_type"].unique().tolist()
+    if d.empty: 
+        return go.Figure().update_layout(title="No individual data for Sankey")
+        
+    # Ensure numerical actual_winnings for accurate math
+    d["aw_num"] = pd.to_numeric(d["actual_winnings"], errors="coerce").fillna(0)
+    
+    bet_types = sorted(d["bet_type"].unique().tolist())
     statuses = ["Win", "Loss", "Push"]
     
-    labels = sports + bet_types + statuses
+    labels = users_to_track + bet_types + statuses
     node_dict = {label: i for i, label in enumerate(labels)}
     
-    source, target, value, link_color = [], [], [], []
+    # ─── 1. CALCULATE NODE STATS (The Blocks) ───
+    node_stats = {l: {"bets": 0, "pl": 0.0, "stake": 0.0} for l in labels}
     
-    sport_mkt = d.groupby(["sport", "bet_type"])["stake"].sum().reset_index()
-    for _, row in sport_mkt.iterrows():
-        source.append(node_dict[row["sport"]])
+    for l in users_to_track:
+        sub = d[d["user"] == l]
+        node_stats[l] = {"bets": len(sub), "pl": sub["aw_num"].sum(), "stake": sub["stake"].sum()}
+    for l in bet_types:
+        sub = d[d["bet_type"] == l]
+        node_stats[l] = {"bets": len(sub), "pl": sub["aw_num"].sum(), "stake": sub["stake"].sum()}
+    for l in statuses:
+        sub = d[d["status"] == l]
+        node_stats[l] = {"bets": len(sub), "pl": sub["aw_num"].sum(), "stake": sub["stake"].sum()}
+        
+    node_customdata = []
+    for l in labels:
+        stk = node_stats[l]["stake"]
+        pl = node_stats[l]["pl"]
+        bets = node_stats[l]["bets"]
+        roi = (pl / stk * 100) if stk > 0 else 0
+        node_customdata.append([bets, f"${pl:+.2f}", f"{roi:+.2f}%"])
+
+    # ─── 2. CALCULATE LINK STATS (The Flows) ───
+    source, target, value, link_color, link_hovercolor, link_customdata = [], [], [], [], [], []
+    
+    # Link 1: User -> Bet Type
+    user_mkt = d.groupby(["user", "bet_type"]).agg(
+        stake=("stake", "sum"), bets=("uuid", "count"), pl=("aw_num", "sum")
+    ).reset_index()
+    
+    for _, row in user_mkt.iterrows():
+        source.append(node_dict[row["user"]])
         target.append(node_dict[row["bet_type"]])
         value.append(row["stake"])
-        link_color.append("rgba(255, 255, 255, 0.05)")
         
-    mkt_stat = d.groupby(["bet_type", "status"])["stake"].sum().reset_index()
+        roi = (row["pl"] / row["stake"] * 100) if row["stake"] > 0 else 0
+        link_customdata.append([row["bets"], f"${row['pl']:+.2f}", f"{roi:+.2f}%"])
+        
+        c = MEMBER_COLORS.get(row["user"], "#ffffff")
+        link_color.append(_hex_to_rgba(c, 0.25))       # Resting: 25% opacity
+        link_hovercolor.append(_hex_to_rgba(c, 0.85))  # Hovering: 85% opacity (Bright!)
+        
+    # Link 2: Bet Type -> Outcome
+    mkt_stat = d.groupby(["bet_type", "status"]).agg(
+        stake=("stake", "sum"), bets=("uuid", "count"), pl=("aw_num", "sum")
+    ).reset_index()
+    
     for _, row in mkt_stat.iterrows():
         source.append(node_dict[row["bet_type"]])
         target.append(node_dict[row["status"]])
         value.append(row["stake"])
         
-        c = WIN_COLOR if row["status"] == "Win" else (LOSS_COLOR if row["status"] == "Loss" else PUSH_COLOR)
-        link_color.append(c.replace("rgb", "rgba").replace(")", ", 0.4)"))
+        roi = (row["pl"] / row["stake"] * 100) if row["stake"] > 0 else 0
+        link_customdata.append([row["bets"], f"${row['pl']:+.2f}", f"{roi:+.2f}%"])
+        
+        if row["status"] == "Win": c = WIN_COLOR
+        elif row["status"] == "Loss": c = LOSS_COLOR
+        else: c = PUSH_COLOR
+        
+        link_color.append(_hex_to_rgba(c, 0.25))       # Resting: 25% opacity
+        link_hovercolor.append(_hex_to_rgba(c, 0.85))  # Hovering: 85% opacity (Bright!)
 
+    # ─── 3. BUILD THE SANKEY ───
     fig = go.Figure(data=[go.Sankey(
+        arrangement="snap", 
         node = dict(
-            pad = 20, thickness = 15, line = dict(color = GRID_CLR, width = 0.5),
+            pad = 45, 
+            thickness = 10, 
+            line = dict(color = GRID_CLR, width = 0.5),
             label = labels,
-            color = "#16213e"
+            color = BG_CARD,
+            customdata = node_customdata,
+            hovertemplate = "<b>%{label}</b><br>Volume: $%{value:.2f}<br>Bets: %{customdata[0]}<br>P/L: %{customdata[1]}<br>ROI: %{customdata[2]}<extra></extra>"
         ),
-        link = dict(source = source, target = target, value = value, color = link_color)
+        link = dict(
+            source = source, 
+            target = target, 
+            value = value, 
+            color = link_color,
+            hovercolor = link_hovercolor,  # <--- The magic happens here
+            customdata = link_customdata,
+            hovertemplate = "<b>%{source.label} ➔ %{target.label}</b><br>Volume: $%{value:.2f}<br>Bets: %{customdata[0]}<br>P/L: %{customdata[1]}<br>ROI: %{customdata[2]}<extra></extra>"
+        )
     )])
     
-    return apply_layout(fig, title="🌊 Flow of Money (Stake Volume)", height=480)
+    return apply_layout(fig, title="", height=550)
 
 
 def chart_accumulator_curse(df: pd.DataFrame) -> go.Figure:
@@ -542,10 +605,45 @@ def chart_member_radar(df: pd.DataFrame) -> go.Figure:
     return apply_layout(fig, title="🕸️ Member Radar", height=400)
 
 def chart_waterfall(df: pd.DataFrame) -> go.Figure:
-    df2 = df.sort_values("date").tail(15).copy()
+    # Focus on Team Pool first, fallback to Global if Team data is sparse
+    team_bets = df[df["user"] == "Team"]
+    if len(team_bets) >= 5:
+        df2 = team_bets.sort_values("date").tail(15).copy()
+        title = "🌊 Team Pool: Recent Result Sequence"
+    else:
+        df2 = df.sort_values("date").tail(15).copy()
+        title = "🌊 Recent Syndicate Form (All Members)"
+
     df2["aw_num"] = pd.to_numeric(df2["actual_winnings"], errors="coerce").fillna(0)
-    fig = go.Figure(go.Waterfall(x=df2["event"].str[:14] + "…", y=df2["aw_num"], measure=["relative"] * len(df2), text=[f"${v:+.2f}" for v in df2["aw_num"]], textposition="outside", decreasing=dict(marker=dict(color=LOSS_COLOR)), increasing=dict(marker=dict(color=WIN_COLOR))))
-    return apply_layout(fig, title="🌊 Last 15 Bets — Waterfall", height=420, showlegend=False)
+    
+    # THE FIX: Create a mathematically unique ID for the X-axis to prevent 
+    # identical string values (like two matches on the same day) from stacking.
+    df2["unique_label"] = df2["event"].astype(str).str[:12] + " [" + df2["uuid"].astype(str).str[:4] + "]"
+    
+    fig = go.Figure(go.Waterfall(
+        name="Profit",
+        orientation="v",
+        x=df2["unique_label"],
+        y=df2["aw_num"],
+        measure=["relative"] * len(df2),
+        text=[f"${v:+.2f}" for v in df2["aw_num"]],
+        textposition="outside",
+        decreasing=dict(marker=dict(color=LOSS_COLOR)),
+        increasing=dict(marker=dict(color=WIN_COLOR)),
+        totals=dict(marker=dict(color=ACCENT)),
+        connector=dict(line=dict(color=GRID_CLR, width=1))
+    ))
+
+    # Clean up the display so the user only sees the readable event name
+    clean_labels = df2["event"].astype(str).str[:14] + ".."
+    fig.update_xaxes(
+        tickmode='array',
+        tickvals=df2["unique_label"],
+        ticktext=clean_labels,
+        tickangle=45
+    )
+    
+    return apply_layout(fig, title=title, height=450, showlegend=False)
 
 def chart_team_vs_individual(df: pd.DataFrame) -> go.Figure:
     groups = MEMBERS + ["Team"]
@@ -718,8 +816,20 @@ def main():
         df_raw, df_roi, df_free, df_pending, kpis = load_data()
 
     df, bankroll_df = get_enriched(df_raw)
-    opening = float(core.OPENING_BANK)
 
+    # --- THE PRESENTATION MODE INTERCEPT ---
+    # If the URL contains ?view=sankey, ONLY draw the Sankey chart and stop.
+    if st.query_params.get("view") == "sankey":
+        st.markdown("<h2 style='text-align: center; color: #56B4E9;'>Syndicate Stake Flow</h2>", unsafe_allow_html=True)
+        # Increase the height so it looks epic on full screen
+        fig = chart_flow_of_money_sankey(df)
+        fig.update_layout(height=800) 
+        pc(fig)
+        return  # Stop executing the rest of the app
+    # ---------------------------------------
+    
+    opening = float(core.OPENING_BANK)
+    
     banking_mask = df_raw["status"].isin(["Reconciliation", "Deposit", "Withdrawal"]) | (df_raw["user"].astype(str).str.lower() == "syndicate")
     df_banking = df_raw[banking_mask]
     df_bets = df_raw[~banking_mask]
@@ -777,6 +887,26 @@ def main():
         st.divider()
 
         if view == "🏆 Leaderboard":
+            # --- THE NEW SHOWSTOPPER CENTERPIECE ---
+            section("🌊 Individual Stake Flow")
+            
+            sankey_filter = st.radio(
+                "Filter Flow by Member:", 
+                ["All", "John", "Richard", "Xander"], 
+                horizontal=True,
+                label_visibility="collapsed",
+                key="sankey_lb_filter"
+            )
+            
+            if sankey_filter == "All":
+                pc(chart_flow_of_money_sankey(df))
+            else:
+                filtered_sankey_df = df[df["user"] == sankey_filter].copy()
+                pc(chart_flow_of_money_sankey(filtered_sankey_df))
+            
+            st.divider()
+            # ---------------------------------------
+
             c1, c2 = cols(2)
             with c1: pc(chart_member_pl_bars(df))
             with c2: pc(chart_member_roi_bars(df))
@@ -790,33 +920,6 @@ def main():
             
             pc(chart_longest_streaks(df))
             pc(chart_team_vs_individual(df))
-        else:
-            m = view.replace("👤 ", "")
-            mdf = df[df["user"] == m]
-            s = member_stats(df, m)
-            streak_n, streak_type = compute_streak(mdf)
-
-            _mk1, _mk2, _mk3, _mk4 = cols(4)
-            with _mk1: kpi(f"{m} P/L", f"${s['pl']:+.2f}")
-            with _mk2: kpi("ROI", f"{s['roi']:+.1f}%")
-            with _mk3: kpi("Win Rate", f"{s['win_rate']:.1f}%", delta=f"{s['wins']}W / {s['losses']}L")
-            with _mk4: kpi("Streak", f"{streak_n}× {streak_type}")
-
-            if len(mdf) > 0:
-                wb = worst_bet(mdf)
-                roast(f"{m}'s worst bet: {event_label(wb)} @ {wb['odds']:.2f} — ${wb['actual_winnings']:.2f}")
-
-            c1, c2 = cols(2)
-            with c1: pc(chart_win_loss_donut(mdf, f"{m}'s Record"))
-            with c2: pc(chart_member_monthly_pl(df, m))
-            c3, c4 = cols(2)
-            with c3: pc(chart_member_odds_violin(df, m))
-            with c4: pc(chart_member_market_breakdown(df, m))
-            
-            pc(chart_ev_proxy(mdf, title=f"📐 {m} — Odds Calibration (Actual vs Implied)"))
-            with st.expander("📐 Show Logic: EV Proxy (Edge)"):
-                st.latex(r"\text{Implied Win \%} = \left( \frac{1}{\text{Avg Odds}} \right) \times 100")
-                st.caption("If Actual Win % > Implied Win %, it suggests a potential mathematical edge against the bookmaker.")
 
     # 3. MARKETS
     with t_markets:
@@ -826,7 +929,7 @@ def main():
         c3, c4 = cols(2)
         with c3: pc(chart_bet_type_roi_bars(df))
         with c4: pc(chart_pl_by_selection(df))
-        pc(chart_flow_of_money_sankey(df)) 
+        
         pc(chart_top_teams(df))
 
     # 4. TIMELINE
