@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # coding: utf-8
 """
-bot_runner.py — Syndicate Tracker v4.1
+bot_runner.py — Syndicate Tracker v4.2
 =======================================
 Always-on background process. Runs on the PC.
 
@@ -143,8 +143,6 @@ def _route_message(text: str, chat_id: str, sender_id: str,
     # ── Reply target: always reply into the conversation the message came from ──
     # chat_id is the conversation ID — group chat ID in a group, or the user's
     # personal ID in a private DM. Either way this is the correct reply target.
-    # (sender_id is the user's personal ID regardless of context — using it here
-    # would reply privately even for group messages, which is not what we want.)
     reply_to = chat_id
 
     # ── 1. Hardcoded instant commands ──
@@ -161,10 +159,13 @@ def _route_message(text: str, chat_id: str, sender_id: str,
             f"Betbot: {betbot_state} | Chronicler: {chronicler_state} | Grading{dry}"
         )
 
-# In bot_runner.py (around line 102)
     def _report_reply() -> str:
         log.info(f"[COMMAND] On-demand Chronicler report requested by {asker_name}")
         try:
+            # Sync fresh data specifically for the on-demand report
+            if core.USE_GSHEETS_LIVE:
+                core.sync_local_csv()
+                
             fresh_df, fresh_roi, fresh_free, _, _ = core.load_ledger()
             # Pass auto_send=False so it doesn't blast the group chat
             report = core.run_chronicler(fresh_df, fresh_roi, fresh_free, force=True, auto_send=False)
@@ -296,7 +297,7 @@ def _startup_catchup(df, df_roi, df_free, df_pending, kpis) -> None:
 
 def run() -> None:
     log.info("=" * 60)
-    log.info("  Syndicate bot_runner v4.0 starting up")
+    log.info("  Syndicate bot_runner v4.2 starting up")
     log.info("=" * 60)
 
     # Validate credentials on startup
@@ -309,6 +310,15 @@ def run() -> None:
 
     # Load data
     log.info("Loading ledger...")
+    
+    # NEW: Sync on startup so the bot knows about bets placed while it was offline
+    if core.USE_GSHEETS_LIVE:
+        log.info("Syncing latest ledger from Google Sheets...")
+        try:
+            core.sync_local_csv()
+        except Exception as e:
+            log.error(f"Failed to sync with Google Sheets on startup: {e}")
+            
     df, df_roi, df_free, df_pending, kpis = core.load_ledger()
     log.info(f"Ledger loaded: {len(df)} rows | {len(df_pending)} pending")
 
@@ -343,6 +353,14 @@ def run() -> None:
                (today == last_grading_date and now.hour >= 10 and
                     last_grading_date < today):
                 log.info("[SCHEDULER] Daily grading trigger (10:00)")
+                
+                # NEW: Sync right before grading to catch late-night additions
+                if core.USE_GSHEETS_LIVE:
+                    try:
+                        core.sync_local_csv()
+                    except Exception as e:
+                        log.error(f"Failed to sync with Google Sheets before grading: {e}")
+                
                 # Reload ledger to pick up any new bets
                 df, df_roi, df_free, df_pending, kpis = core.load_ledger()
                 _run_grading(df, df_roi, df_free, df_pending, kpis)
@@ -352,6 +370,14 @@ def run() -> None:
             if now.weekday() == core.CHRONICLER_WEEKDAY and now.hour >= 9 and \
                today > last_chronicler_date:
                 log.info("[SCHEDULER] Wednesday Chronicler trigger (09:00)")
+                
+                # NEW: Sync right before the report to ensure accurate P/L
+                if core.USE_GSHEETS_LIVE:
+                    try:
+                        core.sync_local_csv()
+                    except Exception as e:
+                        log.error(f"Failed to sync with Google Sheets before report: {e}")
+                        
                 df, df_roi, df_free, df_pending, kpis = core.load_ledger()
                 _run_chronicler_if_due(df, df_roi, df_free)
                 last_chronicler_date = today

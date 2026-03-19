@@ -560,7 +560,6 @@ def needs_report(last_run_state: dict) -> tuple:
     if last_run_state.get('last_report_date') is None or last_run_state.get('last_report_date') < str(today): return True, today
     return False, today
 
-# In syndicate_core.py (around line 352)
 def run_chronicler(df: pd.DataFrame, df_roi: pd.DataFrame, df_free: pd.DataFrame, force: bool = False, auto_send: bool = True) -> str | None:
     state = load_last_run()
     should_run, rep_date = needs_report(state)
@@ -609,20 +608,22 @@ def load_last_run() -> dict: return json.loads(LAST_RUN_JSON.read_text()) if LAS
 def save_last_run(state: dict): CACHE_DIR.mkdir(parents=True, exist_ok=True); LAST_RUN_JSON.write_text(json.dumps(state, indent=2))
 def get_worksheet():
     import gspread
-    import streamlit as st
     import json
     from google.oauth2.service_account import Credentials
     
-    # If running on Streamlit Cloud, use the Secret string
-    if "gcp_service_account" in st.secrets:
-        creds_info = json.loads(st.secrets["gcp_service_account"])
-        creds = Credentials.from_service_account_info(creds_info, scopes=['https://www.googleapis.com/auth/spreadsheets'])
-    # Otherwise, look for your local file
-    else:
+    # 1. Try to use the local file first (for bot_runner and local testing)
+    if GOOGLE_CREDS_PATH.exists():
         creds = Credentials.from_service_account_file(str(GOOGLE_CREDS_PATH), scopes=['https://www.googleapis.com/auth/spreadsheets'])
-        
+    else:
+        # 2. If no local file, assume we are on Streamlit Cloud and use secrets
+        import streamlit as st
+        try:
+            creds_info = json.loads(st.secrets["gcp_service_account"])
+            creds = Credentials.from_service_account_info(creds_info, scopes=['https://www.googleapis.com/auth/spreadsheets'])
+        except Exception as e:
+            raise Exception(f"No local {GOOGLE_CREDS_PATH} found, and Streamlit secrets failed: {e}")
+            
     return gspread.authorize(creds).open_by_key(GSHEET_ID).worksheet(GSHEET_TAB)
-
 def _log_failed_write(record: dict):
     with open(FAILED_WRITES, 'a') as f: f.write(json.dumps(record) + '\n')
 
@@ -643,9 +644,14 @@ def replay_failed_writes() -> int:
     return len(still_pending)
 
 def sync_local_csv() -> bool:
-    if not USE_GSHEETS_LIVE: return True
+    if not USE_GSHEETS_LIVE: 
+        log.warning("USE_GSHEETS_LIVE is set to False in .env. Skipping sync.")
+        return True
+        
     try:
+        log.info("Attempting to pull fresh ledger from Google Sheets...")
         df_sync = pd.DataFrame(get_worksheet().get_all_records())
+        
         # Replace spaces in headers with underscores to match our CSV format
         df_sync.columns = [c.lower().replace(' ', '_') for c in df_sync.columns]
         
@@ -654,14 +660,20 @@ def sync_local_csv() -> bool:
         df_sync['is_bet'] = ~is_banking
         df_sync['is_banking'] = is_banking
 
+        # Overwrite the local CSV with the fresh Google Sheets data
         df_sync.to_csv(LEDGER_CSV, index=False)
         
-        # 🚨 FIX: Force rebuilding of the SQLite database
+        # Force rebuilding of the SQLite database
         from db import build_database
         build_database()
         
+        log.info("✅ Successfully synced from Google Sheets and rebuilt local DB.")
         return True
-    except Exception: return False
+        
+    except Exception as e: 
+        # THIS IS THE FIX: Stop failing silently. 
+        log.error(f"❌ CRITICAL: Failed to sync with Google Sheets! Error: {e}")
+        return False
 
 def _audit_log(bet_uuid: str, field: str, new_value):
     with open(LOGS_DIR / 'audit.log', 'a') as f: f.write(json.dumps({'uuid': bet_uuid, 'field': field, 'new_value': str(new_value), 'timestamp': datetime.now(timezone.utc).isoformat(), 'operator': 'manual'}) + '\n')

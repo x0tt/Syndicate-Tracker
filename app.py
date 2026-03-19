@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 # coding: utf-8
 """
-app.py — Syndicate Tracker v6.2
+app.py — Syndicate Tracker v6.3
 ================================
 Streamlit UI. Mobile-optimised, tab-based, Plotly-powered.
+Includes advanced calibration, matchday tracking, and ghost-chart fix.
 """
 
 import streamlit as st
@@ -42,10 +43,6 @@ MEMBERS =["John", "Richard", "Xander"]
 BET_TYPES = sorted(['Full Time Result', 'Asian Handicap', 'Double Chance', 'Draw No Bet', 'Handicap', 'Relegation', 'BTTS', 'Goal Line', 'Goal Line (1H)', 'Total Goals', 'Multi', 'To Score Anytime', 'To Qualify', 'Winner', 'Method of Victory', 'To Score'])
 COMPETITIONS = sorted(["EPL 25/26", "EPL 24/25", "FA cup 2026", "Champions League 2025", "Club World Cup", "International Football", "NFL", "A-League 2025", "Other"])
 
-def _base_layout(**overrides):
-    base = {k: v for k, v in PLOTLY_LAYOUT.items() if k not in overrides}
-    return {**base, **overrides}
-
 PLOTLY_LAYOUT = dict(
     paper_bgcolor="rgba(0,0,0,0)",
     plot_bgcolor="rgba(0,0,0,0)",
@@ -80,27 +77,17 @@ def section(label: str): st.markdown(f'<div class="section-header">{label}</div>
 def apply_layout(fig, title="", height=420, showlegend=True, **kwargs):
     base = dict(PLOTLY_LAYOUT)
     if not showlegend: base["margin"] = dict(base["margin"], b=10)
-    
-    # Merge kwargs into base so we don't pass duplicate keyword arguments
     base.update(kwargs)
-    
-    fig.update_layout(
-        title=dict(text=title, font=dict(size=14, color=TEXT_CLR), x=0.01), 
-        height=height, 
-        showlegend=showlegend, 
-        **base
-    )
+    fig.update_layout(title=dict(text=title, font=dict(size=14, color=TEXT_CLR), x=0.01), height=height, showlegend=showlegend, **base)
     return fig
 
-def status_color(s: str) -> str: return WIN_COLOR if s == "Win" else LOSS_COLOR if s == "Loss" else PUSH_COLOR
 def cols(n, gap="small"): return st.columns(n, gap=gap)
 
-_chart_counter = [0]
 _PLOTLY_CONFIG = { "displaylogo": False, "scrollZoom": False, "modeBarButtons": [["toImage", "resetScale2d"]], "toImageButtonOptions": { "format": "png", "width": 1200, "height": 600, "scale": 2, "filename": "syndicate_chart" } }
 
+# The bug fix: Removed the global counter and key argument. Let Streamlit natively hash the figure!
 def pc(fig):
-    _chart_counter[0] += 1
-    st.plotly_chart(fig, use_container_width=True, key=f"pc_{_chart_counter[0]}", config=_PLOTLY_CONFIG)
+    st.plotly_chart(fig, use_container_width=True, config=_PLOTLY_CONFIG)
 
 def kpi(label, value, delta=None, delta_color="normal"): st.metric(label=label, value=value, delta=delta, delta_color=delta_color)
 def roast(text: str): st.markdown(f'<div class="roast-strip">🔥 {text}</div>', unsafe_allow_html=True)
@@ -116,6 +103,11 @@ def stat_card(label: str, value: str, sub: str = "", color: str = None, border_c
 # ─────────────────────────────────────────────────────────────────────────────
 @st.cache_data(ttl=300)
 def load_data():
+    # 1. Force a sync with Google Sheets before doing anything else
+    if core.USE_GSHEETS_LIVE:
+        core.sync_local_csv()
+        
+    # 2. Now load the data (which is guaranteed to be fresh)
     df, df_roi, df_free, df_pending, kpis = core.load_ledger()
     return df, df_roi, df_free, df_pending, kpis
 
@@ -130,7 +122,6 @@ def get_enriched(df: pd.DataFrame) -> tuple:
         elif o < 3.5: return "2.50\u20133.49"
         else:         return "3.50+"
 
-    # Bankroll tracks absolutely everything: deposits, reconciliations, bets
     bankroll_df = df.copy()
     bankroll_df["date"]     = pd.to_datetime(bankroll_df["date"])
     bankroll_df["date_str"] = bankroll_df["date"].dt.strftime("%Y-%m-%d")
@@ -138,8 +129,6 @@ def get_enriched(df: pd.DataFrame) -> tuple:
     bankroll_df["actual_winnings_num"] = pd.to_numeric(bankroll_df["actual_winnings"], errors="coerce").fillna(0)
     bankroll_df["cum_pl"]   = bankroll_df["actual_winnings_num"].cumsum()
 
-    # Working DF focuses exclusively on betting performance
-    # Exclude both specific statuses AND any user marked as 'syndicate'
     banking_mask = df["status"].isin(["Reconciliation", "Deposit", "Withdrawal"]) | (df["user"].astype(str).str.lower() == "syndicate")
     working = df[~banking_mask].copy()
     working["date"]     = pd.to_datetime(working["date"])
@@ -147,6 +136,10 @@ def get_enriched(df: pd.DataFrame) -> tuple:
     working["month"]    = working["date"].dt.to_period("M").astype(str)
     working["weekday"]  = working["date"].dt.day_name()
     working["year"]     = working["date"].dt.year
+    working["season"]   = df["season"]
+    working["matchday"] = df["matchday"]
+    working["sport"]    = df.get("sport", "Football")
+    
     working = working.sort_values("date").reset_index(drop=True)
     working["cum_pl"]       = pd.to_numeric(working["actual_winnings"], errors="coerce").fillna(0).cumsum()
     working["implied_prob"] = 1.0 / working["odds"].replace(0, np.nan)
@@ -211,24 +204,74 @@ def chart_cumulative_bankroll(df: pd.DataFrame, opening: float = 0.00, bankroll_
     aw_num = pd.to_numeric(df2["actual_winnings"], errors="coerce").fillna(0)
     df2["bankroll"] = opening + aw_num.cumsum()
     df2["peak"]     = df2["bankroll"].cummax()
-
-    # Calculate total invested (opening + deposits) to plot a more useful baseline
     deposits = pd.to_numeric(src_df[src_df["status"].isin(["Deposit", "Withdrawal"])]["actual_winnings"], errors="coerce").fillna(0).sum()
     total_invested = opening + deposits
 
     fig = go.Figure()
     fig.add_trace(go.Scatter(x=df2["date_str"], y=df2["peak"], line=dict(color="rgba(0,0,0,0)"), showlegend=False))
     fig.add_trace(go.Scatter(x=df2["date_str"], y=df2["bankroll"], fill="tonexty", fillcolor="rgba(230,159,0,0.15)", line=dict(color=LOSS_COLOR, width=0.5, dash="dot"), name="Drawdown"))
-    fig.add_trace(go.Scatter(x=df2["date_str"], y=df2["bankroll"], mode="lines+markers", line=dict(color=ACCENT, width=3), marker=dict(size=4, color=ACCENT), name="Bankroll"))
-    fig.add_hline(y=total_invested, line_dash="dash", line_color=GRID_CLR, annotation_text=f"Total Invested ${total_invested:.0f}", annotation_font_color=GRID_CLR, annotation_position="bottom right")
+    fig.add_trace(go.Scatter(x=df2["date_str"], y=df2["bankroll"], mode="lines", line=dict(color=ACCENT, width=3), name="Bankroll"))
+    fig.add_hline(y=total_invested, line_dash="dash", line_color=GRID_CLR, annotation_text=f"Invested ${total_invested:.0f}", annotation_font_color=GRID_CLR, annotation_position="bottom right")
     return apply_layout(fig, title=f"📈 Bankroll  ${df2['bankroll'].iloc[-1]:.2f}", height=420, showlegend=False)
+
+def chart_cumulative_roi(df: pd.DataFrame) -> go.Figure:
+    d = df[df["status"].isin(["Win", "Loss", "Push"])].sort_values("date").copy()
+    d["aw_num"] = pd.to_numeric(d["actual_winnings"], errors="coerce").fillna(0)
+    d["cum_pl"] = d["aw_num"].cumsum()
+    d["cum_stake"] = d["stake"].cumsum()
+    d["cum_roi"] = (d["cum_pl"] / d["cum_stake"] * 100).fillna(0)
+    fig = go.Figure(go.Scatter(x=d["date_str"], y=d["cum_roi"], mode="lines", line=dict(color=ACCENT, width=2.5)))
+    fig.add_hline(y=0, line_dash="dash", line_color=GRID_CLR)
+    return apply_layout(fig, title="📉 Cumulative ROI % Over Time", height=380, showlegend=False)
+
+def chart_cumulative_win_rate(df: pd.DataFrame) -> go.Figure:
+    d = df[df["status"].isin(["Win", "Loss"])].sort_values("date").copy()
+    d["win_count"] = (d["status"] == "Win").cumsum()
+    d["loss_count"] = (d["status"] == "Loss").cumsum()
+    d["total_resolved"] = np.arange(1, len(d) + 1)
+    d["win_pct"] = d["win_count"] / d["total_resolved"] * 100
+    d["loss_pct"] = d["loss_count"] / d["total_resolved"] * 100
+    
+    fig = go.Figure()
+    fig.add_trace(go.Scatter(x=d["total_resolved"], y=d["win_pct"], name="Win %", mode="lines", line=dict(color=WIN_COLOR, width=2.5)))
+    fig.add_trace(go.Scatter(x=d["total_resolved"], y=d["loss_pct"], name="Loss %", mode="lines", line=dict(color=LOSS_COLOR, width=2.5)))
+    fig.update_layout(xaxis_title="Bets Resolved", yaxis_ticksuffix="%")
+    return apply_layout(fig, title="⚖️ Cumulative Win % vs Loss %", height=380)
 
 def chart_monthly_pl(df: pd.DataFrame) -> go.Figure:
     df["aw_num"] = pd.to_numeric(df["actual_winnings"], errors="coerce").fillna(0)
     monthly = df.groupby("month")["aw_num"].sum().reset_index()
     fig = go.Figure(go.Bar(x=monthly["month"], y=monthly["aw_num"], marker_color=[WIN_COLOR if v >= 0 else LOSS_COLOR for v in monthly["aw_num"]], text=[f"${v:+.2f}" for v in monthly["aw_num"]], textposition="auto", textfont=dict(size=10, family="DM Mono")))
     fig.add_hline(y=0, line_color=GRID_CLR)
-    return apply_layout(fig, title="📅 Monthly Betting P/L", height=400, showlegend=False)
+    return apply_layout(fig, title="📅 Monthly Betting P/L", height=340, showlegend=False)
+
+def chart_pl_by_matchday(df: pd.DataFrame) -> go.Figure:
+    d = df.dropna(subset=["matchday"]).copy()
+    if d.empty: return go.Figure().update_layout(title="No Matchday Data")
+    d["aw_num"] = pd.to_numeric(d["actual_winnings"], errors="coerce").fillna(0)
+    # Extract just the numbers for proper sorting if formatted like "Round 12"
+    d["md_num"] = d["matchday"].astype(str).str.extract(r'(\d+)').astype(float)
+    d = d.sort_values(["md_num", "matchday"])
+    
+    fig = go.Figure()
+    seasons = sorted(d["season"].dropna().unique())
+    colors = [ACCENT, OKABE_ITO[2], OKABE_ITO[6]]
+    
+    for i, season in enumerate(seasons):
+        sub = d[d["season"] == season].groupby("matchday", sort=False)["aw_num"].sum().reset_index()
+        fig.add_trace(go.Bar(name=season, x=sub["matchday"], y=sub["aw_num"], marker_color=colors[i % len(colors)]))
+        
+    fig.update_layout(barmode="group")
+    fig.add_hline(y=0, line_color=GRID_CLR)
+    return apply_layout(fig, title="🏟️ P/L by Matchday / Round", height=400)
+
+def chart_pl_by_sport(df: pd.DataFrame) -> go.Figure:
+    d = df.copy()
+    d["aw_num"] = pd.to_numeric(d["actual_winnings"], errors="coerce").fillna(0)
+    grp = d.groupby("sport").agg(pl=("aw_num", "sum")).sort_values("pl", ascending=False)
+    fig = go.Figure(go.Bar(x=grp.index, y=grp["pl"], marker_color=[WIN_COLOR if p >= 0 else LOSS_COLOR for p in grp["pl"]], text=[f"${p:+.2f}" for p in grp["pl"]], textposition="auto"))
+    fig.add_hline(y=0, line_color=GRID_CLR)
+    return apply_layout(fig, title="⚽ P/L by Sport", height=360, showlegend=False)
 
 def chart_win_loss_donut(df: pd.DataFrame, title: str = "Overall Record") -> go.Figure:
     wins, losses, pushes = (df["status"] == "Win").sum(), (df["status"] == "Loss").sum(), (df["status"] == "Push").sum()
@@ -248,16 +291,6 @@ def chart_member_roi_bars(df: pd.DataFrame) -> go.Figure:
     fig = go.Figure(go.Bar(x=MEMBERS, y=rois, marker_color=[WIN_COLOR if r >= 0 else LOSS_COLOR for r in rois], text=[f"{r:+.1f}%" for r in rois], textposition="auto"))
     fig.add_hline(y=0, line_color=GRID_CLR)
     return apply_layout(fig, title="📊 Individual ROI %", height=340, showlegend=False)
-
-def chart_member_cumulative(df: pd.DataFrame) -> go.Figure:
-    fig = go.Figure()
-    for m in MEMBERS:
-        sub = df[df["user"] == m].sort_values("date").copy()
-        aw_num = pd.to_numeric(sub["actual_winnings"], errors="coerce").fillna(0)
-        sub["cum"] = aw_num.cumsum()
-        fig.add_trace(go.Scatter(x=sub["date_str"], y=sub["cum"], mode="lines+markers", name=m, line=dict(color=MEMBER_COLORS[m], width=3)))
-    fig.add_hline(y=0, line_dash="dash", line_color=GRID_CLR)
-    return apply_layout(fig, title="📈 Member Cumulative P/L", height=440)
 
 def chart_member_win_rate(df: pd.DataFrame) -> go.Figure:
     wrs =[member_stats(df[df["user"] == m], m)["win_rate"] for m in MEMBERS]
@@ -304,7 +337,7 @@ def chart_bet_type_sunburst(df: pd.DataFrame) -> go.Figure:
     grp = df.groupby(["bet_type", "status"]).size().reset_index(name="count")
     grp = grp[grp["status"].isin(["Win", "Loss", "Push"])]
     fig = px.sunburst(grp, path=["bet_type", "status"], values="count", color="status", color_discrete_map={"Win": WIN_COLOR, "Loss": LOSS_COLOR, "Push": PUSH_COLOR})
-    return apply_layout(fig, title="🌐 Bet Type → Outcome Sunburst", height=480, showlegend=False)
+    return apply_layout(fig, title="🌐 Bet Type Outcomes", height=440, showlegend=False)
 
 def chart_accumulator_curse(df: pd.DataFrame) -> go.Figure:
     multis = df[df["bet_type"] == "Multi"].copy()
@@ -348,24 +381,22 @@ def chart_weekday_heatmap(df: pd.DataFrame) -> go.Figure:
     df2["weekday"] = pd.Categorical(df2["weekday"], categories=["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"], ordered=True)
     pivot = df2.pivot_table(index="weekday", columns="month", values="aw_num", aggfunc="sum", fill_value=0)
     fig = go.Figure(go.Heatmap(z=pivot.values, x=pivot.columns.tolist(), y=[d[:3] for d in pivot.index.tolist()], colorscale=[[0, LOSS_COLOR],[0.5, "#1a1a2e"], [1, WIN_COLOR]], zmid=0))
-    return apply_layout(fig, title="📅 P/L Heatmap — Day × Month", height=300, showlegend=False)
+    return apply_layout(fig, title="📅 Day × Month Heatmap", height=300, showlegend=False)
 
-def chart_stake_vs_outcome(df: pd.DataFrame) -> go.Figure:
-    d = df[df["status"].isin(["Win", "Loss"])].copy()
+def chart_odds_correlations(df: pd.DataFrame) -> go.Figure:
+    d = df[df["status"].isin(["Win", "Loss", "Push"])].copy()
     d["aw_num"] = pd.to_numeric(d["actual_winnings"], errors="coerce").fillna(0)
-    fig = go.Figure()
-    for s, c, sym in[("Win", WIN_COLOR, "circle"), ("Loss", LOSS_COLOR, "triangle-up")]:
-        sub = d[d["status"] == s]
-        fig.add_trace(go.Scatter(x=sub["stake"], y=sub["aw_num"], mode="markers", name=s, marker=dict(color=c, size=9, symbol=sym), text=sub.apply(lambda r: f"{r['event']}<br>{r['odds']:.2f}", axis=1), hovertemplate="<b>%{text}</b><br>P/L: $%{y:.2f}<extra></extra>"))
-    fig.add_hline(y=0, line_color=GRID_CLR)
-    return apply_layout(fig, title="💰 Stake vs P/L", height=360)
-
-def chart_odds_histogram(df: pd.DataFrame) -> go.Figure:
-    fig = go.Figure()
-    fig.add_trace(go.Histogram(x=df[df["status"] == "Win"]["odds"], name="Win", marker_color=WIN_COLOR, opacity=0.7))
-    fig.add_trace(go.Histogram(x=df[df["status"] == "Loss"]["odds"], name="Loss", marker_color=LOSS_COLOR, opacity=0.7))
-    fig.update_layout(barmode="overlay")
-    return apply_layout(fig, title="🎲 Odds Distribution — Win vs Loss", height=320)
+    
+    fig = make_subplots(rows=1, cols=2, subplot_titles=("Stake vs Odds", "Odds vs P/L"))
+    fig.add_trace(go.Scatter(x=d["stake"], y=d["odds"], mode="markers", marker=dict(color=ACCENT, size=6, opacity=0.6), name="Stake vs Odds"), row=1, col=1)
+    colors = [WIN_COLOR if p > 0 else (LOSS_COLOR if p < 0 else PUSH_COLOR) for p in d["aw_num"]]
+    fig.add_trace(go.Scatter(x=d["odds"], y=d["aw_num"], mode="markers", marker=dict(color=colors, size=6, opacity=0.7), name="Odds vs P/L"), row=1, col=2)
+    
+    fig.update_xaxes(title_text="Stake ($)", title_font=dict(size=10), row=1, col=1)
+    fig.update_yaxes(title_text="Odds", title_font=dict(size=10), row=1, col=1)
+    fig.update_xaxes(title_text="Odds", title_font=dict(size=10), row=1, col=2)
+    fig.update_yaxes(title_text="P/L ($)", title_font=dict(size=10), row=1, col=2)
+    return apply_layout(fig, title="🔗 Odds & Stake Correlations", height=360, showlegend=False)
 
 def _hex_to_rgba(hex_color: str, alpha: float = 0.15) -> str:
     h = hex_color.lstrip("#")
@@ -374,43 +405,21 @@ def _hex_to_rgba(hex_color: str, alpha: float = 0.15) -> str:
 
 def chart_member_radar(df: pd.DataFrame) -> go.Figure:
     fig = go.Figure()
-    
     stats = {m: member_stats(df[df["user"] == m], m) for m in MEMBERS}
-    
     min_wr, max_wr = 0, max([s["win_rate"] for s in stats.values()] + [1])
     min_roi, max_roi = min([s["roi"] for s in stats.values()] + [0]), max([s["roi"] for s in stats.values()] + [1])
     min_odds, max_odds = 1.0, max([s["avg_odds"] for s in stats.values()] + [1.1])
     min_bets, max_bets = 0, max([s["bets"] for s in stats.values()] + [1])
-    
     effs = [(stats[m]["pl"] / stats[m]["staked"] * 100) if stats[m]["staked"] > 0 else 0 for m in MEMBERS]
     min_eff, max_eff = min(effs + [0]), max(effs + [1])
-    
-    def norm(val, vmin, vmax):
-        if vmax == vmin: return 50
-        # Map to [20, 100] so negatives/minimums don't completely vanish at the center
-        return 20 + 80 * (val - vmin) / (vmax - vmin)
+    def norm(val, vmin, vmax): return 50 if vmax == vmin else 20 + 80 * (val - vmin) / (vmax - vmin)
     
     for m in MEMBERS:
         s = stats[m]
         eff = (s["pl"] / s["staked"] * 100) if s["staked"] > 0 else 0
-        
-        r_vals = [
-            norm(s["win_rate"], min_wr, max_wr),
-            norm(s["roi"], min_roi, max_roi),
-            norm(s["avg_odds"], min_odds, max_odds),
-            norm(s["bets"], min_bets, max_bets),
-            norm(eff, min_eff, max_eff)
-        ]
-        r_vals.append(r_vals[0]) # Close the loop
-        
-        fig.add_trace(go.Scatterpolar(
-            r=r_vals, 
-            theta=["Win Rate", "ROI", "Avg Odds", "Bets", "Efficiency", "Win Rate"], 
-            fill="toself", name=m, 
-            line=dict(color=MEMBER_COLORS[m]), 
-            fillcolor=_hex_to_rgba(MEMBER_COLORS[m])
-        ))
-        
+        r_vals = [norm(s["win_rate"], min_wr, max_wr), norm(s["roi"], min_roi, max_roi), norm(s["avg_odds"], min_odds, max_odds), norm(s["bets"], min_bets, max_bets), norm(eff, min_eff, max_eff)]
+        r_vals.append(r_vals[0]) 
+        fig.add_trace(go.Scatterpolar(r=r_vals, theta=["Win Rate", "ROI", "Avg Odds", "Bets", "Efficiency", "Win Rate"], fill="toself", name=m, line=dict(color=MEMBER_COLORS[m]), fillcolor=_hex_to_rgba(MEMBER_COLORS[m])))
     fig.update_layout(polar=dict(radialaxis=dict(visible=False, range=[0, 100]), bgcolor="rgba(0,0,0,0)"))
     return apply_layout(fig, title="🕸️ Member Radar", height=400)
 
@@ -418,7 +427,7 @@ def chart_waterfall(df: pd.DataFrame) -> go.Figure:
     df2 = df.sort_values("date").tail(15).copy()
     df2["aw_num"] = pd.to_numeric(df2["actual_winnings"], errors="coerce").fillna(0)
     fig = go.Figure(go.Waterfall(x=df2["event"].str[:14] + "…", y=df2["aw_num"], measure=["relative"] * len(df2), text=[f"${v:+.2f}" for v in df2["aw_num"]], textposition="outside", decreasing=dict(marker=dict(color=LOSS_COLOR)), increasing=dict(marker=dict(color=WIN_COLOR))))
-    return apply_layout(fig, title="🌊 Last 15 Bets — P/L Waterfall", height=420, showlegend=False)
+    return apply_layout(fig, title="🌊 Last 15 Bets — Waterfall", height=420, showlegend=False)
 
 def chart_team_vs_individual(df: pd.DataFrame) -> go.Figure:
     groups = MEMBERS + ["Team"]
@@ -428,11 +437,6 @@ def chart_team_vs_individual(df: pd.DataFrame) -> go.Figure:
     fig.add_trace(go.Bar(x=groups, y=rois, marker_color=[MEMBER_COLORS.get(g, ACCENT) for g in groups], text=[f"{r:+.1f}%" for r in rois]), row=1, col=1)
     fig.add_trace(go.Bar(x=groups, y=pls, marker_color=[MEMBER_COLORS.get(g, ACCENT) for g in groups], text=[f"${p:+.2f}" for p in pls]), row=1, col=2)
     return apply_layout(fig, title="👥 Team Pool vs Individuals", height=340, showlegend=False)
-
-def chart_stake_distribution(df: pd.DataFrame) -> go.Figure:
-    fig = go.Figure()
-    for m in MEMBERS + ["Team"]: fig.add_trace(go.Box(y=df[df["user"] == m]["stake"], name=m, marker_color=MEMBER_COLORS.get(m, ACCENT)))
-    return apply_layout(fig, title="💵 Stake Distribution", height=340, showlegend=False)
 
 def chart_top_teams(df: pd.DataFrame) -> go.Figure:
     teams = pd.concat([df['home_team'], df['away_team']]).dropna()
@@ -460,16 +464,16 @@ def chart_longest_streaks(df: pd.DataFrame) -> go.Figure:
     fig = go.Figure()
     fig.add_trace(go.Bar(x=MEMBERS, y=w_str, name="Win Streak", marker_color=WIN_COLOR, text=w_str))
     fig.add_trace(go.Bar(x=MEMBERS, y=[-x for x in l_str], name="Loss Streak", marker_color=LOSS_COLOR, text=[f"-{x}" for x in l_str]))
-    return apply_layout(fig, title="🔥 Win & Loss Streaks", height=320)
+    return apply_layout(fig, title="🔥 Longest Streaks", height=320)
 
-def chart_ev_proxy(df: pd.DataFrame) -> go.Figure:
+def chart_ev_proxy(df: pd.DataFrame, title: str = "📐 Edge Proxy — Actual vs Implied") -> go.Figure:
     grp = df[df["status"].isin(["Win", "Loss"])].groupby("odds_bucket").agg(wins=("status", lambda x: (x == "Win").sum()), bets=("status", "count"), avg_odds=("odds", "mean"))
     grp["win_rate"] = grp["wins"] / grp["bets"] * 100; grp["implied"] = 1 / grp["avg_odds"] * 100
     grp = grp.reindex(["<1.40", "1.40\u20131.69", "1.70\u20131.99", "2.00\u20132.49", "2.50\u20133.49", "3.50+"]).dropna()
     fig = go.Figure()
     fig.add_trace(go.Scatter(x=grp.index, y=grp["win_rate"], name="Actual Win %", line=dict(color=WIN_COLOR)))
     fig.add_trace(go.Scatter(x=grp.index, y=grp["implied"], name="Implied Win %", line=dict(color=LOSS_COLOR, dash="dash")))
-    return apply_layout(fig, title="📐 Edge Proxy — Actual vs Implied", height=340)
+    return apply_layout(fig, title=title, height=340)
 
 def chart_year_on_year(df: pd.DataFrame) -> go.Figure:
     df["aw_num"] = pd.to_numeric(df["actual_winnings"], errors="coerce").fillna(0)
@@ -477,27 +481,7 @@ def chart_year_on_year(df: pd.DataFrame) -> go.Figure:
     fig = make_subplots(specs=[[{"secondary_y": True}]])
     fig.add_trace(go.Bar(x=grp["year"].astype(str), y=grp["pl"], marker_color=[WIN_COLOR if p >= 0 else LOSS_COLOR for p in grp["pl"]], name="P/L"), secondary_y=False)
     fig.add_trace(go.Scatter(x=grp["year"].astype(str), y=grp["bets"], name="Bets", line=dict(color=PUSH_COLOR, dash="dot")), secondary_y=True)
-    return apply_layout(fig, title="📆 Year-on-Year Performance", height=320)
-
-def chart_bankroll_by_member_contrib(df: pd.DataFrame, opening: float = 0.00, bankroll_df: pd.DataFrame = None) -> go.Figure:
-    bk = (bankroll_df if bankroll_df is not None else df).sort_values("date").copy()
-    bk["bankroll_change"] = pd.to_numeric(bk["actual_winnings"], errors="coerce").fillna(0)
-    bk["bankroll"] = opening + bk["bankroll_change"].cumsum()
-    fig = go.Figure(go.Scatter(x=bk["date_str"], y=bk["bankroll"], name="Combined", line=dict(color=ACCENT), fill="tozeroy"))
-    for m in MEMBERS:
-        sub = df[df["user"] == m].sort_values("date").copy()
-        sub["aw_num"] = pd.to_numeric(sub["actual_winnings"], errors="coerce").fillna(0)
-        fig.add_trace(go.Scatter(x=sub["date_str"], y=sub["aw_num"].cumsum(), name=m, line=dict(color=MEMBER_COLORS[m], dash="dash")))
-    return apply_layout(fig, title="🏦 Combined Bankroll + Individual P/L", height=440)
-
-def chart_bet_type_win_rate_vs_roi(df: pd.DataFrame) -> go.Figure:
-    df["aw_num"] = pd.to_numeric(df["actual_winnings"], errors="coerce").fillna(0)
-    grp = df.groupby("bet_type").agg(wins=("status", lambda x: (x == "Win").sum()), bets=("status", lambda x: x.isin(["Win", "Loss"]).sum()), pl=("aw_num", "sum"), staked=("stake", "sum"))
-    grp = grp[grp["bets"] >= 3]
-    grp["win_rate"] = grp["wins"] / grp["bets"] * 100; grp["roi"] = grp["pl"] / grp["staked"] * 100
-    fig = px.scatter(grp.reset_index(), x="win_rate", y="roi", size="bets", color="bet_type", text="bet_type", size_max=40)
-    fig.add_hline(y=0, line_dash="dash", line_color=GRID_CLR); fig.add_vline(x=50, line_dash="dash", line_color=GRID_CLR)
-    return apply_layout(fig, title="🔍 Bet Type: Win Rate vs ROI", height=420)
+    return apply_layout(fig, title="📆 Year-on-Year", height=320)
 
 def chart_monthly_volatility(df: pd.DataFrame) -> go.Figure:
     df["aw_num"] = pd.to_numeric(df["actual_winnings"], errors="coerce").fillna(0)
@@ -519,7 +503,7 @@ def chart_longshot_vs_fav(df: pd.DataFrame) -> go.Figure:
     fig = make_subplots(rows=1, cols=2, subplot_titles=("ROI % by Tier", "Win Rate % by Tier"))
     fig.add_trace(go.Bar(x=grp.index, y=grp["roi"], marker_color=[WIN_COLOR if r >= 0 else LOSS_COLOR for r in grp["roi"]]), row=1, col=1)
     fig.add_trace(go.Bar(x=grp.index, y=grp["win_rate"], marker_color=OKABE_ITO[2]), row=1, col=2)
-    return apply_layout(fig, title="🏹 Favourite vs Value vs Long-shot", height=340, showlegend=False)
+    return apply_layout(fig, title="🏹 Edge by Odds Tier", height=340, showlegend=False)
 
 def chart_voting_success(df: pd.DataFrame) -> go.Figure:
     ind = df[df["user"].isin(MEMBERS) & df["status"].isin(["Win", "Loss", "Push"])].copy()
@@ -533,88 +517,26 @@ def chart_voting_success(df: pd.DataFrame) -> go.Figure:
         l = (sub["status"] == "Loss").sum()
         pl = sub["aw_num"].sum()
         st = sub["stake"].sum()
-        return {
-            "win_rate": round(w / (w + l) * 100, 2) if (w + l) > 0 else 0,
-            "roi": round(pl / st * 100, 2) if st > 0 else 0,
-            "pl": round(float(pl), 2),
-            "bets": int(len(sub))
-        }
+        return {"win_rate": round(w / (w + l) * 100, 2) if (w + l) > 0 else 0, "roi": round(pl / st * 100, 2) if st > 0 else 0, "pl": round(float(pl), 2), "bets": int(len(sub))}
 
     ag = s(agreed)
     mbr = {m: s(solo[solo["user"] == m]) for m in MEMBERS}
-
     entries = [("🤝 Agreed", ag, ACCENT)] + [(m, mbr[m], MEMBER_COLORS[m]) for m in MEMBERS]
-    n_rows = len(entries)
-    vertical_spacing = 0.15
-
-    fig = make_subplots(
-        rows=n_rows, cols=2,
-        column_widths=[0.55, 0.45],
-        vertical_spacing=vertical_spacing,
-        horizontal_spacing=0.04,
-        specs=[[{"type": "indicator"}, {"type": "indicator"}]] * n_rows,
-    )
+    
+    fig = make_subplots(rows=len(entries), cols=2, column_widths=[0.55, 0.45], vertical_spacing=0.15, horizontal_spacing=0.04, specs=[[{"type": "indicator"}, {"type": "indicator"}]] * len(entries))
 
     def wr_color(v): return WIN_COLOR if v >= 60 else (PUSH_COLOR if v >= 45 else LOSS_COLOR)
     def roi_color(v): return WIN_COLOR if v >= 0 else LOSS_COLOR
 
     for row_idx, (label, st_dict, color) in enumerate(entries, start=1):
-        # Col 1: Win Rate gauge (No title)
-        fig.add_trace(go.Indicator(
-            mode="gauge+number",
-            value=st_dict["win_rate"],
-            number=dict(suffix="%", font=dict(size=22, family="DM Mono", color=wr_color(st_dict["win_rate"])), valueformat=".1f"),
-            gauge=dict(
-                axis=dict(range=[0, 100], tickcolor=GRID_CLR, tickfont=dict(color=TEXT_CLR, size=8), nticks=5),
-                bar=dict(color=color, thickness=0.4),
-                bgcolor="rgba(0,0,0,0)",
-                bordercolor=GRID_CLR,
-                steps=[
-                    dict(range=[0, 45],  color="rgba(230,159,0,0.08)"),
-                    dict(range=[45, 60], color="rgba(153,153,153,0.06)"),
-                    dict(range=[60, 100],color="rgba(86,180,233,0.08)"),
-                ],
-                threshold=dict(line=dict(color=PUSH_COLOR, width=2), value=50),
-            ),
-        ), row=row_idx, col=1)
-
-        # Col 2: ROI & P/L Stats (No title)
-        fig.add_trace(go.Indicator(
-            mode="number",
-            value=st_dict["roi"],
-            number=dict(suffix="%", font=dict(size=24, family="DM Mono", color=roi_color(st_dict["roi"])), valueformat="+.1f"),
-        ), row=row_idx, col=2)
-
-        # Calculate Y bottom of the current row's domain
-        i = row_idx - 1
-        row_height = (1.0 - (n_rows - 1) * vertical_spacing) / n_rows
-        y_bottom = 1.0 - (i * row_height) - (i * vertical_spacing) - row_height
-
-        # Add Annotation for the Gauge (Col 1)
-        fig.add_annotation(
-            x=0.26,
-            y=y_bottom - 0.02, # Just slightly below the domain
-            text=f"<b><span style='color:{color}'>{label}</span></b><br><span style='color:{TEXT_CLR};font-size:11px'>Win Rate</span>",
-            showarrow=False,
-            font=dict(size=14),
-            xanchor="center",
-            yanchor="top",
-            xref="paper",
-            yref="paper"
-        )
-
-        # Add Annotation for the ROI (Col 2)
-        fig.add_annotation(
-            x=0.78,
-            y=y_bottom - 0.02,
-            text=f"<b><span style='color:{color}'>{label if label == '🤝 Agreed' else label + ' Solo'} ROI</span></b><br><span style='color:{TEXT_CLR};font-size:11px'>P/L ${st_dict['pl']:+.2f} · {st_dict['bets']} bets</span>",
-            showarrow=False,
-            font=dict(size=14),
-            xanchor="center",
-            yanchor="top",
-            xref="paper",
-            yref="paper"
-        )
+        fig.add_trace(go.Indicator(mode="gauge+number", value=st_dict["win_rate"], number=dict(suffix="%", font=dict(size=22, family="DM Mono", color=wr_color(st_dict["win_rate"])), valueformat=".1f"), gauge=dict(axis=dict(range=[0, 100], tickcolor=GRID_CLR, tickfont=dict(color=TEXT_CLR, size=8), nticks=5), bar=dict(color=color, thickness=0.4), bgcolor="rgba(0,0,0,0)", bordercolor=GRID_CLR, steps=[dict(range=[0, 45], color="rgba(230,159,0,0.08)"), dict(range=[45, 60], color="rgba(153,153,153,0.06)"), dict(range=[60, 100], color="rgba(86,180,233,0.08)")], threshold=dict(line=dict(color=PUSH_COLOR, width=2), value=50))), row=row_idx, col=1)
+        fig.add_trace(go.Indicator(mode="number", value=st_dict["roi"], number=dict(suffix="%", font=dict(size=24, family="DM Mono", color=roi_color(st_dict["roi"])), valueformat="+.1f")), row=row_idx, col=2)
+        
+        row_height = (1.0 - (len(entries) - 1) * 0.15) / len(entries)
+        y_bottom = 1.0 - ((row_idx - 1) * row_height) - ((row_idx - 1) * 0.15) - row_height
+        
+        fig.add_annotation(x=0.26, y=y_bottom - 0.02, text=f"<b><span style='color:{color}'>{label}</span></b><br><span style='color:{TEXT_CLR};font-size:11px'>Win Rate</span>", showarrow=False, font=dict(size=14), xanchor="center", yanchor="top", xref="paper", yref="paper")
+        fig.add_annotation(x=0.78, y=y_bottom - 0.02, text=f"<b><span style='color:{color}'>{label if label == '🤝 Agreed' else label + ' Solo'} ROI</span></b><br><span style='color:{TEXT_CLR};font-size:11px'>P/L ${st_dict['pl']:+.2f} · {st_dict['bets']} bets</span>", showarrow=False, font=dict(size=14), xanchor="center", yanchor="top", xref="paper", yref="paper")
 
     return apply_layout(fig, title="🗳️ Agreed Picks vs Solo Bets", height=850, showlegend=False, margin=dict(l=6, r=6, t=52, b=90))
 
@@ -644,69 +566,14 @@ def chart_anim_member_worm(df: pd.DataFrame) -> go.Figure:
         for _, row in ind[ind["date"] == d].iterrows(): running[row["user"]] += row["aw_num"]
         snaps.append({"date": str(d)[:10], **{m: round(running[m], 2) for m in MEMBERS}})
     snaps = pd.DataFrame(snaps)
-    
-    min_y = snaps[MEMBERS].min().min()
-    max_y = snaps[MEMBERS].max().max()
+    min_y, max_y = snaps[MEMBERS].min().min(), snaps[MEMBERS].max().max()
     pad = max(10, (max_y - min_y) * 0.1)
     
     def mkt(sub): return [go.Scatter(x=sub["date"], y=sub[m], mode="lines", name=m, line=dict(color=MEMBER_COLORS[m])) for m in MEMBERS]
     frames =[go.Frame(name=snaps["date"].iloc[i], data=mkt(snaps.iloc[:i+1])) for i in range(len(snaps))]
     fig = go.Figure(data=mkt(snaps.iloc[:1]), frames=frames)
-    fig.update_layout(
-        updatemenus=_anim_buttons(280, 160), 
-        sliders=_anim_slider(snaps["date"], 280, 160), 
-        xaxis=dict(range=[snaps["date"].iloc[0], snaps["date"].iloc[-1]]),
-        yaxis=dict(range=[min_y - pad, max_y + pad])
-    )
+    fig.update_layout(updatemenus=_anim_buttons(280, 160), sliders=_anim_slider(snaps["date"], 280, 160), xaxis=dict(range=[snaps["date"].iloc[0], snaps["date"].iloc[-1]]), yaxis=dict(range=[min_y - pad, max_y + pad]))
     return apply_layout(fig, title="🏎️ Member P/L Worm Race", height=520, showlegend=True)
-
-def chart_anim_monthly_roi_build(df: pd.DataFrame) -> go.Figure:
-    df["aw_num"] = pd.to_numeric(df["actual_winnings"], errors="coerce").fillna(0)
-    monthly = df.groupby("month").agg(pl=("aw_num", "sum"), staked=("stake", "sum")).reset_index()
-    monthly["roi"] = (monthly["pl"] / monthly["staked"] * 100).round(1)
-    
-    min_y = min(monthly["roi"].min(), 0)
-    max_y = max(monthly["roi"].max(), 0)
-    pad = max(5, (max_y - min_y) * 0.1)
-    
-    def mkf(i): return[go.Bar(x=monthly["month"], y=[monthly["roi"].iloc[j] if j<=i else 0 for j in range(len(monthly))])]
-    frames =[go.Frame(name=monthly["month"].iloc[i], data=mkf(i)) for i in range(len(monthly))]
-    fig = go.Figure(data=mkf(0), frames=frames)
-    fig.update_layout(
-        updatemenus=_anim_buttons(), 
-        sliders=_anim_slider(monthly["month"]),
-        yaxis=dict(range=[min_y - pad, max_y + pad])
-    )
-    return apply_layout(fig, title="📅 Monthly ROI Animation", height=500, showlegend=False)
-
-def chart_anim_bet_type_worm(df: pd.DataFrame) -> go.Figure:
-    df2 = df.copy()
-    df2["aw_num"] = pd.to_numeric(df2["actual_winnings"], errors="coerce").fillna(0)
-    top_mkts = df2.groupby("bet_type")["aw_num"].sum().abs().nlargest(6).index.tolist()
-    df3 = df2[df2["bet_type"].isin(top_mkts)].copy()
-    months = sorted(df3["month"].unique())
-    run = {m: 0.0 for m in top_mkts}
-    snaps = []
-    for mo in months:
-        mod = df3[df3["month"] == mo]
-        for m in top_mkts: run[m] += mod[mod["bet_type"] == m]["aw_num"].sum()
-        snaps.append({"month": mo, **run})
-    sdf = pd.DataFrame(snaps)
-    def mkf(i): return[go.Scatter(x=sdf["month"], y=sdf[m].apply(lambda x: x if j<=i else None), mode="lines+markers", name=m) for j, m in enumerate(top_mkts)]
-    frames = [go.Frame(name=months[i], data=[go.Scatter(x=sdf["month"].iloc[:i+1], y=sdf[m].iloc[:i+1], mode="lines+markers", name=m) for m in top_mkts]) for i in range(len(months))]
-    fig = go.Figure(data=[go.Scatter(x=sdf["month"].iloc[:1], y=sdf[m].iloc[:1], name=m) for m in top_mkts], frames=frames)
-    fig.update_layout(updatemenus=_anim_buttons(), sliders=_anim_slider(months))
-    return apply_layout(fig, title="📊 Bet Type Worm Race", height=560, showlegend=True)
-
-def chart_anim_odds_scatter_race(df: pd.DataFrame) -> go.Figure:
-    closed = df[df["status"].isin(["Win", "Loss"])].sort_values("date").copy()
-    closed["aw_num"] = pd.to_numeric(closed["actual_winnings"], errors="coerce").fillna(0)
-    mkts = sorted(closed["bet_type"].unique().tolist())
-    def mkf(sub): return [go.Scatter(x=sub[sub["bet_type"]==m]["odds"], y=sub[sub["bet_type"]==m]["aw_num"], mode="markers", name=m) for m in mkts]
-    frames =[go.Frame(name=str(i), data=mkf(closed.iloc[:i+1])) for i in range(len(closed))]
-    fig = go.Figure(data=mkf(closed.iloc[:1]), frames=frames)
-    fig.update_layout(updatemenus=_anim_buttons(80, 40), sliders=_anim_slider(range(len(closed)), 80, 40))
-    return apply_layout(fig, title="🌌 Every Bet Revealed", height=560, showlegend=True)
 
 def chart_anim_win_rate_evolution(df: pd.DataFrame) -> go.Figure:
     fig_data = {}
@@ -763,10 +630,12 @@ def main():
         </div>''', unsafe_allow_html=True)
     st.divider()
 
-    t_home, t_people, t_markets, t_extremes, t_advanced, t_anim, t_inbox, t_ledger = st.tabs([
-        "🏠 Home", "👤 People", "📈 Markets", "🎯 Extremes", "🔬 Advanced", "🎬 Animated", "📥 Inbox", "📒 Ledger"
+    # The New 7-Tab Architecture
+    t_home, t_people, t_markets, t_timeline, t_analytics, t_extremes, t_anim, t_inbox, t_ledger = st.tabs([
+        "🏠 Home", "👤 People", "📈 Markets", "📆 Timeline", "📐 Analytics", "🎯 Extremes", "🎬 Anim", "📥 Inbox", "📒 Ledger"
     ])
 
+    # 1. HOME
     with t_home:
         c1, c2 = cols(2)
         with c1: stat_card("💰 Betting P/L", f"${cur_pl:+.2f}", color=_pl_col)
@@ -776,11 +645,14 @@ def main():
         st.divider()
         ca, cb = cols(2)
         with ca: pc(chart_cumulative_bankroll(df, opening, bankroll_df))
-        with cb: pc(chart_win_loss_donut(df))
-        pc(chart_waterfall(df))
+        with cb: pc(chart_cumulative_roi(df)) # The new stabilizing ROI chart
+        c3, c4 = cols(2)
+        with c3: pc(chart_win_loss_donut(df))
+        with c4: pc(chart_waterfall(df))
 
+    # 2. PEOPLE
     with t_people:
-        view = st.radio("Select View", ["🏆 Leaderboard"] + [f"👤 {m}" for m in MEMBERS], horizontal=True, label_visibility="collapsed", key="people_view_radio")
+        view = st.radio("Select View", ["🏆 Leaderboard"] + [f"👤 {m}" for m in MEMBERS], horizontal=True, label_visibility="collapsed")
         st.divider()
 
         if view == "🏆 Leaderboard":
@@ -790,7 +662,6 @@ def main():
             c3, c4 = cols(2)
             with c3: pc(chart_member_win_rate(df))
             with c4: pc(chart_member_radar(df))
-            pc(chart_member_cumulative(df))
             pc(chart_longest_streaks(df))
             pc(chart_team_vs_individual(df))
         else:
@@ -812,252 +683,158 @@ def main():
             c1, c2 = cols(2)
             with c1: pc(chart_win_loss_donut(mdf, f"{m}'s Record"))
             with c2: pc(chart_member_monthly_pl(df, m))
-
             c3, c4 = cols(2)
             with c3: pc(chart_member_odds_dist(df, m))
             with c4: pc(chart_member_market_breakdown(df, m))
+            pc(chart_ev_proxy(mdf, title=f"📐 {m} — Odds Calibration (Actual vs Implied)"))
 
+    # 3. MARKETS
     with t_markets:
-        mkt_view = st.radio("Market View", ["📊 Overview", "💀 Multi Curse", "🎲 Odds Analysis", "🌐 Sunburst"], horizontal=True, label_visibility="collapsed", key="mkt_view_radio")
-        st.divider()
+        c1, c2 = cols(2)
+        with c1: pc(chart_pl_by_sport(df))
+        with c2: pc(chart_competition_roi(df))
+        c3, c4 = cols(2)
+        with c3: pc(chart_bet_type_roi_bars(df))
+        with c4: pc(chart_pl_by_selection(df))
+        pc(chart_bet_type_sunburst(df))
+        pc(chart_top_teams(df))
 
-        if mkt_view == "📊 Overview":
-            c1, c2 = cols(2)
-            with c1: pc(chart_bet_type_roi_bars(df))
-            with c2: pc(chart_competition_roi(df))
-            pc(chart_pl_by_selection(df))
+    # 4. TIMELINE
+    with t_timeline:
+        pc(chart_pl_by_matchday(df))
+        c1, c2 = cols(2)
+        with c1: pc(chart_monthly_pl(df))
+        with c2: pc(chart_monthly_volatility(df))
+        pc(chart_weekday_heatmap(df))
+        pc(chart_year_on_year(df))
 
-        elif mkt_view == "💀 Multi Curse":
-            pc(chart_accumulator_curse(df))
+    # 5. ANALYTICS
+    with t_analytics:
+        pc(chart_cumulative_win_rate(df))
+        pc(chart_odds_correlations(df))
+        pc(chart_ev_proxy(df, title="📐 Global Edge Proxy — Actual vs Implied"))
+        c1, c2 = cols(2)
+        with c1: pc(chart_odds_bucket_roi(df))
+        with c2: pc(chart_longshot_vs_fav(df))
+        pc(chart_roi_rollercoaster(df))
+        pc(chart_voting_success(df))
 
-        elif mkt_view == "🎲 Odds Analysis":
-            c1, c2 = cols(2)
-            with c1: pc(chart_odds_histogram(df))
-            with c2: pc(chart_odds_bucket_roi(df))
-            pc(chart_ev_proxy(df))
-            pc(chart_stake_vs_outcome(df))
-
-        elif mkt_view == "🌐 Sunburst":
-            pc(chart_bet_type_sunburst(df))
-
+    # 6. EXTREMES
     with t_extremes:
-        section("Hall of Fame (and Shame)")
         best = best_bet(df)
         worst = worst_bet(df)
-
         bc, wc = cols(2)
         with bc:
             _b_sel = str(best.get("selection", "")).strip()
             _b_date = str(best.get("date", ""))[:10]
-            stat_card(
-                label="🏆 Best Bet Ever",
-                value=f'${best.get("aw_num", 0):+.2f}',
-                sub=f'{event_label(best)}<br>📌 {_b_sel} · {best.get("odds", 0):.2f}x · {best.get("bet_type","?")}<br>{best.get("user", "?")} · {_b_date}',
-                color=WIN_COLOR,
-                border_color=WIN_COLOR,
-            )
+            stat_card("🏆 Best Bet Ever", f'${best.get("aw_num", 0):+.2f}', sub=f'{event_label(best)}<br>📌 {_b_sel} · {best.get("odds", 0):.2f}x<br>{best.get("user", "?")} · {_b_date}', color=WIN_COLOR)
         with wc:
             _w_sel = str(worst.get("selection", "")).strip()
             _w_date = str(worst.get("date", ""))[:10]
-            stat_card(
-                label="💀 Worst Bet Ever",
-                value=f'${worst.get("aw_num", 0):+.2f}',
-                sub=f'{event_label(worst)}<br>📌 {_w_sel} · {worst.get("odds", 0):.2f}x · {worst.get("bet_type","?")}<br>{worst.get("user", "?")} · {_w_date}',
-                color=LOSS_COLOR,
-                border_color=LOSS_COLOR,
-            )
-            
+            stat_card("💀 Worst Bet Ever", f'${worst.get("aw_num", 0):+.2f}', sub=f'{event_label(worst)}<br>📌 {_w_sel} · {worst.get("odds", 0):.2f}x<br>{worst.get("user", "?")} · {_w_date}', color=LOSS_COLOR)
+        
         st.write("")
         section("Top 10 Wins")
         _show_cols = [c for c in["date", "user", "home_team", "away_team", "competition", "bet_type", "selection", "odds", "stake", "actual_winnings"] if c in df.columns]
-        
         df["aw_num"] = pd.to_numeric(df["actual_winnings"], errors="coerce").fillna(0)
         st.dataframe(df[df["status"] == "Win"].nlargest(10, "aw_num")[_show_cols], hide_index=True)
         
         section("Top 10 Losses")
         st.dataframe(df[df["status"] == "Loss"].nsmallest(10, "aw_num")[_show_cols], hide_index=True)
         
-        pc(chart_weekday_heatmap(df))
-        pc(chart_top_teams(df))
+        pc(chart_accumulator_curse(df))
 
-    with t_advanced:
-        pc(chart_roi_rollercoaster(df))
-        pc(chart_bankroll_by_member_contrib(df, opening, bankroll_df))
-        pc(chart_bet_type_win_rate_vs_roi(df))
-        pc(chart_voting_success(df))
-        pc(chart_monthly_volatility(df))
-        pc(chart_longshot_vs_fav(df))
+    # 7. ANIMATED
+    with t_anim:
+        st.caption("Press ▶ Play or drag the slider.")
+        pc(chart_anim_bankroll_worm(df, opening, bankroll_df))
+        pc(chart_anim_member_worm(df))
+        pc(chart_anim_win_rate_evolution(df))
+
+    # 8. INBOX (Data Sync & Grading)
+    with t_inbox:
+        st.subheader("Data Management")
+        if st.button("🔄 Pull Latest from Google Sheets", use_container_width=True):
+            with st.spinner("Downloading ledger from Google Sheets..."):
+                if core.sync_local_csv():
+                    st.cache_data.clear()
+                    st.success("Ledger synced successfully!")
+                    st.rerun()
+                else: st.error("Sync failed.")
+                    
+        st.divider()
+        st.subheader("Pending Bets")
+        if len(df_pending) == 0: st.success("No pending bets — all caught up.")
+        else:
+            st.info(f"{len(df_pending)} bet(s) awaiting grading.")
+            for _, row in df_pending.iterrows():
+                with st.expander(f"**{row['event']}** | {row['competition']} | {row['selection']} @ {row['odds']:.2f}"):
+                    col1, col2, col3 = cols(3)
+                    with col1: new_status = st.selectbox("Result", ["Pending", "Win", "Loss", "Push", "Void"], key=f"status_{row['uuid']}")
+                    with col2: actual_winnings = st.number_input("Winnings ($)", value=0.0, format="%.2f", key=f"winnings_{row['uuid']}")
+                    with col3:
+                        st.write(""); st.write("")
+                        if st.button("Commit", key=f"commit_{row['uuid']}", type="primary", use_container_width=True):
+                            if new_status != "Pending":
+                                if core.update_grade(row["uuid"], new_status, actual_winnings):
+                                    st.success(f"✅ {row['uuid']} → {new_status}"); st.cache_data.clear(); st.rerun()
 
         st.divider()
+        st.subheader("Add a Bet Manually")
+        with st.form("add_bet_form", clear_on_submit=True):
+            col1, col2 = cols(2)
+            with col1:
+                user = st.selectbox("Member", core.SYNDICATE_MEMBERS + ["Syndicate"])
+                home_team = st.text_input("Home Team (e.g. Arsenal)")
+                away_team = st.text_input("Away Team")
+                competition = st.selectbox("Competition", COMPETITIONS)
+                bet_type = st.selectbox("Bet Type", BET_TYPES)
+                selection = st.text_input("Selection")
+            with col2:
+                odds = st.number_input("Odds", min_value=1.01, value=1.80, step=0.01)
+                stake = st.number_input("Stake ($)", value=5.0)
+                bet_date = st.date_input("Date")
+                status = st.selectbox("Status",["Pending", "Win", "Loss", "Push", "Deposit", "Withdrawal", "Reconciliation"])
+                aw = st.number_input("Actual Winnings", value=0.0)
+
+            if st.form_submit_button("Add Bet", type="primary"):
+                if home_team and selection:
+                    core.append_bet(user, home_team, away_team, competition, bet_type, selection, odds, stake, bet_date, status, aw)
+                    st.success("Added!"); st.cache_data.clear(); st.rerun()
+
+    # 9. LEDGER & BETBOT
+    with t_ledger:
         section("🤖 Betbot — Ask the Ledger")
         asker = st.selectbox("Who's asking?", core.SYNDICATE_MEMBERS, key="betbot_asker")
         question = st.text_input("Question", placeholder="What's our ROI on BTTS bets?", key="betbot_q")
         if st.button("Ask", type="primary") and question:
             with st.spinner("Consulting the LangChain oracle…"):
                 try:
-                    if "agent" not in st.session_state:
-                        st.session_state.agent = build_agent()
-                    raw_ans = agent_query(st.session_state.agent, question)
-                    reply = core.apply_persona(raw_ans, asker_name=asker)
+                    if "agent" not in st.session_state: st.session_state.agent = build_agent()
+                    reply = core.apply_persona(agent_query(st.session_state.agent, question), asker_name=asker)
                     st.info(reply)
-                except Exception as e:
-                    st.error(f"Betbot error: {e}")
-
-    with t_anim:
-        st.caption("Press ▶ Play or drag the slider.")
-        pc(chart_anim_bankroll_worm(df, opening, bankroll_df))
-        pc(chart_anim_member_worm(df))
-        pc(chart_anim_monthly_roi_build(df))
-        pc(chart_anim_bet_type_worm(df))
-        pc(chart_anim_odds_scatter_race(df))
-        pc(chart_anim_win_rate_evolution(df))
-
-    with t_inbox:
-        # --- NEW DATA SYNC SECTION ---
-        st.subheader("Data Management")
-        if st.button("🔄 Pull Latest from Google Sheets", use_container_width=True):
-            with st.spinner("Downloading ledger from Google Sheets..."):
-                success = core.sync_local_csv()
-                if success:
-                    st.cache_data.clear() # Dump the old cached data
-                    st.success("Ledger synced successfully!")
-                    st.rerun() # Reload the UI with the fresh data
-                else:
-                    st.error("Sync failed — check your API limits or credentials.")
-                    
-        st.divider()
-
-        # --- EXISTING PENDING BETS SECTION ---
-        st.subheader("Pending Bets")
-        if len(df_pending) == 0:
-            st.success("No pending bets — all caught up.")
-        else:
-            st.info(f"{len(df_pending)} bet(s) awaiting grading.")
-            for _, row in df_pending.iterrows():
-                with st.expander(
-                    f"**{row['event']}** | {row['competition']} | {row['bet_type']} | {row['selection']} @ {row['odds']:.2f} "
-                    f"(${row['stake']:.2f}) — *{row['date'].date()}*"
-                ):
-                    col1, col2, col3 = cols(3)
-                    with col1:
-                        new_status = st.selectbox(
-                            "Result",
-                            options=["Pending", "Win", "Loss", "Push", "Void", "manual_review"],
-                            key=f"status_{row['uuid']}",
-                        )
-                    with col2:
-                        actual_winnings = st.number_input(
-                            "Actual winnings ($)", value=0.0, step=0.01,
-                            format="%.2f", key=f"winnings_{row['uuid']}",
-                        )
-                    with col3:
-# ... the rest continues as normal ...
-                        st.write(""); st.write("")
-                        if st.button("Commit", key=f"commit_{row['uuid']}", type="primary", use_container_width=True):
-                            if new_status == "Pending":
-                                st.warning("Select a result before committing.")
-                            else:
-                                with st.spinner("Writing to Google Sheets…"):
-                                    ok = core.update_grade(row["uuid"], new_status, actual_winnings)
-                                if ok:
-                                    st.success(f"✅ {row['uuid']} → {new_status} ${actual_winnings:.2f}")
-                                    st.cache_data.clear(); st.rerun()
-                                else:
-                                    st.error("Write failed — check logs/failed_writes.log")
+                except Exception as e: st.error(f"Betbot error: {e}")
 
         st.divider()
-
-        # MANUAL ADD BET
-        st.subheader("Add a Bet Manually")
-        with st.form("add_bet_form", clear_on_submit=True):
-            col1, col2 = cols(2)
-            with col1:
-                user        = st.selectbox("Member", core.SYNDICATE_MEMBERS + ["Syndicate"])
-                home_team   = st.text_input("Home Team (e.g. Arsenal)")
-                away_team   = st.text_input("Away Team (e.g. Chelsea)")
-                competition = st.selectbox("Competition", COMPETITIONS)
-                bet_type    = st.selectbox("Bet Type", BET_TYPES)
-                selection   = st.text_input("Selection")
-            with col2:
-                odds     = st.number_input("Odds", min_value=1.01, value=1.80, step=0.01)
-                stake    = st.number_input("Stake ($)", min_value=0.0, value=5.0, step=0.5)
-                bet_date = st.date_input("Date")
-                status   = st.selectbox("Status",["Pending", "Win", "Loss", "Push", "Deposit", "Withdrawal", "Reconciliation"])
-                aw       = st.number_input("Actual Winnings", value=0.0)
-
-            if st.form_submit_button("Add Bet / Record", type="primary"):
-                if not home_team or not selection:
-                    st.warning("Home team and selection are required.")
-                else:
-                    new_uuid = core.append_bet(user, home_team, away_team, competition, bet_type, selection, odds, stake, bet_date, status, aw)
-                    st.success(f"Added {new_uuid}")
-                    st.cache_data.clear(); st.rerun()
-
-    with t_ledger:
         st.subheader("Full Ledger")
-
-        all_users     = sorted(df_raw["user"].dropna().unique().tolist())
-        all_bet_types = sorted(df_raw["bet_type"].dropna().unique().tolist())
-        all_years     = sorted(df_raw["date"].dt.year.unique().tolist())
-
         with st.expander("Filters", expanded=False):
             fc = cols(4)
-            with fc[0]:
-                f_user = st.multiselect("Member", options=all_users, default=all_users)
-            with fc[1]:
-                f_bet_type = st.multiselect("Bet Type", options=all_bet_types, default=all_bet_types)
-            with fc[2]:
-                f_status = st.multiselect(
-                    "Status",
-                    options=["Win", "Loss", "Push", "Void", "Pending", "manual_review", "Deposit", "Reconciliation"],
-                    default=["Win", "Loss", "Push"],
-                )
-            with fc[3]:
-                f_year = st.multiselect("Year", options=all_years, default=all_years)
+            with fc[0]: f_user = st.multiselect("Member", options=sorted(df_raw["user"].dropna().unique()), default=sorted(df_raw["user"].dropna().unique()))
+            with fc[1]: f_bet_type = st.multiselect("Bet Type", options=sorted(df_raw["bet_type"].dropna().unique()), default=sorted(df_raw["bet_type"].dropna().unique()))
+            with fc[2]: f_status = st.multiselect("Status", options=["Win", "Loss", "Push", "Void", "Pending", "Deposit", "Reconciliation"], default=["Win", "Loss", "Push"])
+            with fc[3]: f_year = st.multiselect("Year", options=sorted(df_raw["date"].dt.year.unique()), default=sorted(df_raw["date"].dt.year.unique()))
 
-        # Apply to raw data so Deposits etc. can be viewed
-        mask = (
-            df_raw["user"].isin(f_user) &
-            df_raw["bet_type"].isin(f_bet_type) &
-            df_raw["status"].isin(f_status) &
-            df_raw["date"].dt.year.isin(f_year)
-        )
+        mask = (df_raw["user"].isin(f_user) & df_raw["bet_type"].isin(f_bet_type) & df_raw["status"].isin(f_status) & df_raw["date"].dt.year.isin(f_year))
         df_filtered = df_raw[mask].copy()
-        st.caption(f"Showing {len(df_filtered)} of {len(df_raw)} rows")
-
-        # DISPLAY COLUMNS (Including UUID)
-        display_cols = [c for c in["uuid", "date", "user", "home_team", "away_team", "competition", "bet_type", "selection",
-                                    "odds", "stake", "status", "actual_winnings"] if c in df_filtered.columns]
+        display_cols = [c for c in["uuid", "date", "user", "home_team", "away_team", "competition", "bet_type", "selection", "odds", "stake", "status", "actual_winnings"] if c in df_filtered.columns]
         
         ledger_display = df_filtered[display_cols].sort_values("date", ascending=False).copy()
-        
-        # Avoid crashing on deposits by mapping correctly
         ledger_display["actual_winnings"] = pd.to_numeric(ledger_display["actual_winnings"], errors="coerce").fillna(0).map("${:+.2f}".format)
         ledger_display["stake"]           = ledger_display["stake"].map("${:.2f}".format)
         ledger_display["date"]            = ledger_display["date"].dt.date
         ledger_display.columns =[c.replace("_", " ").title() for c in ledger_display.columns]
         
         st.dataframe(ledger_display, use_container_width=True, hide_index=True)
-
-        st.divider()
-
-        # MANUAL CORRECTIONS
-        with st.expander("Manual correction", expanded=False):
-            mc1, mc2, mc3 = cols(3)
-            with mc1: mc_uuid  = st.text_input("UUID")
-            with mc2: mc_field = st.selectbox("Field", options=list(core.COLUMN_MAP.keys()))
-            with mc3: mc_value = st.text_input("New value")
-            if st.button("Apply correction", type="secondary"):
-                if not mc_uuid or not mc_value:
-                    st.warning("UUID and new value are required.")
-                else:
-                    with st.spinner("Updating…"):
-                        ok = core.manual_correction(mc_uuid, mc_field, mc_value)
-                    if ok:
-                        st.success(f"✅ {mc_uuid} · {mc_field} = {mc_value}")
-                        st.cache_data.clear(); st.rerun()
-                    else:
-                        st.error("Correction failed — UUID not found or write error.")
 
 if __name__ == "__main__":
     main()
