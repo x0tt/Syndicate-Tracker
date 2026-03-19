@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
 # coding: utf-8
 """
-app.py — Syndicate Tracker v6.3
+app.py — Syndicate Tracker v6.4
 ================================
 Streamlit UI. Mobile-optimised, tab-based, Plotly-powered.
-Includes advanced calibration, matchday tracking, and ghost-chart fix.
+Includes advanced calibration, matchday tracking, ghost-chart fix,
+and "Information is Beautiful" visual upgrades.
 """
 
 import streamlit as st
@@ -85,7 +86,7 @@ def cols(n, gap="small"): return st.columns(n, gap=gap)
 
 _PLOTLY_CONFIG = { "displaylogo": False, "scrollZoom": False, "modeBarButtons": [["toImage", "resetScale2d"]], "toImageButtonOptions": { "format": "png", "width": 1200, "height": 600, "scale": 2, "filename": "syndicate_chart" } }
 
-# The bug fix: Removed the global counter and key argument. Let Streamlit natively hash the figure!
+# The ghost chart fix: Streamlit natively hashes the figure, so we removed the global key counter
 def pc(fig):
     st.plotly_chart(fig, use_container_width=True, config=_PLOTLY_CONFIG)
 
@@ -198,21 +199,48 @@ def rolling_roi(df: pd.DataFrame, window: int = 20) -> pd.Series:
 # ─────────────────────────────────────────────────────────────────────────────
 # CHART FACTORY
 # ─────────────────────────────────────────────────────────────────────────────
+
 def chart_cumulative_bankroll(df: pd.DataFrame, opening: float = 0.00, bankroll_df: pd.DataFrame = None) -> go.Figure:
     src_df = bankroll_df if bankroll_df is not None else df
     df2 = src_df.sort_values("date").copy()
     aw_num = pd.to_numeric(df2["actual_winnings"], errors="coerce").fillna(0)
     df2["bankroll"] = opening + aw_num.cumsum()
-    df2["peak"]     = df2["bankroll"].cummax()
+    df2["peak"] = df2["bankroll"].cummax()
+    df2["drawdown"] = df2["peak"] - df2["bankroll"]
+    
     deposits = pd.to_numeric(src_df[src_df["status"].isin(["Deposit", "Withdrawal"])]["actual_winnings"], errors="coerce").fillna(0).sum()
     total_invested = opening + deposits
 
     fig = go.Figure()
-    fig.add_trace(go.Scatter(x=df2["date_str"], y=df2["peak"], line=dict(color="rgba(0,0,0,0)"), showlegend=False))
-    fig.add_trace(go.Scatter(x=df2["date_str"], y=df2["bankroll"], fill="tonexty", fillcolor="rgba(230,159,0,0.15)", line=dict(color=LOSS_COLOR, width=0.5, dash="dot"), name="Drawdown"))
-    fig.add_trace(go.Scatter(x=df2["date_str"], y=df2["bankroll"], mode="lines", line=dict(color=ACCENT, width=3), name="Bankroll"))
+    
+    # Smooth Bankroll Line with a gradient fill below it
+    fig.add_trace(go.Scatter(
+        x=df2["date_str"], y=df2["bankroll"], mode="lines", 
+        line=dict(color=ACCENT, width=3, shape='spline', smoothing=1.3), 
+        fill="tozeroy", fillcolor="rgba(86,180,233,0.08)", name="Bankroll"
+    ))
+    
+    # Find points of interest for direct labeling
+    if not df2.empty:
+        ath_idx = df2["bankroll"].idxmax()
+        ath_row = df2.loc[ath_idx]
+        dd_idx = df2["drawdown"].idxmax()
+        dd_row = df2.loc[dd_idx]
+        
+        # ATH Annotation
+        fig.add_annotation(x=ath_row["date_str"], y=ath_row["bankroll"], text=f"All-Time High<br>${ath_row['bankroll']:.0f}", showarrow=True, arrowhead=2, arrowcolor=WIN_COLOR, ax=0, ay=-40, font=dict(color=WIN_COLOR, size=11))
+        # Max Drawdown Annotation
+        if dd_row["drawdown"] > 0:
+            fig.add_annotation(x=dd_row["date_str"], y=dd_row["bankroll"], text=f"Max Drawdown<br>-${dd_row['drawdown']:.0f}", showarrow=True, arrowhead=2, arrowcolor=LOSS_COLOR, ax=0, ay=40, font=dict(color=LOSS_COLOR, size=11))
+
     fig.add_hline(y=total_invested, line_dash="dash", line_color=GRID_CLR, annotation_text=f"Invested ${total_invested:.0f}", annotation_font_color=GRID_CLR, annotation_position="bottom right")
-    return apply_layout(fig, title=f"📈 Bankroll  ${df2['bankroll'].iloc[-1]:.2f}", height=420, showlegend=False)
+    
+    # Strip away the Y-axis to make it look clean and modern
+    fig.update_yaxes(visible=False, showgrid=False)
+    fig.update_xaxes(showgrid=False)
+    
+    return apply_layout(fig, title=f"📈 Bankroll Spline  ${df2['bankroll'].iloc[-1]:.2f}", height=420, showlegend=False)
+
 
 def chart_cumulative_roi(df: pd.DataFrame) -> go.Figure:
     d = df[df["status"].isin(["Win", "Loss", "Push"])].sort_values("date").copy()
@@ -297,13 +325,29 @@ def chart_member_win_rate(df: pd.DataFrame) -> go.Figure:
     fig = go.Figure(go.Bar(y=MEMBERS, x=wrs, orientation="h", marker_color=[MEMBER_COLORS[m] for m in MEMBERS], text=[f"{w:.1f}%" for w in wrs], textposition="inside"))
     return apply_layout(fig, title="🎯 Win Rate by Member", height=260, showlegend=False)
 
-def chart_member_odds_dist(df: pd.DataFrame, member: str) -> go.Figure:
-    sub = df[df["user"] == member]
-    wins = sub[sub["status"] == "Win"]["odds"]; losses = sub[sub["status"] == "Loss"]["odds"]
-    fig = go.Figure()
-    fig.add_trace(go.Violin(y=wins, name="Win", fillcolor=WIN_COLOR, opacity=0.7, line_color=WIN_COLOR))
-    fig.add_trace(go.Violin(y=losses, name="Loss", fillcolor=LOSS_COLOR, opacity=0.7, line_color=LOSS_COLOR))
-    return apply_layout(fig, title=f"🎲 {member} — Odds Distribution", height=320)
+
+def chart_member_odds_beeswarm(df: pd.DataFrame, member: str) -> go.Figure:
+    sub = df[(df["user"] == member) & (df["status"].isin(["Win", "Loss"]))].copy()
+    if sub.empty: return go.Figure().update_layout(title="No odds data")
+    
+    sub["aw_num"] = pd.to_numeric(sub["actual_winnings"], errors="coerce").fillna(0)
+    
+    # Plotly Express strip plot creates the perfect jittered beeswarm
+    fig = px.strip(
+        sub, x="odds", y="status", color="status", 
+        stripmode="overlay", # Overlays the jitter points beautifully
+        color_discrete_map={"Win": WIN_COLOR, "Loss": LOSS_COLOR},
+        hover_data=["event", "selection", "stake", "aw_num"]
+    )
+    
+    fig.update_traces(marker=dict(size=8, opacity=0.7, line=dict(width=0)))
+    
+    # Custom Hover Template
+    fig.update_traces(hovertemplate="<b>%{customdata[0]}</b><br>%{customdata[1]}<br>Odds: %{x}<br>Stake: $%{customdata[2]:.2f}<br>P/L: $%{customdata[3]:.2f}<extra></extra>")
+    
+    fig.update_yaxes(title="")
+    return apply_layout(fig, title=f"🐝 {member} — Every Bet Placed (Odds)", height=320, showlegend=False)
+
 
 def chart_member_market_breakdown(df: pd.DataFrame, member: str) -> go.Figure:
     sub = df[df["user"] == member]
@@ -333,11 +377,53 @@ def chart_bet_type_roi_bars(df: pd.DataFrame) -> go.Figure:
     fig.add_vline(x=0, line_color=GRID_CLR)
     return apply_layout(fig, title="📊 ROI by Bet Type (≥3 bets)", height=max(300, len(grp)*38), showlegend=False)
 
-def chart_bet_type_sunburst(df: pd.DataFrame) -> go.Figure:
-    grp = df.groupby(["bet_type", "status"]).size().reset_index(name="count")
-    grp = grp[grp["status"].isin(["Win", "Loss", "Push"])]
-    fig = px.sunburst(grp, path=["bet_type", "status"], values="count", color="status", color_discrete_map={"Win": WIN_COLOR, "Loss": LOSS_COLOR, "Push": PUSH_COLOR})
-    return apply_layout(fig, title="🌐 Bet Type Outcomes", height=440, showlegend=False)
+
+def chart_flow_of_money_sankey(df: pd.DataFrame) -> go.Figure:
+    # Filter only closed bets
+    d = df[df["status"].isin(["Win", "Loss", "Push"])].copy()
+    if d.empty: return go.Figure().update_layout(title="No data for Flow of Money")
+    
+    # We are mapping: Sport -> Bet Type -> Status based on Stake volume
+    sports = d["sport"].unique().tolist()
+    bet_types = d["bet_type"].unique().tolist()
+    statuses = ["Win", "Loss", "Push"]
+    
+    # Create master node list and indices
+    labels = sports + bet_types + statuses
+    node_dict = {label: i for i, label in enumerate(labels)}
+    
+    source, target, value, link_color = [], [], [], []
+    
+    # Link 1: Sport -> Bet Type
+    sport_mkt = d.groupby(["sport", "bet_type"])["stake"].sum().reset_index()
+    for _, row in sport_mkt.iterrows():
+        source.append(node_dict[row["sport"]])
+        target.append(node_dict[row["bet_type"]])
+        value.append(row["stake"])
+        link_color.append("rgba(255, 255, 255, 0.05)") # Subtle grey flow
+        
+    # Link 2: Bet Type -> Status
+    mkt_stat = d.groupby(["bet_type", "status"])["stake"].sum().reset_index()
+    for _, row in mkt_stat.iterrows():
+        source.append(node_dict[row["bet_type"]])
+        target.append(node_dict[row["status"]])
+        value.append(row["stake"])
+        
+        # Color the final outcome flows!
+        c = WIN_COLOR if row["status"] == "Win" else (LOSS_COLOR if row["status"] == "Loss" else PUSH_COLOR)
+        link_color.append(c.replace("rgb", "rgba").replace(")", ", 0.4)")) # Add opacity to hex/rgb
+
+    fig = go.Figure(data=[go.Sankey(
+        node = dict(
+            pad = 20, thickness = 15, line = dict(color = GRID_CLR, width = 0.5),
+            label = labels,
+            color = "#16213e" # Dark nodes to blend in, letting the flow colors pop
+        ),
+        link = dict(source = source, target = target, value = value, color = link_color)
+    )])
+    
+    return apply_layout(fig, title="🌊 Flow of Money (Stake Volume)", height=480)
+
 
 def chart_accumulator_curse(df: pd.DataFrame) -> go.Figure:
     multis = df[df["bet_type"] == "Multi"].copy()
@@ -375,13 +461,43 @@ def chart_roi_rollercoaster(df: pd.DataFrame) -> go.Figure:
     fig.add_hline(y=0, line_dash="dash", line_color=GRID_CLR)
     return apply_layout(fig, title="🎢 20-Bet Rolling ROI", height=400, showlegend=False)
 
-def chart_weekday_heatmap(df: pd.DataFrame) -> go.Figure:
-    df2 = df.copy()
-    df2["aw_num"] = pd.to_numeric(df2["actual_winnings"], errors="coerce").fillna(0)
-    df2["weekday"] = pd.Categorical(df2["weekday"], categories=["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"], ordered=True)
-    pivot = df2.pivot_table(index="weekday", columns="month", values="aw_num", aggfunc="sum", fill_value=0)
-    fig = go.Figure(go.Heatmap(z=pivot.values, x=pivot.columns.tolist(), y=[d[:3] for d in pivot.index.tolist()], colorscale=[[0, LOSS_COLOR],[0.5, "#1a1a2e"], [1, WIN_COLOR]], zmid=0))
-    return apply_layout(fig, title="📅 Day × Month Heatmap", height=300, showlegend=False)
+
+def chart_weekday_bubble(df: pd.DataFrame) -> go.Figure:
+    d = df[df["status"].isin(["Win", "Loss", "Push"])].copy()
+    d["aw_num"] = pd.to_numeric(d["actual_winnings"], errors="coerce").fillna(0)
+    
+    # Group to get volume (bets) and profit (aw_num)
+    grp = d.groupby(["month", "weekday"]).agg(bets=("uuid", "count"), pl=("aw_num", "sum")).reset_index()
+    
+    # Ensure proper weekday ordering
+    days_order = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
+    grp["weekday"] = pd.Categorical(grp["weekday"], categories=days_order, ordered=True)
+    grp = grp.sort_values(["month", "weekday"])
+
+    fig = go.Figure()
+    
+    # Create the bubbles
+    colors = [WIN_COLOR if p > 0 else (LOSS_COLOR if p < 0 else PUSH_COLOR) for p in grp["pl"]]
+    fig.add_trace(go.Scatter(
+        x=grp["month"], y=grp["weekday"], 
+        mode="markers",
+        marker=dict(
+            size=grp["bets"], 
+            sizemode="area", sizeref=2.*max(grp["bets"])/(40.**2), sizemin=4, # Scales bubbles nicely
+            color=colors,
+            opacity=0.8,
+            line=dict(width=1, color=BG_DARK)
+        ),
+        text=[f"P/L: ${p:+.2f}<br>Bets: {b}" for p, b in zip(grp["pl"], grp["bets"])],
+        hovertemplate="<b>%{x} %{y}</b><br>%{text}<extra></extra>"
+    ))
+
+    # Strip the grid to let the bubbles float
+    fig.update_xaxes(showgrid=False)
+    fig.update_yaxes(showgrid=False)
+    
+    return apply_layout(fig, title="🫧 Day × Month Volume & P/L", height=340, showlegend=False)
+
 
 def chart_odds_correlations(df: pd.DataFrame) -> go.Figure:
     d = df[df["status"].isin(["Win", "Loss", "Push"])].copy()
@@ -645,7 +761,7 @@ def main():
         st.divider()
         ca, cb = cols(2)
         with ca: pc(chart_cumulative_bankroll(df, opening, bankroll_df))
-        with cb: pc(chart_cumulative_roi(df)) # The new stabilizing ROI chart
+        with cb: pc(chart_cumulative_roi(df)) 
         c3, c4 = cols(2)
         with c3: pc(chart_win_loss_donut(df))
         with c4: pc(chart_waterfall(df))
@@ -684,7 +800,7 @@ def main():
             with c1: pc(chart_win_loss_donut(mdf, f"{m}'s Record"))
             with c2: pc(chart_member_monthly_pl(df, m))
             c3, c4 = cols(2)
-            with c3: pc(chart_member_odds_dist(df, m))
+            with c3: pc(chart_member_odds_beeswarm(df, m)) # NEW Beeswarm
             with c4: pc(chart_member_market_breakdown(df, m))
             pc(chart_ev_proxy(mdf, title=f"📐 {m} — Odds Calibration (Actual vs Implied)"))
 
@@ -696,7 +812,7 @@ def main():
         c3, c4 = cols(2)
         with c3: pc(chart_bet_type_roi_bars(df))
         with c4: pc(chart_pl_by_selection(df))
-        pc(chart_bet_type_sunburst(df))
+        pc(chart_flow_of_money_sankey(df)) # NEW Sankey Flow
         pc(chart_top_teams(df))
 
     # 4. TIMELINE
@@ -705,7 +821,7 @@ def main():
         c1, c2 = cols(2)
         with c1: pc(chart_monthly_pl(df))
         with c2: pc(chart_monthly_volatility(df))
-        pc(chart_weekday_heatmap(df))
+        pc(chart_weekday_bubble(df)) # NEW Bubble Calendar
         pc(chart_year_on_year(df))
 
     # 5. ANALYTICS
