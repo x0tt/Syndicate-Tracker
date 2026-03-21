@@ -441,6 +441,6 @@ eed5af6a-dd95-a9a6-f125-2739b1ad8c24,2026-03-05,Xander,Fulham,West Ham,EPL 25/26
 a8abb4bb-284b-5b27-aa7c-b790dc20f80b,2026-03-16,John,Forest,Fulham,EPL 25/26,Handicap,Fulham +1,1.7,5,Win,3.5,30,Football,True,False
 15d4e891-d784-977c-acbf-cbb00c48f133,2026-03-16,Richard,Palace,Leeds,EPL 25/26,Draw No Bet,Palace,1.7,5,Push,0.0,30,Football,True,False
 c203d8a1-5161-2acf-1245-7e4d67635a95,2026-03-16,Xander,Palace,Leeds,EPL 25/26,Draw No Bet,Palace,1.7,5,Push,0.0,30,Football,True,False
-28b064ae,2026-03-22,John,Everton,Chelsea,EPL 25/26,BTTS,Yes,1.65,5,Pending,0.0,31,Football,True,False
-8c5655e8,2026-03-22,Richard,Fulham,Burnley,EPL 25/26,Full Time Result,Fulham,1.53,5,Pending,0.0,31,Football,True,False
+28b064ae,2026-03-22,John,Everton,Chelsea,EPL 25/26,BTTS,Yes,1.65,5,Loss,-5.0,31,Football,True,False
+8c5655e8,2026-03-22,Richard,Fulham,Burnley,EPL 25/26,Full Time Result,Fulham,1.53,5,Win,2.65,31,Football,True,False
 8f641dfc,2026-03-23,Xander,Villa,West Ham,EPL 25/26,Full Time Result,Villa,1.95,5,Pending,0.0,31,Football,True,False

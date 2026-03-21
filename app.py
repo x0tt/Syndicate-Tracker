@@ -605,18 +605,16 @@ def chart_member_radar(df: pd.DataFrame) -> go.Figure:
     return apply_layout(fig, title="🕸️ Member Radar", height=400)
 
 def chart_waterfall(df: pd.DataFrame) -> go.Figure:
-    # Focus on Team Pool first, fallback to Global if Team data is sparse
-    team_bets = df[df["user"] == "Team"]
-    if len(team_bets) >= 5:
-        df2 = team_bets.sort_values("date").tail(15).copy()
-        title = "🌊 Team Pool: Recent Result Sequence"
-    else:
-        df2 = df.sort_values("date").tail(15).copy()
-        title = "🌊 Recent Syndicate Form (All Members)"
+    # Filter for resolved bets only (exclude Pending and Voids)
+    resolved_bets = df[df["status"].isin(["Win", "Loss", "Push"])]
+    
+    # Get the last 15 resolved bets across the entire syndicate
+    df2 = resolved_bets.sort_values("date").tail(15).copy()
+    title = "🌊 Recent Syndicate Form (All Members)"
 
     df2["aw_num"] = pd.to_numeric(df2["actual_winnings"], errors="coerce").fillna(0)
     
-    # THE FIX: Create a mathematically unique ID for the X-axis to prevent 
+    # Create a mathematically unique ID for the X-axis to prevent 
     # identical string values (like two matches on the same day) from stacking.
     df2["unique_label"] = df2["event"].astype(str).str[:12] + " [" + df2["uuid"].astype(str).str[:4] + "]"
     
@@ -889,21 +887,7 @@ def main():
         if view == "🏆 Leaderboard":
             # --- THE NEW SHOWSTOPPER CENTERPIECE ---
             section("🌊 Individual Stake Flow")
-            
-            sankey_filter = st.radio(
-                "Filter Flow by Member:", 
-                ["All", "John", "Richard", "Xander"], 
-                horizontal=True,
-                label_visibility="collapsed",
-                key="sankey_lb_filter"
-            )
-            
-            if sankey_filter == "All":
-                pc(chart_flow_of_money_sankey(df))
-            else:
-                filtered_sankey_df = df[df["user"] == sankey_filter].copy()
-                pc(chart_flow_of_money_sankey(filtered_sankey_df))
-            
+            pc(chart_flow_of_money_sankey(df))
             st.divider()
             # ---------------------------------------
 
@@ -920,6 +904,39 @@ def main():
             
             pc(chart_longest_streaks(df))
             pc(chart_team_vs_individual(df))
+
+        else:
+            # Individual member pages
+            member = view.replace("👤 ", "")
+            member_df = df[df["user"] == member].copy()
+            stats = member_stats(member_df, member)
+            streak_count, streak_type = compute_streak(member_df)
+
+            color = MEMBER_COLORS.get(member, ACCENT)
+            _m_pl_col  = WIN_COLOR if stats["pl"] >= 0 else LOSS_COLOR
+            _m_roi_col = WIN_COLOR if stats["roi"] >= 0 else LOSS_COLOR
+
+            c1, c2, c3, c4 = cols(4)
+            with c1: stat_card("💰 P/L", f"${stats['pl']:+.2f}", color=_m_pl_col)
+            with c2: stat_card("📊 ROI", f"{stats['roi']:+.1f}%", color=_m_roi_col)
+            with c3: stat_card("🎯 Win Rate", f"{stats['win_rate']:.1f}%", color=color)
+            with c4:
+                streak_col = WIN_COLOR if streak_type == "Win" else (LOSS_COLOR if streak_type == "Loss" else PUSH_COLOR)
+                stat_card("🔥 Streak", f"{streak_count} {streak_type}", color=streak_col)
+
+            st.divider()
+
+            section(f"🌊 {member}'s Stake Flow")
+            pc(chart_flow_of_money_sankey(member_df))
+
+            st.divider()
+
+            ca, cb = cols(2)
+            with ca: pc(chart_member_monthly_pl(df, member))
+            with cb: pc(chart_member_market_breakdown(df, member))
+
+            pc(chart_member_odds_violin(df, member))
+            pc(chart_ev_proxy(member_df, title=f"📐 {member} — Edge Proxy (Actual vs Implied)"))
 
     # 3. MARKETS
     with t_markets:
