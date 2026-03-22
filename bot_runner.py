@@ -39,6 +39,7 @@ import requests
 
 import syndicate_core as core
 from agent import build_agent, query as agent_query
+from graph_of_week import run_graph_of_week
 
 log = logging.getLogger('syndicate.bot')
 
@@ -193,14 +194,33 @@ def _route_message(text: str, chat_id: str, sender_id: str,
             log.error(f"[COMMAND] On-demand report failed: {e}")
             return f"Report generation failed: {e}"
 
+    def _preview_graph_reply() -> str:
+        log.info(f"[COMMAND] Graph of the Week preview requested by {asker_name}")
+        if not core.TEST_CHAT_ID:
+            return "TEST_CHAT_ID is not set in .env — cannot send preview."
+        try:
+            if core.USE_GSHEETS_LIVE:
+                core.sync_local_csv()
+            fresh_df, fresh_roi, fresh_free, _, _ = core.load_ledger()
+            # Always route to TEST_CHAT_ID — hardcoded, not affected by TEST_MODE
+            success = run_graph_of_week(fresh_df, preview=True)
+            if success:
+                return f"✅ Graph of the Week preview sent to your private chat."
+            else:
+                return "❌ Preview failed — check the logs."
+        except Exception as e:
+            log.error(f"[COMMAND] Graph preview failed: {e}")
+            return f"Preview failed: {e}"
+
     exact_commands = {
-        'pending'    : lambda: core.format_pending(df_pending),
-        'leaderboard': lambda: core.format_leaderboard(df_roi),
-        'bank'       : lambda: core.format_bank(df),
-        'streaks'    : lambda: core.format_streaks(df_roi),
-        'report'     : _report_reply,
-        'help'       : lambda: core.BETBOT_HELP_TEXT,
-        'status'     : _status_reply,
+        'pending'      : lambda: core.format_pending(df_pending),
+        'leaderboard'  : lambda: core.format_leaderboard(df_roi),
+        'bank'         : lambda: core.format_bank(df),
+        'streaks'      : lambda: core.format_streaks(df_roi),
+        'report'       : _report_reply,
+        'preview_graph': _preview_graph_reply,
+        'help'         : lambda: core.BETBOT_HELP_TEXT,
+        'status'       : _status_reply,
     }
     if q_lower in exact_commands:
         reply = exact_commands[q_lower]()
@@ -416,6 +436,14 @@ def run() -> None:
                         
                 df, df_roi, df_free, df_pending, kpis = core.load_ledger()
                 _run_chronicler_if_due(df, df_roi, df_free)
+
+                # ── Graph of the Week — sent after the Chronicler report ──
+                log.info("[SCHEDULER] Running Graph of the Week...")
+                try:
+                    run_graph_of_week(df, preview=False)
+                except Exception as e:
+                    log.error(f"[SCHEDULER] Graph of the Week failed: {e}")
+
                 last_chronicler_date = today
 
             # ── Telegram long-poll ──

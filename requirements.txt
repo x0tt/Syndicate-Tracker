@@ -99,5 +99,6 @@ xxhash==3.6.0
 yarl==1.23.0
 zstandard==0.25.0
 plotly
+kaleido==0.2.1
 langchain-experimental
 tabulate
