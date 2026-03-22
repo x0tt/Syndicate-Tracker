@@ -68,7 +68,6 @@ USE_GSHEETS_LIVE  = os.getenv('USE_GSHEETS_LIVE',  'true').lower()  == 'true'
 USE_ODDS_API_LIVE = os.getenv('USE_ODDS_API_LIVE', 'true').lower()  == 'true'
 GRADING_DRY_RUN   = os.getenv('GRADING_DRY_RUN',  'true').lower()  == 'true'
 BETBOT_LIVE       = os.getenv('BETBOT_LIVE',       'true').lower()  == 'true'
-CHRONICLER_LIVE   = os.getenv('CHRONICLER_LIVE',   'true').lower()  == 'true'
 
 GEMINI_MODEL              = os.getenv('GEMINI_MODEL', 'gemini-3.1-flash-lite-preview')
 BETBOT_THINKING_LEVEL     = 'minimal'
@@ -87,7 +86,6 @@ COLUMN_MAP = {
     'stake': 'J', 'status': 'K', 'actual_winnings': 'L', 'matchday': 'M', 'sport': 'N'
 }
 
-CHRONICLER_WEEKDAY = 2  # Wednesday
 
 CHRONICLER_PERSONAS =[
     {'name': 'The Statistician', 'instruction': 'You are a dry, precise statistician. Present every result with unnecessary decimal places and passive-voice hedging.'},
@@ -148,9 +146,8 @@ You MUST adhere strictly to these definitions to avoid financial miscalculations
 
 STRICT RULES:
 1. Every number, stat, profit figure, and result MUST come verbatim from the JSON summary below. Do not invent any values.
-2. Write a comprehensive, engaging report (around 300-450 words).
-3. Structure:
-   - Opening: In persona voice, set the scene.
+2. {length_instruction}
+3. Structure:   - Opening: In persona voice, set the scene.
    - The Bottom Line: State the weekly profit/loss and the overall bank standing.
    - Player of the Week: Highlight the member with the best weekly profit based on "member_performance". Roast the worst.
    - Best & Worst Bets: Call out the specific best and worst bets of the week (ONLY if worst_bet is not null).
@@ -471,10 +468,23 @@ def run_grading(df_pending_in: pd.DataFrame) -> pd.DataFrame:
             results.append({'uuid': row['uuid'], 'old_status': row['status'], 'new_status': new_status, 'actual_winnings': winnings})
     return pd.DataFrame(results)
 
-# ── C4: Wednesday Chronicler ──────────────────────────────────────────────────
-def get_report_window() -> tuple:
+# ── C4: Chronicler ───────────────────────────────────────────────────────────
+def get_report_window(days: int = 7) -> tuple:
     today = date.today()
-    return today - timedelta(days=7), today - timedelta(days=1)
+    return today - timedelta(days=days), today - timedelta(days=1)
+
+
+def get_matchday_window(df_roi: pd.DataFrame, matchday: int) -> tuple:
+    """Returns (week_start, week_end) date range covering all bets in the given EPL matchday,
+    scoped to the current (most recent) season in the ledger."""
+    if df_roi.empty:
+        raise ValueError("No bet data in ledger")
+    current_season = df_roi['season'].max()
+    mask = (df_roi['matchday'].astype(str) == str(matchday)) & (df_roi['season'] == current_season)
+    if not mask.any():
+        raise ValueError(f"No bets found for matchday {matchday} in {current_season}")
+    dates = df_roi.loc[mask, 'date'].dt.date
+    return dates.min(), dates.max()
 
 def get_report_persona(report_date: date = None) -> dict:
     if report_date is None: report_date = date.today()
@@ -505,6 +515,8 @@ def build_weekly_summary(df: pd.DataFrame, df_roi: pd.DataFrame, df_free: pd.Dat
     # Add Member Performance logic so the Chronicler can pick a "Player of the Week"
     member_summary = {}
     for user, grp in closed.groupby('user'):
+        if len(grp) == 0:
+            continue  # skip members with no settled bets this week
         member_summary[user] = {
             'bets': len(grp),
             'profit': round(float(grp['profit'].sum()), 2),
@@ -561,42 +573,76 @@ def save_report_locally(text: str, report_date: date) -> Path:
     path.write_text(text)
     return path
 
-def needs_report(last_run_state: dict) -> tuple:
+def run_chronicler(df: pd.DataFrame, df_roi: pd.DataFrame, df_free: pd.DataFrame,
+                   concise: bool = False, days: int = 7, matchday: int = None) -> str | None:
+    """Generate the Chronicler report. Always runs — scheduling is the caller's responsibility.
+    Returns the report text, or None if generation fails.
     """
-    Returns True only if today is Wednesday AND no report has
-    been recorded in last_run.json for today's date.
-    """
-    today = date.today()
-    is_wednesday = today.weekday() == CHRONICLER_WEEKDAY
+    rep_date = date.today()
 
-    last_report_date_str = last_run_state.get('last_report_date')
-    already_run_today = (last_report_date_str == str(today))
+    # Determine date window — matchday takes priority over days
+    if matchday is not None:
+        try:
+            w_start, w_end = get_matchday_window(df_roi, matchday)
+        except ValueError as e:
+            return f"Could not generate report: {e}"
+    else:
+        w_start, w_end = get_report_window(days=days)
 
-    if is_wednesday and not already_run_today:
-        return True, today
-
-    return False, today
-
-def run_chronicler(df: pd.DataFrame, df_roi: pd.DataFrame, df_free: pd.DataFrame, force: bool = False, auto_send: bool = True) -> str | None:
-    state = load_last_run()
-    should_run, rep_date = needs_report(state)
-    if not should_run and not force: return None
-    w_start, w_end = get_report_window()
     persona = get_report_persona(rep_date)
     summary = build_weekly_summary(df, df_roi, df_free, w_start, w_end)
-    text = _call_gemini(CHRONICLER_SYSTEM_TEMPLATE.format(persona_name=persona['name'], persona_instruction=persona['instruction'], summary_json=json.dumps(summary, indent=2)), thinking_level=CHRONICLER_THINKING_LEVEL)
 
-    # Only broadcast automatically if auto_send is True
-    if CHRONICLER_LIVE and auto_send:
-        if not send_telegram(text): save_report_locally(text, rep_date)
-    else:
-        save_report_locally(text, rep_date)
+    length_instruction = (
+        "Write a short, punchy summary — 3 paragraphs maximum, around 120-180 words. "
+        "Cover: bottom line, player of the week, one notable bet. Skip Market Watch and Streaks."
+        if concise else
+        "Write a comprehensive, engaging report (around 300-450 words)."
+    )
+    max_tokens = 400 if concise else 1000
 
-    state['last_report_date'] = str(rep_date); state['last_report_persona'] = persona['name']; save_last_run(state)
+    text = _call_gemini(
+        CHRONICLER_SYSTEM_TEMPLATE.format(
+            persona_name=persona['name'],
+            persona_instruction=persona['instruction'],
+            length_instruction=length_instruction,
+            summary_json=json.dumps(summary, indent=2),
+        ),
+        thinking_level=CHRONICLER_THINKING_LEVEL,
+        max_tokens=max_tokens,
+    )
+
+    # Always save locally as an archive, regardless of send target
+    save_report_locally(text, rep_date)
+
+    state = load_last_run()
+    state['last_report_date'] = str(rep_date)
+    state['last_report_persona'] = persona['name']
+    save_last_run(state)
     return text
 
 # ── C5: Betbot ────────────────────────────────────────────────────────────────
-BETBOT_HELP_TEXT = "Betbot v6.2 — I interrogate your ledger. Use ? pending, ? leaderboard, ? bank, ? streaks."
+BETBOT_HELP_TEXT = """\
+🤖 Betbot — Commands
+
+  pending        — unresolved bets
+  leaderboard    — season P/L rankings
+  bank           — current bankroll
+  streaks        — active win/loss streaks
+  report         — generate the Chronicler report
+  preview_graph  — send P/L graph to your DM
+  status         — bot mode & feature flags
+  fixtures       — upcoming EPL fixtures
+
+Report flags (combine freely):
+  -concise       — short 3-para summary
+  -days N        — look back N days (default 7)
+  -round N       — cover EPL matchday N
+
+Ask me anything:
+  ? who has the best ROI this month?
+  ? how did we do on BTTS bets?
+  ? what's our record vs away favourites?\
+"""
 
 def parse_betbot_flags(text: str) -> tuple: return text, {'raw': False, 'persona': None}
 

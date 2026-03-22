@@ -8,7 +8,7 @@ Always-on background process. Runs on the PC.
 Responsibilities:
   1. Startup catch-up  — run missed grading / Chronicler reports since last_run.json
   2. Telegram listener — 5s long-poll loop; routes messages to handlers
-  3. Internal scheduler — daily grading at 10:00, Wednesday Chronicler at 09:00
+  3. Internal scheduler — daily grading at 10:00
 
 Reply-to-sender:
   All bot replies go directly to the chat that originated the question.
@@ -171,7 +171,6 @@ def _route_message(text: str, chat_id: str, sender_id: str,
         target = core.TEST_CHAT_ID if core.TEST_MODE else core.TELEGRAM_CHAT_ID
         target_label = f"private DM ({target})" if core.TEST_MODE else f"group chat ({target})"
         betbot_state  = "live" if core.BETBOT_LIVE     else "offline"
-        chronicler_state = "live" if core.CHRONICLER_LIVE else "offline"
         dry = " [DRY RUN]" if core.GRADING_DRY_RUN else ""
         return (
             f"⚙️ Syndicate Bot — {mode}\n"
@@ -179,17 +178,47 @@ def _route_message(text: str, chat_id: str, sender_id: str,
             f"Betbot: {betbot_state} | Chronicler: {chronicler_state} | Grading{dry}"
         )
 
+    def _parse_report_flags(q: str) -> dict:
+        """Extract -concise, -days N, -round N flags from a report command string."""
+        import re
+        flags = {'concise': False, 'days': 7, 'matchday': None}
+        if '-concise' in q:
+            flags['concise'] = True
+        m = re.search(r'-days\s+(\d+)', q)
+        if m:
+            flags['days'] = int(m.group(1))
+        m = re.search(r'-round\s+(\d+)', q)
+        if m:
+            flags['matchday'] = int(m.group(1))
+        return flags
+
     def _report_reply() -> str:
         log.info(f"[COMMAND] On-demand Chronicler report requested by {asker_name}")
         try:
-            # Sync fresh data specifically for the on-demand report
+            flags = _parse_report_flags(question)
             if core.USE_GSHEETS_LIVE:
                 core.sync_local_csv()
-                
+
             fresh_df, fresh_roi, fresh_free, _, _ = core.load_ledger()
-            # Pass auto_send=False so it doesn't blast the group chat
-            report = core.run_chronicler(fresh_df, fresh_roi, fresh_free, force=True, auto_send=False)
-            return report if report else "Couldn't generate the report — check the logs."
+            report = core.run_chronicler(
+                fresh_df, fresh_roi, fresh_free,
+                concise=flags['concise'],
+                days=flags['days'],
+                matchday=flags['matchday'],
+            )
+            if not report:
+                return "Couldn't generate the report — check the logs."
+
+            # Send report text first, then follow up with the graph
+            core.send_telegram(report, chat_id=reply_to)
+            log.info(f"[COMMAND] Report sent to {reply_to}, now generating graph...")
+            try:
+                run_graph_of_week(fresh_df, send_target=reply_to)
+            except Exception as e:
+                log.error(f"[COMMAND] Graph of the Week failed (non-fatal): {e}")
+
+            # Return empty string — we already sent the report above
+            return ""
         except Exception as e:
             log.error(f"[COMMAND] On-demand report failed: {e}")
             return f"Report generation failed: {e}"
@@ -222,11 +251,23 @@ def _route_message(text: str, chat_id: str, sender_id: str,
         'help'         : lambda: core.BETBOT_HELP_TEXT,
         'status'       : _status_reply,
     }
+    # Exact match first (bare commands like "report", "bank")
     if q_lower in exact_commands:
         reply = exact_commands[q_lower]()
-        core.send_telegram(reply, chat_id=reply_to)
+        if reply:  # _report_reply sends itself and returns "" — don't double-send
+            core.send_telegram(reply, chat_id=reply_to)
         log.info(f"[COMMAND] Handled '{q_lower}' for {asker_name} → {reply_to}")
         return
+
+    # Prefix match — catches flagged variants like "report -concise" or "report -round 29"
+    prefix_commands = {'report': _report_reply}
+    for prefix, handler in prefix_commands.items():
+        if q_lower.startswith(prefix + ' '):
+            reply = handler()
+            if reply:  # same guard
+                core.send_telegram(reply, chat_id=reply_to)
+            log.info(f"[COMMAND] Handled prefix '{prefix}' for {asker_name} → {reply_to}")
+            return
 
     # ── 2. Fixture shortcut — intercept before Betbot ──
     fixture_keywords = ('fixture', 'fixtures', 'upcoming', 'next match',
@@ -295,27 +336,9 @@ def _run_grading(df, df_roi, df_free, df_pending, kpis) -> None:
     core.save_last_run(state)
 
 
-def _run_chronicler_if_due(df, df_roi, df_free) -> None:
-    """Generates and sends the weekly report if due."""
-    should_run, report_date = core.needs_report(core.load_last_run())
-    if should_run:
-        log.info(f"[SCHEDULER] Running Chronicler for {report_date}")
-        try:
-            report = core.run_chronicler(df, df_roi, df_free)
-            if report:
-                log.info("[SCHEDULER] Chronicler complete.")
-        except Exception as e:
-            log.error(f"[SCHEDULER] Chronicler failed: {e}")
-    else:
-        log.info("[SCHEDULER] Chronicler not due.")
-
 
 def _startup_catchup(df, df_roi, df_free, df_pending, kpis) -> None:
-    """
-    On startup: Only catch up on grading and failed writes.
-    The Chronicler (weekly report) is now strictly handled by the 
-    Wednesday scheduler or manual '? report' command.
-    """
+    """On startup: catch up on grading and replay any failed writes."""
     log.info("[STARTUP] Running minimalist catch-up...")
     
     # 1. Grading catch-up — run if there are pending bets
@@ -393,9 +416,8 @@ def run() -> None:
     _startup_catchup(df, df_roi, df_free, df_pending, kpis)
 
     # Tracking for scheduled tasks
-    last_grading_date    = date.today()
-    last_chronicler_date = date.today()
-    update_offset        = None
+    last_grading_date = date.today()
+    update_offset     = None
 
     log.info("[BOT] Entering long-poll loop (5s timeout). Ctrl+C to stop.")
 
@@ -421,30 +443,6 @@ def run() -> None:
                 df, df_roi, df_free, df_pending, kpis = core.load_ledger()
                 _run_grading(df, df_roi, df_free, df_pending, kpis)
                 last_grading_date = today
-
-            # ── Wednesday Chronicler at 09:00 ──
-            if now.weekday() == core.CHRONICLER_WEEKDAY and now.hour >= 9 and \
-               today > last_chronicler_date:
-                log.info("[SCHEDULER] Wednesday Chronicler trigger (09:00)")
-                
-                # NEW: Sync right before the report to ensure accurate P/L
-                if core.USE_GSHEETS_LIVE:
-                    try:
-                        core.sync_local_csv()
-                    except Exception as e:
-                        log.error(f"Failed to sync with Google Sheets before report: {e}")
-                        
-                df, df_roi, df_free, df_pending, kpis = core.load_ledger()
-                _run_chronicler_if_due(df, df_roi, df_free)
-
-                # ── Graph of the Week — sent after the Chronicler report ──
-                log.info("[SCHEDULER] Running Graph of the Week...")
-                try:
-                    run_graph_of_week(df, preview=False)
-                except Exception as e:
-                    log.error(f"[SCHEDULER] Graph of the Week failed: {e}")
-
-                last_chronicler_date = today
 
             # ── Telegram long-poll ──
             updates = _get_updates(update_offset, timeout=5)

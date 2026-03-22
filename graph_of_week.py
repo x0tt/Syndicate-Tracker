@@ -460,7 +460,28 @@ SELECTION_PROMPT = """
 You are the data editor for a private betting syndicate's weekly newsletter.
 Members are John, Richard, and Xander.
 
-Pick the SINGLE most interesting chart for "Graph of the Week" — the one with the most compelling data story this week.
+Pick the SINGLE most interesting chart for "Graph of the Week" — the one that tells the most compelling story RIGHT NOW for this specific group of people.
+
+PRIORITY ORDER — work down this list and pick the first chart with a genuine story to tell:
+1. PERSONAL RIVALRY & JOURNEYS: running_pl_by_member, member_pl_comparison, member_roi_comparison
+   — Always prefer these when members have meaningfully different P/L or one is on a streak.
+   — running_pl_by_member is the gold standard: it shows the full journey and names everyone.
+2. RECENT FORM: waterfall_recent, cumulative_bankroll
+   — Use when there has been a notable run of wins or losses in the last 10 bets.
+3. COMPETITION/TOURNAMENT INSIGHT: roi_by_competition
+   — Use when multiple competitions are active and one is clearly outperforming.
+4. SEASON PATTERNS: monthly_pl, weekday_pl, odds_bucket_roi
+   — Only useful once 3+ months of data exist. Check monthly_pl key count before picking monthly_pl.
+5. AGGREGATE STATS (LAST RESORT): roi_by_bet_type, win_loss_donut, accumulator_record
+   — Only pick these if the data is genuinely striking (e.g. one bet type has ROI > +30% or < -30%).
+   — Do NOT pick roi_by_bet_type just because it has data — it needs a real story.
+
+DATA DEPTH GUARDS — do not pick a chart if the underlying data is too thin:
+- roi_by_bet_type: only pick if at least 4 distinct bet types each have 5+ bets
+- roi_by_competition: only pick if at least 3 competitions each have 5+ bets
+- monthly_pl: only pick if monthly_pl has 3+ keys
+- odds_bucket_roi: only pick if overall_record.total_bets >= 40
+- accumulator_record: only pick if accumulator.total >= 5
 
 RULES:
 - Always use $ before money figures, % after ROI/percentage figures
@@ -969,18 +990,22 @@ def _get_this_week_selection() -> Optional[dict]:
 
 # ── Public entry point ────────────────────────────────────────────────────────
 
-def run_graph_of_week(df: pd.DataFrame, preview: bool = False) -> bool:
+def run_graph_of_week(df: pd.DataFrame, preview: bool = False,
+                      send_target: str = None) -> bool:
     """
     Full pipeline: select → build → render → send.
 
+    send_target   → explicit chat_id to send to (used by on-demand report command).
     preview=True  → always sends to TEST_CHAT_ID (safe, won't spam group).
-    preview=False → uses normal send target (Wednesday scheduler).
+    If neither is set, falls back to the normal group send target.
     """
     import traceback
 
     # ── Target ──
     try:
-        if preview:
+        if send_target:
+            log.info(f'[GOTW] Explicit send_target: {send_target}')
+        elif preview:
             send_target = core.TEST_CHAT_ID
             if not send_target:
                 log.error('[GOTW] Preview requested but TEST_CHAT_ID not set in .env')
@@ -988,7 +1013,7 @@ def run_graph_of_week(df: pd.DataFrame, preview: bool = False) -> bool:
             log.info(f'[GOTW] PREVIEW mode — sending to TEST_CHAT_ID {send_target}')
         else:
             send_target = core.get_send_target()
-            log.info(f'[GOTW] Scheduled run — sending to {send_target}')
+            log.info(f'[GOTW] Using default send target: {send_target}')
     except Exception as e:
         log.error(f'[GOTW] Failed to determine send target: {e}\n{traceback.format_exc()}')
         return False

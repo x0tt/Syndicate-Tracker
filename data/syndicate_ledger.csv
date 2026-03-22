@@ -312,7 +312,7 @@ eddea82a-d275-5b24-c4e1-68c5fc2ebd40,2025-06-30,Team,Multiple,Multiple,Club Worl
 9dfcd5e5-58df-a04a-af37-f137a1d9d3e5,2025-07-01,Team,Dortmund,Monterrey,Club World Cup,To Qualify,Dortmund,1.36,3,Win,1.09,,Football,True,False
 950a4152-c2b4-aa3a-d78b-dd6b366cc179,2025-07-01,Team,Multiple,Multiple,Club World Cup,Multi,Multiple,1.77,2,Win,1.56,,Football,True,False
 158f3069-a435-b314-a80b-dcb024f8e422,2025-07-05,Team,Al Hilal Riyadh,Fluminense,Club World Cup,To Qualify,Al Hilal Riyadh,1.8,0,Loss,0.0,,Football,True,False
-75887499-8f5b-d0c3-93da-094e1967a72b,2025-07-05,Team,Chelsea,Palmeiras,Club World Cup,To Qualify,Chelsea,1.67,0,Win,23.85,,Football,True,False
+75887499-8f5b-d0c3-93da-094e1967a72b,2025-07-05,Team,Chelsea,Palmeiras,Club World Cup,To Qualify,Chelsea,1.67,0,Win,24.39,,Football,True,False
 ad13a2a0-7ca4-b764-2959-dc0c4c740ab6,2025-07-06,Team,PSG,Bayern Munich,Club World Cup,To Qualify,PSG,1.53,0,Win,29.88,,Football,True,False
 3fe94a00-2317-b5f9-259f-82690aeea4cd,2025-07-06,Team,Real Madrid,Borussia Dortmund ,Club World Cup,To Qualify,Real Madrid,1.35,0,Win,14.75,,Football,True,False
 5b8add2a-5d98-b1a6-52ea-7fd72d942dac,2025-07-06,Team,Multiple,Multiple,Club World Cup,Multi,Multiple,6.2,0,Loss,0.0,,Football,True,False
@@ -423,10 +423,10 @@ e0c64119-5b27-425b-b056-ac56f8953d24,2026-02-11,John,Everton,Bournemouth,EPL 25/
 f85454e8-279b-e180-185c-ac7d243c5eb3,2026-02-11,Richard,Chelsea,Leeds,EPL 25/26,Full Time Result,Chelsea,1.55,5,Loss,-5.0,26,Football,True,False
 faa9afea-49ef-2ff0-29a8-33cccc778fd0,2026-02-12,Xander,Villa,Brighton,EPL 25/26,Draw No Bet,Villa,1.4,5,Win,2.0,26,Football,True,False
 3c7781a3-6bcd-6cf0-8c11-a970fbe0e2a6,2026-02-12,Team,Multiple,Multiple,EPL 25/26,Multi,Multiple,3.46,1,Loss,-1.0,26,Football,True,False
-25b2822c-2f5a-3230-abfa-dd476e8b04c9,2026-02-15,Team,Multiple,Multiple,FA cup 2026,FA Cup Multi,Multiple,2.98,2,Loss,-2.0,,Football,True,False
-6ecbdd6e-c859-d284-dc13-885a37ce8d81,2026-02-15,Team,Multiple,Multiple,FA cup 2026,FA Cup Multi,Multiple,3.13,2,Loss,-2.0,,Football,True,False
-18997733-ec25-8a9f-caf2-39cc55d53363,2026-02-15,Team,Multiple,Multiple,FA cup 2026,FA Cup Multi,Multiple,5.79,2,Loss,-2.0,,Football,True,False
-8d7d8ee0-69cb-0cbb-f816-bbb65d56947e,2026-02-15,Team,Multiple,Multiple,FA cup 2026,FA Cup Multi,Multiple,9.75,2,Loss,-2.0,,Football,True,False
+25b2822c-2f5a-3230-abfa-dd476e8b04c9,2026-02-15,Team,Multiple,Multiple,FA cup 2026,Multi,Multiple,2.98,2,Loss,-2.0,,Football,True,False
+6ecbdd6e-c859-d284-dc13-885a37ce8d81,2026-02-15,Team,Multiple,Multiple,FA cup 2026,Multi,Multiple,3.13,2,Loss,-2.0,,Football,True,False
+18997733-ec25-8a9f-caf2-39cc55d53363,2026-02-15,Team,Multiple,Multiple,FA cup 2026,Multi,Multiple,5.79,2,Loss,-2.0,,Football,True,False
+8d7d8ee0-69cb-0cbb-f816-bbb65d56947e,2026-02-15,Team,Multiple,Multiple,FA cup 2026,Multi,Multiple,9.75,2,Loss,-2.0,,Football,True,False
 75fc093c-0ee7-42f6-ddda-a13fff98f104,2026-02-22,Xander,West Ham,Bournemouth,EPL 25/26,Draw No Bet,Bournemouth,1.95,5,Push,0.0,27,Football,True,False
 f74909ac-e68e-5189-1440-e4da0b65a70c,2026-02-22,Richard,Villa,Leeds,EPL 25/26,Full Time Result,Villa,1.85,5,Loss,-5.0,27,Football,True,False
 66368270-ffd5-1418-ec58-bd793f2d9b1b,2026-02-23,John,Tottenham,Arsenal,EPL 25/26,Full Time Result,Arsenal,1.55,5,Win,2.75,27,Football,True,False
@@ -443,4 +443,4 @@ a8abb4bb-284b-5b27-aa7c-b790dc20f80b,2026-03-16,John,Forest,Fulham,EPL 25/26,Han
 c203d8a1-5161-2acf-1245-7e4d67635a95,2026-03-16,Xander,Palace,Leeds,EPL 25/26,Draw No Bet,Palace,1.7,5,Push,0.0,30,Football,True,False
 28b064ae,2026-03-22,John,Everton,Chelsea,EPL 25/26,BTTS,Yes,1.65,5,Loss,-5.0,31,Football,True,False
 8c5655e8,2026-03-22,Richard,Fulham,Burnley,EPL 25/26,Full Time Result,Fulham,1.53,5,Win,2.65,31,Football,True,False
-8f641dfc,2026-03-23,Xander,Villa,West Ham,EPL 25/26,Full Time Result,Villa,1.95,5,Pending,0.0,31,Football,True,False
+8f641dfc,2026-03-23,Xander,Villa,West Ham,EPL 25/26,Full Time Result,Villa,1.95,5,Win,4.75,31,Football,True,False
