@@ -95,9 +95,14 @@ CHRONICLER_PERSONAS =[
     {'name': 'The Victorian Gentleman', 'instruction': 'You are a Victorian gentleman who finds the whole enterprise frightfully vulgar but cannot stop reading the ledger. Express moral disapproval while clearly being riveted. Use "frightful", "beastly", and "capital".'},
     {'name': 'The Cricket Commentator', 'instruction': 'You are a cricket commentator who only knows cricket. Describe all football results using cricket terminology. Seem confused but carry on professionally. Refer to goals as "wickets" and matches as "overs".'},
     {'name': 'The Degenerate Gambler', 'instruction': 'You are a completely unhinged sports bettor who is absolutely certain the next bet will turn everything around. Every loss is "basically a win" because you nearly got it. Every win is proof the system works. You are already mentally spending the profits. You refer to the syndicate as "we" with intense emotional investment, use phrases like "trust the process", "value everywhere", and "this is it lads". You are dangerously optimistic at all times.'},
-    {'name': 'The Conspiracy Theorist', 'instruction': 'You are convinced that all draws are rigged by Big Football. Every loss is suspicious. Every win is "despite them". Connect unrelated results into a coherent (but wrong) narrative.'},
+    {'name': 'The Conspiracy Theorist', 'instruction': 'You are absolutely certain that Big Football — a shadowy cartel of referees, bookmakers, and at least one European royal family — is rigging results against the syndicate. Every loss is a deliberate intervention. Every draw was manufactured. Every win only happened because they let their guard down or miscalculated. Name specific mechanisms: VAR is a control tool, injury time is negotiated, odds movements are coordinated signals. Connect unrelated results into a detailed, internally consistent, and completely wrong narrative. You have a whiteboard. Reference it.'},
     {'name': 'The Pirate', 'instruction': 'You are a pirate who desperately wants to attack Australia but keeps getting distracted by the betting results. Nautical metaphors throughout. End every report with a revised plan to sail east.'},
 ]
+
+# Personas excluded from the rotation for this report cycle.
+# They remain in the list so they can still appear via apply_persona (Betbot),
+# but the Chronicler report will never randomly land on them.
+_EXCLUDED_REPORT_PERSONAS = {'The Pirate', 'The Alien', 'The Victorian Gentleman'}
 
 SPORT_KEY_MAP = {
     'EPL 24/25'                        : 'soccer_epl',
@@ -469,9 +474,10 @@ def run_grading(df_pending_in: pd.DataFrame) -> pd.DataFrame:
     return pd.DataFrame(results)
 
 # ── C4: Chronicler ───────────────────────────────────────────────────────────
-def get_report_window(days: int = 7) -> tuple:
+def get_report_window(days: int = 7, include_today: bool = False) -> tuple:
     today = date.today()
-    return today - timedelta(days=days), today - timedelta(days=1)
+    week_end = today if include_today else today - timedelta(days=1)
+    return today - timedelta(days=days), week_end
 
 
 def get_matchday_window(df_roi: pd.DataFrame, matchday: int) -> tuple:
@@ -487,8 +493,18 @@ def get_matchday_window(df_roi: pd.DataFrame, matchday: int) -> tuple:
     return dates.min(), dates.max()
 
 def get_report_persona(report_date: date = None) -> dict:
-    if report_date is None: report_date = date.today()
-    return CHRONICLER_PERSONAS[report_date.isocalendar().week % len(CHRONICLER_PERSONAS)]
+    """Returns a randomly selected Chronicler persona, excluding the retired three.
+    Seeded by the report date so reruns on the same day always get the same persona,
+    but each new date gets an independent random pick.
+    """
+    if report_date is None:
+        report_date = date.today()
+    pool = [p for p in CHRONICLER_PERSONAS if p['name'] not in _EXCLUDED_REPORT_PERSONAS]
+    if not pool:
+        pool = CHRONICLER_PERSONAS  # safety fallback — should never happen
+    import random as _random
+    rng = _random.Random(report_date.toordinal())
+    return rng.choice(pool)
 
 def apply_persona(raw_answer: str, asker_name: str = 'mate', persona: dict = None) -> str:
     if not BETBOT_LIVE: return raw_answer
@@ -574,9 +590,13 @@ def save_report_locally(text: str, report_date: date) -> Path:
     return path
 
 def run_chronicler(df: pd.DataFrame, df_roi: pd.DataFrame, df_free: pd.DataFrame,
-                   concise: bool = False, days: int = 7, matchday: int = None) -> str | None:
+                   concise: bool = False, days: int = 7, matchday: int = None,
+                   on_demand: bool = False) -> str | None:
     """Generate the Chronicler report. Always runs — scheduling is the caller's responsibility.
     Returns the report text, or None if generation fails.
+
+    on_demand=True: week_end is today (inclusive), so bets placed earlier today are included.
+    on_demand=False (scheduled): week_end is yesterday, matching the original behaviour.
     """
     rep_date = date.today()
 
@@ -587,7 +607,7 @@ def run_chronicler(df: pd.DataFrame, df_roi: pd.DataFrame, df_free: pd.DataFrame
         except ValueError as e:
             return f"Could not generate report: {e}"
     else:
-        w_start, w_end = get_report_window(days=days)
+        w_start, w_end = get_report_window(days=days, include_today=on_demand)
 
     persona = get_report_persona(rep_date)
     summary = build_weekly_summary(df, df_roi, df_free, w_start, w_end)

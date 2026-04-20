@@ -205,6 +205,7 @@ def _route_message(text: str, chat_id: str, sender_id: str,
                 concise=flags['concise'],
                 days=flags['days'],
                 matchday=flags['matchday'],
+                on_demand=True,
             )
             if not report:
                 return "Couldn't generate the report — check the logs."

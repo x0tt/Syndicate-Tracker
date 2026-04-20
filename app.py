@@ -88,7 +88,7 @@ _PLOTLY_CONFIG = { "displaylogo": False, "scrollZoom": False, "modeBarButtons": 
 
 # The ghost chart fix: Streamlit natively hashes the figure, so we removed the global key counter
 def pc(fig):
-    st.plotly_chart(fig, use_container_width=True, config=_PLOTLY_CONFIG)
+    st.plotly_chart(fig, width='stretch', config=_PLOTLY_CONFIG)
 
 def kpi(label, value, delta=None, delta_color="normal"): st.metric(label=label, value=value, delta=delta, delta_color=delta_color)
 def roast(text: str): st.markdown(f'<div class="roast-strip">🔥 {text}</div>', unsafe_allow_html=True)
@@ -340,26 +340,193 @@ def chart_member_odds_violin(df: pd.DataFrame, member: str) -> go.Figure:
     return apply_layout(fig, title=f"🎻 {member} — Odds Distribution (Violin)", height=340, showlegend=False)
 
 def chart_global_odds_beeswarm(df: pd.DataFrame) -> go.Figure:
+    """
+    Odds Density Strip — v2
+    ───────────────────────
+    Two subplots (Win / Loss), each a 1-D scatter on a log-odds x-axis.
+    Dots at the same odds value stack symmetrically on the y-axis.
+    Colour = bettor (MEMBER_COLORS). True radial gradient via marker.gradient
+    (opaque centre → transparent edge). Team bets always render outside the
+    member cluster on the y-axis.
+    Y-range shared between both panels, driven by the tallest stack.
+    """
     sub = df[df["status"].isin(["Win", "Loss"])].copy()
-    if sub.empty: return go.Figure().update_layout(title="No odds data")
-    
+    if sub.empty:
+        return go.Figure().update_layout(title="No odds data")
+
     sub["aw_num"] = pd.to_numeric(sub["actual_winnings"], errors="coerce").fillna(0)
-    
-    fig = px.strip(
-        sub, x="odds", y="status", color="status", 
-        stripmode="overlay", 
-        color_discrete_map={"Win": WIN_COLOR, "Loss": LOSS_COLOR},
-        hover_data=["event", "selection", "stake", "aw_num", "user"]
+    sub["odds_r"] = sub["odds"].round(2)
+
+    # ── CONSTANTS ────────────────────────────────────────────────────────────
+    DOT_SIZE_PX   = 112            # dot render size
+    # STEP = 1 radius in data units.
+    STEP          = 3.0            # centre-to-centre spacing
+    CENTRE_OPACITY = 0.16          # how ghostly the opaque centre is
+    # Within each odds column, members (John/Richard/Xander) occupy inner
+    # y positions; Team bets fill outward from there.
+    # ─────────────────────────────────────────────────────────────────────────
+
+    def _hex_to_rgba(hex_color: str, alpha: float) -> str:
+        h = hex_color.lstrip("#")
+        r, g, b = int(h[0:2], 16), int(h[2:4], 16), int(h[4:6], 16)
+        return f"rgba({r},{g},{b},{alpha})"
+
+    def _assign_stack_y(grp: pd.DataFrame, step: float) -> pd.Series:
+        """
+        Deterministic symmetric stacking per odds value.
+        Within each odds column, member bets (John/Richard/Xander) occupy the
+        inner positions (closest to y=0); Team bets fill outward from there.
+        Symmetric about zero: positions are 0, ±step, ±2*step, …
+        or ±0.5*step, ±1.5*step, … for even totals.
+        """
+        ys = np.zeros(len(grp), dtype=float)
+        for odds_val, col_idx in grp.groupby("odds_r").groups.items():
+            col  = grp.loc[col_idx].copy()
+            # Sort: members first (inner), Team last (outer)
+            col["_is_team"] = (col["user"] == "Team").astype(int)
+            col = col.sort_values("_is_team")
+            n   = len(col)
+            for rank, (orig_idx, _) in enumerate(col.iterrows()):
+                if n % 2 == 1:
+                    if rank == 0:
+                        y = 0.0
+                    elif rank % 2 == 1:
+                        y =  ((rank + 1) // 2) * step
+                    else:
+                        y = -(rank // 2) * step
+                else:
+                    half = (rank // 2) + 0.5
+                    y = half * step if rank % 2 == 0 else -half * step
+                ys[grp.index.get_loc(orig_idx)] = y
+        return pd.Series(ys, index=grp.index)
+
+    # ── compute stack positions ───────────────────────────────────────────────
+    panels       = {}
+    global_y_max = 0.0
+    for status in ["Win", "Loss"]:
+        grp = sub[sub["status"] == status].copy().reset_index(drop=True)
+        if grp.empty:
+            continue
+
+        grp["stack_y"] = _assign_stack_y(grp, STEP)
+        global_y_max   = max(global_y_max, grp["stack_y"].abs().max())
+        panels[status] = grp
+
+    # Padding must cover the halo radius in data units.
+    # halo_r_units = (DOT_SIZE_PX / 2) / (CHART_H_PX / (2 * y_lim_raw))
+    # Solving: padding = (DOT_SIZE_PX / 2) * (global_y_max + padding) / (CHART_H_PX / 2)
+    # => padding = DOT_SIZE_PX * global_y_max / (CHART_H_PX - DOT_SIZE_PX)
+    CHART_H_PX = 900
+    halo_padding = (DOT_SIZE_PX / 2) * (global_y_max / ((CHART_H_PX / 2) - (DOT_SIZE_PX / 2)))
+    y_lim = global_y_max + halo_padding * 1.3   # 1.3x for breathing room
+
+    # ── axes ─────────────────────────────────────────────────────────────────
+    tick_odds = [1, 1.25, 1.5, 1.75, 2, 2.5, 3, 4, 5, 7, 10, 15, 25, 40]
+    _xaxis = dict(
+        type          = "linear",
+        tickmode      = "array",
+        tickvals      = [np.log10(o) for o in tick_odds],
+        ticktext      = [str(o)      for o in tick_odds],
+        range         = [np.log10(1.0) - 0.12, np.log10(40) + 0.12],
+        title         = "odds",
+        gridcolor     = GRID_CLR,
+        zerolinecolor = GRID_CLR,
+        title_font    = dict(size=11),
+        tickfont      = dict(size=11),
     )
-    
-    fig.update_traces(
-        marker=dict(size=18, opacity=0.65, line=dict(width=1, color=BG_DARK)),
-        jitter=0.99
+    _yaxis = dict(
+        range          = [-y_lim, y_lim],
+        showticklabels = False,
+        showgrid       = False,
+        zeroline       = True,
+        zerolinecolor  = GRID_CLR,
+        zerolinewidth  = 1,
+        title          = "",
     )
-    
-    fig.update_traces(hovertemplate="<b>%{customdata[0]}</b> (%{customdata[4]})<br>%{customdata[1]}<br>Odds: %{x}<br>Stake: $%{customdata[2]:.2f}<br>P/L: $%{customdata[3]:.2f}<extra></extra>")
-    fig.update_yaxes(title="")
-    return apply_layout(fig, title="🐝 Every Bet Placed (Odds Beeswarm)", height=360, showlegend=False)
+
+    # ── build subplots ────────────────────────────────────────────────────────
+    row_map = {"Win": 1, "Loss": 2}
+    fig = make_subplots(
+        rows=2, cols=1,
+        shared_xaxes=True,
+        vertical_spacing=0.10,
+        subplot_titles=["✅  Wins", "❌  Losses"],
+    )
+
+    seen_users = set()
+
+    for status, grp in panels.items():
+        row  = row_map[status]
+        log_x = np.log10(grp["odds_r"].values.clip(1.0))
+
+        customdata = np.column_stack([
+            grp["event"].fillna("").astype(str).values,       # [0] event
+            grp["selection"].fillna("").astype(str).values,   # [1] selection
+            grp["stake"].values,                               # [2] stake
+            grp["aw_num"].values,                              # [3] p/l
+            grp["user"].fillna("").astype(str).values,        # [4] user
+            grp["odds_r"].values,                              # [5] odds
+            grp["bet_type"].fillna("").astype(str).values,    # [6] bet type
+        ])
+        hover = (
+            "<b>%{customdata[0]}</b> (%{customdata[4]})<br>"
+            "%{customdata[1]} — %{customdata[6]}<br>"
+            "Odds: %{customdata[5]:.2f}&nbsp;&nbsp;"
+            "Stake: $%{customdata[2]:.2f}&nbsp;&nbsp;P/L: $%{customdata[3]:.2f}"
+            "<extra></extra>"
+        )
+
+        for user, ugrp in grp.groupby("user"):
+            color      = MEMBER_COLORS.get(user, ACCENT)
+            u_mask     = grp["user"] == user
+            show_leg   = user not in seen_users
+            if show_leg:
+                seen_users.add(user)
+
+            fig.add_trace(
+                go.Scatter(
+                    x          = log_x[u_mask.values],
+                    y          = grp.loc[u_mask, "stack_y"].values,
+                    mode       = "markers",
+                    name       = user,
+                    legendgroup= user,
+                    showlegend = show_leg,
+                    marker     = dict(
+                        color    = _hex_to_rgba(color, 0.0),        # edge: fully transparent
+                        size     = DOT_SIZE_PX,
+                        gradient = dict(
+                            type  = "radial",
+                            color = _hex_to_rgba(color, CENTRE_OPACITY),  # centre: ghostly
+                        ),
+                        line     = dict(width=0),
+                    ),
+                    customdata    = customdata[u_mask.values],
+                    hovertemplate = hover,
+                ),
+                row=row, col=1,
+            )
+
+    fig.update_xaxes(**_xaxis)
+    fig.update_yaxes(**_yaxis)
+
+    for ann in fig.layout.annotations:
+        ann.update(font=dict(size=12, color=TEXT_CLR))
+
+    fig.update_layout(
+        title         = dict(text="🎯 Odds Density — Wins vs Losses", font=dict(size=14, color=TEXT_CLR), x=0.01),
+        height        = CHART_H_PX,
+        showlegend    = True,
+        paper_bgcolor = "rgba(0,0,0,0)",
+        plot_bgcolor  = "rgba(0,0,0,0)",
+        font          = dict(family="'DM Mono', 'Courier New', monospace", size=13, color=TEXT_CLR),
+        margin        = dict(l=6, r=6, t=52, b=60),
+        modebar       = dict(orientation="v", bgcolor="rgba(0,0,0,0)", color="#555577", activecolor=ACCENT),
+        dragmode      = False,
+        legend        = dict(bgcolor="rgba(0,0,0,0.3)", bordercolor=GRID_CLR, borderwidth=1,
+                             font=dict(size=12), orientation="h",
+                             yanchor="top", y=-0.06, xanchor="center", x=0.5),
+    )
+    return fig
 
 def chart_member_market_breakdown(df: pd.DataFrame, member: str) -> go.Figure:
     sub = df[df["user"] == member]
