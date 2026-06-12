@@ -1224,7 +1224,8 @@ def main():
                 user = st.selectbox("Member", core.SYNDICATE_MEMBERS + ["Syndicate"])
                 home_team = st.text_input("Home Team (e.g. Arsenal)")
                 away_team = st.text_input("Away Team")
-                competition = st.selectbox("Competition", COMPETITIONS)
+                comp_options = sorted(set(COMPETITIONS) | set(df_raw["competition"].dropna().astype(str).str.strip()) - {""})
+                competition = st.selectbox("Competition", comp_options)
                 bet_type = st.selectbox("Bet Type", BET_TYPES)
                 selection = st.text_input("Selection")
             with col2:
