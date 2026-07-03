@@ -1260,7 +1260,9 @@ def main():
             with fc[0]: f_user = st.multiselect("Member", options=sorted(df_raw["user"].dropna().unique()), default=sorted(df_raw["user"].dropna().unique()))
             with fc[1]: f_bet_type = st.multiselect("Bet Type", options=sorted(df_raw["bet_type"].dropna().unique()), default=sorted(df_raw["bet_type"].dropna().unique()))
             with fc[2]: f_status = st.multiselect("Status", options=["Win", "Loss", "Push", "Void", "Pending", "Deposit", "Reconciliation"], default=["Win", "Loss", "Push"])
-            with fc[3]: f_year = st.multiselect("Year", options=sorted(df_raw["date"].dt.year.unique()), default=sorted(df_raw["date"].dt.year.unique()))
+            with fc[3]:
+                years = sorted(int(y) for y in df_raw["date"].dt.year.dropna().unique())
+                f_year = st.multiselect("Year", options=years, default=years)
 
         mask = (df_raw["user"].isin(f_user) & df_raw["bet_type"].isin(f_bet_type) & df_raw["status"].isin(f_status) & df_raw["date"].dt.year.isin(f_year))
         df_filtered = df_raw[mask].copy()
