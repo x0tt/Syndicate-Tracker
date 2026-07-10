@@ -1705,7 +1705,8 @@ def main():
                 away_team = st.text_input("Away Team")
                 comp_options = sorted(set(COMPETITIONS) | set(df_raw["competition"].dropna().astype(str).str.strip()) - {""})
                 competition = st.selectbox("Competition", comp_options)
-                bet_type = st.selectbox("Bet Type", BET_TYPES)
+                bet_type_options = sorted((set(BET_TYPES) | (set(df_raw["bet_type"].dropna().astype(str).str.strip()) - {""})) - {"Deposit", "Withdrawal", "Reconciliation"})
+                bet_type = st.selectbox("Bet Type", bet_type_options)
                 selection = st.text_input("Selection")
             with col2:
                 odds = st.number_input("Odds", min_value=1.01, value=1.80, step=0.01)
