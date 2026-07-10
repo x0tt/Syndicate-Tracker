@@ -976,6 +976,427 @@ def chart_anim_win_rate_evolution(df: pd.DataFrame) -> go.Figure:
 # ─────────────────────────────────────────────────────────────────────────────
 # MAIN APP
 # ─────────────────────────────────────────────────────────────────────────────
+# ─────────────────────────────────────────────────────────────────────────────
+# WORLD CUP 2026
+# ─────────────────────────────────────────────────────────────────────────────
+# ── WORLD CUP CONFIG ───────────────────────────────────────────────────────────
+WC_COMPETITION = "FIFA World Cup 2026"
+WC_ROUND_MAP = {1:"Group · MD1", 2:"Group · MD2", 3:"Group · MD3", 4:"Round of 32",
+                5:"Round of 16", 6:"Quarter-finals", 7:"Semi-finals", 8:"Final"}
+WC_ROUND_SHORT = {1:"MD1", 2:"MD2", 3:"MD3", 4:"R32", 5:"R16", 6:"QF", 7:"SF", 8:"Final"}
+WC_LABEL = {"John":"John","Richard":"Richard","Xander":"Xander","Team":"Bot"}
+WC_ORDER = ["John","Richard","Xander","Team"]
+_SETTLED = ["Win","Loss","Push"]
+
+
+def wc_prepare(df: pd.DataFrame) -> pd.DataFrame:
+    """Filter the enriched ledger to the World Cup and attach round labels."""
+    w = df[df["competition"] == WC_COMPETITION].copy()
+    if w.empty: return w
+    w["date"] = pd.to_datetime(w["date"])
+    w["aw_num"] = pd.to_numeric(w["actual_winnings"], errors="coerce").fillna(0)
+    w["stake"]  = pd.to_numeric(w["stake"], errors="coerce").fillna(0)
+    w["odds"]   = pd.to_numeric(w["odds"], errors="coerce")
+    md = pd.to_numeric(w["matchday"], errors="coerce")
+    w["round_num"]   = md
+    w["round_label"] = md.map(WC_ROUND_MAP).fillna("Outright / Other")
+    w["round_short"] = md.map(WC_ROUND_SHORT).fillna("—")
+    w["label"] = w["user"].map(WC_LABEL).fillna(w["user"])
+    w["implied"] = 1.0 / w["odds"].replace(0, np.nan)
+    w = w.sort_values(["date"]).reset_index(drop=True)
+    return w
+
+
+def wc_round_options(w: pd.DataFrame):
+    """Ordered list of round labels present in the data (group stages collapsed option handled in UI)."""
+    present = sorted(w["round_num"].dropna().unique())
+    return [WC_ROUND_MAP.get(int(r), f"Round {int(r)}") for r in present]
+
+
+def wc_stats(w: pd.DataFrame, user: str) -> dict:
+    s = w[(w["user"] == user) & (w["status"].isin(_SETTLED))]
+    wins = (s["status"]=="Win").sum(); losses=(s["status"]=="Loss").sum(); pushes=(s["status"]=="Push").sum()
+    staked = s["stake"].sum(); pl = s["aw_num"].sum()
+    roi = pl/staked*100 if staked>0 else 0
+    decisive = wins+losses
+    hit = wins/decisive*100 if decisive>0 else 0
+    implied = s[s["status"].isin(["Win","Loss"])]["implied"].mean()*100 if decisive>0 else 0
+    return dict(bets=len(s), wins=wins, losses=losses, pushes=pushes, staked=staked,
+                pl=pl, roi=roi, hit=hit, implied=implied, avg_odds=s["odds"].mean())
+
+
+# 1 ── CUMULATIVE WORM (date-aligned, all players share the x-axis) ─────────────
+def chart_wc_worm(w: pd.DataFrame, title="📈 Cumulative Profit — The Reckoning") -> go.Figure:
+    s = w[w["status"].isin(_SETTLED)].sort_values("date").copy()
+    if s.empty: return apply_layout(go.Figure(), title="No settled bets", height=360, showlegend=False)
+    fig = go.Figure()
+    fig.add_hline(y=0, line_dash="dash", line_color=GRID_CLR)
+    for user in WC_ORDER:
+        u = s[s["user"] == user].sort_values("date").copy()
+        if u.empty: continue
+        u["cum"] = u["aw_num"].cumsum()
+        color = MEMBER_COLORS.get(user, ACCENT)
+        x = u["date"].tolist(); y = u["cum"].tolist()
+        fig.add_trace(go.Scatter(
+            x=x, y=y, mode="lines", name=WC_LABEL.get(user, user),
+            line=dict(color=color, width=3, shape="spline", smoothing=0.5),
+            hovertemplate=f"{WC_LABEL.get(user,user)}<br>%{{x|%b %d}}<br>cum $%{{y:+.2f}}<extra></extra>"))
+        fig.add_trace(go.Scatter(
+            x=[x[-1]], y=[y[-1]], mode="markers+text", showlegend=False,
+            marker=dict(color=color, size=9),
+            text=[f" {WC_LABEL.get(user,user)} ${y[-1]:+.0f}"], textposition="middle right",
+            textfont=dict(color=color, size=11, family="DM Mono"), cliponaxis=False))
+    fig.update_xaxes(title="")
+    fig.update_yaxes(title="cumulative P/L ($)")
+    return apply_layout(fig, title=title, height=440)
+
+
+# 2 ── THE TAPE (per-bet running total, coloured by player · 1 trace/player) ─────
+def chart_wc_tape(w: pd.DataFrame) -> go.Figure:
+    s = w[w["status"].isin(_SETTLED)].sort_values("date").reset_index(drop=True).copy()
+    if s.empty: return apply_layout(go.Figure(), title="No settled bets", height=360, showlegend=False)
+    s["cum"] = s["aw_num"].cumsum()
+    s["prev"] = s["cum"].shift(1).fillna(0)
+    s["x"] = np.arange(len(s))
+    fig = go.Figure()
+    for user in WC_ORDER:
+        u = s[s["user"] == user]
+        if u.empty: continue
+        color = MEMBER_COLORS.get(user, ACCENT)
+        cd = np.column_stack([u["round_short"].astype(str), u["home_team"].astype(str),
+                              u["away_team"].astype(str), u["bet_type"].astype(str),
+                              u["odds"].to_numpy(), u["cum"].to_numpy()])
+        fig.add_trace(go.Bar(
+            x=u["x"], y=u["aw_num"], base=u["prev"], width=0.82,
+            marker=dict(color=color, line=dict(width=0)),
+            name=WC_LABEL.get(user, user), customdata=cd,
+            hovertemplate=("%{customdata[1]} v %{customdata[2]} · %{customdata[0]}<br>"
+                           "%{customdata[3]} @ %{customdata[4]:.2f}<br>"
+                           "P/L $%{y:+.2f} → running $%{customdata[5]:+.2f}<extra></extra>")))
+    fig.add_trace(go.Scatter(x=s["x"], y=s["cum"], mode="lines",
+                             line=dict(color=TEXT_CLR, width=1.4, shape="hv"),
+                             name="running net", hoverinfo="skip"))
+    fig.add_hline(y=0, line_color=GRID_CLR)
+    fig.update_xaxes(title="every bet, in chronological order", showticklabels=False)
+    fig.update_yaxes(title="running profit ($)")
+    return apply_layout(fig, title="🎞️ The Tape — every bet, and how deep the hole got",
+                        height=420, barmode="overlay")
+
+
+# 3 ── DRAWDOWN ─────────────────────────────────────────────────────────────────
+def chart_wc_drawdown(w: pd.DataFrame) -> go.Figure:
+    s = w[w["status"].isin(_SETTLED)].sort_values("date").reset_index(drop=True).copy()
+    if s.empty: return apply_layout(go.Figure(), title="No settled bets", height=320, showlegend=False)
+    s["cum"] = s["aw_num"].cumsum()
+    s["peak"] = s["cum"].cummax()
+    s["dd"] = s["cum"] - s["peak"]
+    fig = go.Figure(go.Scatter(x=list(s.index), y=s["dd"], mode="lines",
+                               line=dict(color=LOSS_COLOR, width=2), fill="tozeroy",
+                               fillcolor="rgba(230,159,0,0.15)", name="drawdown"))
+    mx = s["dd"].idxmin()
+    if s.loc[mx, "dd"] < 0:
+        fig.add_annotation(x=mx, y=s.loc[mx, "dd"], text=f"max drawdown<br>${s.loc[mx,'dd']:.2f}",
+                           showarrow=True, arrowhead=2, arrowcolor=LOSS_COLOR, ay=-34,
+                           font=dict(color=LOSS_COLOR, size=11))
+    fig.add_hline(y=0, line_color=GRID_CLR)
+    fig.update_xaxes(title="bet number", showticklabels=False)
+    fig.update_yaxes(title="distance below high-water mark ($)")
+    return apply_layout(fig, title="🌊 Drawdown — below the high-water mark", height=320, showlegend=False)
+
+
+# 4 ── MONEY FLOW SANKEY (Member → Bet Type → Outcome) ──────────────────────────
+def chart_wc_sankey(w: pd.DataFrame) -> go.Figure:
+    s = w[w["status"].isin(_SETTLED)].copy()
+    if s.empty: return apply_layout(go.Figure(), title="No settled bets", height=420, showlegend=False)
+    s["outcome"] = s["status"].map({"Win":"Won","Loss":"Lost","Push":"Push"})
+    members = [WC_LABEL.get(m, m) for m in WC_ORDER if not s[s["user"]==m].empty]
+    member_src = [m for m in WC_ORDER if not s[s["user"]==m].empty]
+    bet_types = sorted(s["bet_type"].dropna().unique())
+    outcomes = [o for o in ["Won","Push","Lost"] if o in s["outcome"].values]
+    nodes = members + bet_types + outcomes
+    idx = {n:i for i,n in enumerate(nodes)}
+    m_idx = {m: idx[WC_LABEL.get(m,m)] for m in member_src}
+    node_colors = ([MEMBER_COLORS.get(m, ACCENT) for m in member_src]
+                   + [ACCENT]*len(bet_types)
+                   + [WIN_COLOR if o=="Won" else PUSH_COLOR if o=="Push" else LOSS_COLOR for o in outcomes])
+
+    def rgba(hexc, a=0.45):
+        h = hexc.lstrip("#"); return f"rgba({int(h[0:2],16)},{int(h[2:4],16)},{int(h[4:6],16)},{a})"
+
+    src, tgt, val, lcol = [], [], [], []
+    # member → bet type
+    for (m, bt), g in s.groupby(["user","bet_type"]):
+        src.append(m_idx[m]); tgt.append(idx[bt]); val.append(float(g["stake"].sum()))
+        lcol.append(rgba(MEMBER_COLORS.get(m, ACCENT)))
+    # bet type → outcome
+    for (bt, oc), g in s.groupby(["bet_type","outcome"]):
+        src.append(idx[bt]); tgt.append(idx[oc]); val.append(float(g["stake"].sum()))
+        c = WIN_COLOR if oc=="Won" else PUSH_COLOR if oc=="Push" else LOSS_COLOR
+        lcol.append(rgba(c, 0.35))
+
+    fig = go.Figure(go.Sankey(
+        arrangement="snap",
+        node=dict(pad=14, thickness=16, line=dict(color=GRID_CLR, width=0.5),
+                  label=nodes, color=node_colors,
+                  hovertemplate="%{label}<br>$%{value:.0f} staked<extra></extra>"),
+        link=dict(source=src, target=tgt, value=val, color=lcol,
+                  hovertemplate="%{source.label} → %{target.label}<br>$%{value:.0f}<extra></extra>")))
+    return apply_layout(fig, title="🌐 Money Flow — Member → Market → Outcome (width = stake)",
+                        height=520, showlegend=False)
+
+
+# 5 ── P/L BY MARKET TYPE (diverging bars) ──────────────────────────────────────
+def chart_wc_market_pl(w: pd.DataFrame) -> go.Figure:
+    s = w[w["status"].isin(_SETTLED)].copy()
+    if s.empty: return apply_layout(go.Figure(), title="No settled bets", height=360, showlegend=False)
+    grp = s.groupby("bet_type").agg(pl=("aw_num","sum"), n=("aw_num","count")).sort_values("pl")
+    fig = go.Figure(go.Bar(
+        y=grp.index, x=grp["pl"], orientation="h",
+        marker=dict(color=[WIN_COLOR if v>=0 else LOSS_COLOR for v in grp["pl"]]),
+        text=[f"${v:+.2f}  (n{n})" for v,n in zip(grp["pl"], grp["n"])],
+        textposition="outside", textfont=dict(size=10, family="DM Mono")))
+    fig.add_vline(x=0, line_color=GRID_CLR)
+    fig.update_xaxes(title="net profit / loss ($)")
+    return apply_layout(fig, title="🎯 P/L by Market Type", height=max(320, len(grp)*34), showlegend=False)
+
+
+# 6 ── CALIBRATION / RELIABILITY (implied vs observed, per operator) ────────────
+def _wilson(k, n, z=1.96):
+    if n == 0: return (0, 0, 0)
+    p = k/n; denom = 1 + z*z/n
+    centre = (p + z*z/(2*n))/denom
+    half = z*np.sqrt(p*(1-p)/n + z*z/(4*n*n))/denom
+    return (centre, max(0, centre-half), min(1, centre+half))
+
+def chart_wc_calibration(w: pd.DataFrame) -> go.Figure:
+    s = w[w["status"].isin(["Win","Loss"])].copy()  # decisive only
+    if s.empty: return apply_layout(go.Figure(), title="No decisive bets", height=420, showlegend=False)
+    fig = go.Figure()
+    fig.add_trace(go.Scatter(x=[0,100], y=[0,100], mode="lines",
+                             line=dict(color=GRID_CLR, dash="dash", width=1),
+                             name="fair (implied = observed)", hoverinfo="skip"))
+    for user in WC_ORDER:
+        u = s[s["user"] == user]
+        if u.empty: continue
+        n = len(u); k = (u["status"]=="Win").sum()
+        implied = u["implied"].mean()*100
+        centre, lo, hi = _wilson(k, n)
+        color = MEMBER_COLORS.get(user, ACCENT)
+        fig.add_trace(go.Scatter(
+            x=[implied], y=[centre*100], mode="markers+text",
+            error_y=dict(type="data", symmetric=False,
+                         array=[(hi-centre)*100], arrayminus=[(centre-lo)*100],
+                         color=color, thickness=1.4, width=6),
+            marker=dict(color=color, size=8+min(22, n)),
+            name=WC_LABEL.get(user, user),
+            text=[f" {WC_LABEL.get(user,user)}"], textposition="middle right",
+            textfont=dict(color=color, size=11, family="DM Mono"), cliponaxis=False,
+            hovertemplate=(f"{WC_LABEL.get(user,user)}<br>implied %{{x:.1f}}%<br>"
+                           f"observed %{{y:.1f}}%<br>n={n}, wins={k}<extra></extra>")))
+    fig.update_xaxes(title="implied win % (1 / odds)", range=[20, 85])
+    fig.update_yaxes(title="observed win % (Wilson 95%)", range=[20, 85])
+    return apply_layout(fig, title="🎚️ Calibration — priced fairly? (marker size = n)", height=440)
+
+
+# 7 ── PER-BET RETURN DISTRIBUTION (violin per operator) ────────────────────────
+def chart_wc_return_dist(w: pd.DataFrame) -> go.Figure:
+    s = w[w["status"].isin(_SETTLED)].copy()
+    if s.empty: return apply_layout(go.Figure(), title="No settled bets", height=420, showlegend=False)
+    s["r"] = s["aw_num"] / s["stake"].replace(0, np.nan)
+    s = s.dropna(subset=["r"])
+    fig = go.Figure()
+    for user in WC_ORDER:
+        u = s[s["user"] == user]
+        if u.empty: continue
+        color = MEMBER_COLORS.get(user, ACCENT)
+        fig.add_trace(go.Violin(
+            y=[WC_LABEL.get(user, user)]*len(u), x=u["r"], orientation="h",
+            name=WC_LABEL.get(user, user), line_color=color, fillcolor=color, opacity=0.55,
+            points="all", pointpos=0, jitter=0.4, meanline_visible=True, spanmode="soft",
+            marker=dict(size=5, color=color, opacity=0.8, line=dict(width=0)),
+            hovertemplate=f"{WC_LABEL.get(user,user)}<br>return on stake %{{x:+.2f}}<extra></extra>"))
+    fig.add_vline(x=0, line_color=GRID_CLR)
+    fig.update_xaxes(title="per-bet return on stake  (r = profit ÷ stake)")
+    fig.update_traces(width=0.85)
+    return apply_layout(fig, title="🎻 Return Distribution — who swings widest", height=440, showlegend=False)
+
+
+# 8 ── ODDS STRIP / BEESWARM (dot per bet, hollow = loss) ───────────────────────
+def chart_wc_odds_strip(w: pd.DataFrame) -> go.Figure:
+    s = w[w["status"].isin(["Win","Loss"])].copy()
+    if s.empty: return apply_layout(go.Figure(), title="No decisive bets", height=440, showlegend=False)
+    s = s.dropna(subset=["odds"])
+    s["logodds"] = np.log10(s["odds"].clip(1.0))
+    yorder = [WC_LABEL.get(u, u) for u in WC_ORDER if not s[s["user"]==u].empty]
+    ymap = {lab:i for i, lab in enumerate(yorder)}
+    fig = go.Figure()
+    seen_w = seen_l = False
+    for user in WC_ORDER:
+        u = s[s["user"] == user]
+        if u.empty: continue
+        color = MEMBER_COLORS.get(user, ACCENT); lab = WC_LABEL.get(user, user)
+        base = ymap[lab]
+        rng = np.random.default_rng(len(u))
+        jit = (rng.random(len(u)) - 0.5) * 0.5
+        for status, filled in [("Win", True), ("Loss", False)]:
+            g = u[u["status"] == status]
+            if g.empty: continue
+            gj = jit[(u["status"] == status).values]
+            marker = (dict(color=color, size=9, line=dict(width=0)) if filled
+                      else dict(color="rgba(0,0,0,0)", size=9, line=dict(color=color, width=1.6)))
+            showleg = (filled and not seen_w) or ((not filled) and not seen_l)
+            if filled: seen_w = seen_w or showleg
+            else: seen_l = seen_l or showleg
+            fig.add_trace(go.Scatter(
+                x=np.log10(g["odds"].clip(1.0)), y=base + gj, mode="markers",
+                name=("won" if filled else "lost"), legendgroup=("won" if filled else "lost"),
+                showlegend=showleg, marker=marker,
+                customdata=np.column_stack([g["home_team"].astype(str), g["away_team"].astype(str),
+                                            g["selection"].astype(str), g["odds"], g["aw_num"]]),
+                hovertemplate=("%{customdata[0]} v %{customdata[1]}<br>%{customdata[2]}<br>"
+                               "odds %{customdata[3]:.2f} · P/L $%{customdata[4]:+.2f}<extra></extra>")))
+        # median tick
+        med = u["logodds"].median()
+        fig.add_shape(type="line", x0=med, x1=med, y0=base-0.34, y1=base+0.34,
+                      line=dict(color=color, width=2))
+    ticks = [1.2, 1.5, 2, 2.5, 3, 4, 5, 7, 10]
+    fig.update_xaxes(title="odds taken (log scale) · vertical bar = member median",
+                     tickmode="array", tickvals=[np.log10(t) for t in ticks],
+                     ticktext=[str(t) for t in ticks])
+    fig.update_yaxes(tickmode="array", tickvals=list(ymap.values()), ticktext=list(ymap.keys()),
+                     range=[-0.6, len(yorder)-0.4])
+    return apply_layout(fig, title="⚪ Who Takes What Price — filled = won, hollow = lost", height=440)
+
+
+# 9 ── MONTE CARLO FAN (actual path vs zero-edge cone) ──────────────────────────
+def chart_wc_montecarlo(w: pd.DataFrame, n_sims=8000, seed=42) -> go.Figure:
+    s = w[w["status"].isin(["Win","Loss"])].sort_values("date").reset_index(drop=True).copy()
+    if len(s) < 3: return apply_layout(go.Figure(), title="Not enough bets", height=420, showlegend=False)
+    stake = s["stake"].to_numpy(); odds = s["odds"].to_numpy()
+    p = (1.0 / odds)                       # fair implied prob
+    win_profit = stake * (odds - 1.0)      # profit if win
+    lose_profit = -stake                   # loss if lose
+    rng = np.random.default_rng(seed)
+    draws = rng.random((n_sims, len(s))) < p               # True = win
+    pnl = np.where(draws, win_profit, lose_profit)
+    cum = np.cumsum(pnl, axis=1)                            # (sims, bets)
+    x = np.arange(1, len(s)+1)
+    q = {k: np.percentile(cum, k, axis=0) for k in (10, 25, 50, 75, 90)}
+    actual = s["aw_num"].cumsum().to_numpy()
+    final_pctile = (cum[:, -1] < actual[-1]).mean() * 100
+
+    def band(a, b): return f"rgba(86,180,233,{a})"
+    fig = go.Figure()
+    # 10–90 band
+    fig.add_trace(go.Scatter(x=np.concatenate([x, x[::-1]]),
+                             y=np.concatenate([q[90], q[10][::-1]]), fill="toself",
+                             fillcolor="rgba(136,136,170,0.12)", line=dict(width=0),
+                             name="10–90% (no edge)", hoverinfo="skip"))
+    # 25–75 band
+    fig.add_trace(go.Scatter(x=np.concatenate([x, x[::-1]]),
+                             y=np.concatenate([q[75], q[25][::-1]]), fill="toself",
+                             fillcolor="rgba(136,136,170,0.20)", line=dict(width=0),
+                             name="25–75%", hoverinfo="skip"))
+    fig.add_trace(go.Scatter(x=x, y=q[50], mode="lines",
+                             line=dict(color=PUSH_COLOR, dash="dash", width=1.2),
+                             name="zero-edge median", hoverinfo="skip"))
+    fig.add_trace(go.Scatter(x=x, y=actual, mode="lines",
+                             line=dict(color=ACCENT, width=3),
+                             name=f"actual (${actual[-1]:+.2f})",
+                             hovertemplate="bet %{x}<br>cum $%{y:+.2f}<extra></extra>"))
+    fig.add_annotation(x=x[-1], y=actual[-1], text=f"{final_pctile:.0f}th pct",
+                       showarrow=True, arrowhead=2, arrowcolor=ACCENT, ax=-30, ay=-24,
+                       font=dict(color=ACCENT, size=11))
+    fig.add_hline(y=0, line_color=GRID_CLR)
+    fig.update_xaxes(title="bet number (in time order)")
+    fig.update_yaxes(title="cumulative P/L ($)")
+    return apply_layout(fig, title=f"🎲 Monte Carlo — actual vs {n_sims:,} zero-edge seasons", height=440)
+
+
+def wc_standings(w: pd.DataFrame) -> pd.DataFrame:
+    rows = []
+    for user in WC_ORDER + [u for u in w["user"].unique() if u not in WC_ORDER]:
+        st = wc_stats(w, user)
+        if st["bets"] == 0: continue
+        rows.append({"Member": WC_LABEL.get(user, user),
+                     "Bets": st["bets"],
+                     "W–L–P": f'{st["wins"]}–{st["losses"]}–{st["pushes"]}',
+                     "Hit %": f'{st["hit"]:.0f}%',
+                     "Staked": f'${st["staked"]:.0f}',
+                     "Net": f'${st["pl"]:+.2f}',
+                     "ROI %": f'{st["roi"]:+.1f}%'})
+    # syndicate total (humans + bot)
+    st_all = wc_stats(w, None) if False else None
+    settled = w[w["status"].isin(_SETTLED)]
+    tot_stake = settled["stake"].sum(); tot_pl = settled["aw_num"].sum()
+    wins=(settled["status"]=="Win").sum(); losses=(settled["status"]=="Loss").sum(); pushes=(settled["status"]=="Push").sum()
+    rows.append({"Member":"SYNDICATE","Bets":len(settled),
+                 "W–L–P":f"{wins}–{losses}–{pushes}",
+                 "Hit %":f'{wins/(wins+losses)*100:.0f}%' if wins+losses else "—",
+                 "Staked":f"${tot_stake:.0f}","Net":f"${tot_pl:+.2f}",
+                 "ROI %":f"{tot_pl/tot_stake*100:+.1f}%" if tot_stake else "—"})
+    return pd.DataFrame(rows)
+
+
+# ── WORLD CUP TAB RENDERER ─────────────────────────────────────────────────────
+def render_world_cup(df: pd.DataFrame):
+    """Self-contained World Cup 2026 tab: round selector + a wall of graphs."""
+    w_all = wc_prepare(df)
+    if w_all.empty:
+        st.info("No FIFA World Cup 2026 bets in the ledger yet.")
+        return
+
+    round_opts = ["🌍 Whole Tournament", "⚽ Group Stage (MD1–3)"] + wc_round_options(w_all)
+    choice = st.radio("Round", round_opts, horizontal=True, label_visibility="collapsed")
+    if choice == "🌍 Whole Tournament":
+        w = w_all
+    elif choice == "⚽ Group Stage (MD1–3)":
+        w = w_all[w_all["round_num"].isin([1, 2, 3])]
+    else:
+        w = w_all[w_all["round_label"] == choice]
+
+    settled = w[w["status"].isin(_SETTLED)]
+    pending = (w["status"] == "Pending").sum()
+    if settled.empty:
+        st.info("No settled bets in this round yet." + (f"  ({pending} pending)" if pending else ""))
+        return
+    st.caption(f"{len(settled)} settled bets" + (f" · {pending} still open" if pending else "")
+               + f" · staked ${settled['stake'].sum():.0f}")
+
+    # ── KPI cards, one per active operator ────────────────────────────────────
+    section("🏁 The Table")
+    active = [u for u in WC_ORDER if wc_stats(w, u)["bets"] > 0]
+    ccols = cols(len(active)) if active else cols(1)
+    for col, user in zip(ccols, active):
+        s = wc_stats(w, user); c = MEMBER_COLORS.get(user, ACCENT)
+        pl_col = WIN_COLOR if s["pl"] >= 0 else LOSS_COLOR
+        with col:
+            stat_card(WC_LABEL.get(user, user), f'${s["pl"]:+.2f}',
+                      sub=(f'{s["wins"]}–{s["losses"]}–{s["pushes"]} · ROI {s["roi"]:+.1f}%<br>'
+                           f'hit {s["hit"]:.0f} / imp {s["implied"]:.0f} · odds {s["avg_odds"]:.2f}'),
+                      color=pl_col, border_color=c + "88")
+
+    # ── centrepiece + standings ───────────────────────────────────────────────
+    pc(chart_wc_worm(w))
+    section("📋 Standings")
+    st.dataframe(wc_standings(w), hide_index=True, use_container_width=True)
+
+    # ── the money trail ───────────────────────────────────────────────────────
+    st.divider(); section("🌐 The Money Trail")
+    pc(chart_wc_sankey(w))
+    pc(chart_wc_tape(w))
+    pc(chart_wc_drawdown(w))
+    pc(chart_wc_market_pl(w))
+
+    # ── the quant centrefold ──────────────────────────────────────────────────
+    st.divider(); section("🎲 The Quant Centrefold")
+    pc(chart_wc_montecarlo(w))
+    q1, q2 = cols(2)
+    with q1: pc(chart_wc_calibration(w))
+    with q2: pc(chart_wc_return_dist(w))
+    pc(chart_wc_odds_strip(w))
+
+
 def main():
     with st.spinner("Loading ledger…"):
         df_raw, df_roi, df_free, df_pending, kpis = load_data()
@@ -1012,25 +1433,24 @@ def main():
     _pl_col  = WIN_COLOR if cur_pl >= 0 else LOSS_COLOR
     _roi_col = WIN_COLOR if roi >= 0 else LOSS_COLOR
 
-    st.markdown(f'''<div style="display:flex; justify-content:space-between; margin-bottom:4px;">
+    st.markdown(f'''<div style="display:flex; justify-content:space-between; align-items:baseline; margin-bottom:4px;">
           <div style="font-size:1.9rem;font-weight:700;">Xanderdu 🏆</div>
           <div style="font-size:1.05rem;">
-            <span style="color:#8888aa">Bank</span> <span style="color:{_bal_col};">${current_balance:.2f}</span> &nbsp;&nbsp; 
-            <span style="color:#8888aa">Invested</span> <span style="color:#e0e0f0;">${total_invested:.2f}</span> &nbsp;&nbsp;
-            <span style="color:#8888aa">Betting P/L</span> <span style="color:{_pl_col};">${cur_pl:+.2f}</span>
+            <span style="color:#8888aa">Invested</span> <span style="color:#e0e0f0;">${total_invested:.2f}</span>
           </div>
         </div>''', unsafe_allow_html=True)
     st.divider()
 
-    t_home, t_people, t_markets, t_timeline, t_analytics, t_extremes, t_anim, t_inbox, t_ledger = st.tabs([
-        "🏠 Home", "👤 People", "📈 Markets", "📆 Timeline", "📐 Analytics", "🎯 Extremes", "🎬 Anim", "📥 Inbox", "📒 Ledger"
+    t_home, t_worldcup, t_people, t_markets, t_timeline, t_analytics, t_extremes, t_anim, t_inbox, t_ledger = st.tabs([
+        "🏠 Home", "🏆 World Cup", "👤 People", "📈 Markets", "📆 Timeline", "📐 Analytics", "🎯 Extremes", "🎬 Anim", "📥 Inbox", "📒 Ledger"
     ])
 
     # 1. HOME
     with t_home:
-        c1, c2 = cols(2)
-        with c1: stat_card("💰 Betting P/L", f"${cur_pl:+.2f}", color=_pl_col)
-        with c2: stat_card("📊 Overall ROI", f"{roi:+.1f}%", color=_roi_col)
+        c1, c2, c3 = cols(3)
+        with c1: stat_card("💰 Bankroll", f"${current_balance:.2f}", sub=f"invested ${total_invested:.0f}", color=_bal_col)
+        with c2: stat_card("📈 Betting P/L", f"${cur_pl:+.2f}", color=_pl_col)
+        with c3: stat_card("📊 Overall ROI", f"{roi:+.1f}%", color=_roi_col)
         worst = worst_bet(df)
         roast(f'Worst bet: {event_label(worst)} @ {worst["odds"]:.2f} — ${worst["actual_winnings"]:.2f}')
         st.divider()
@@ -1045,6 +1465,10 @@ def main():
         c3, c4 = cols(2)
         with c3: pc(chart_win_loss_donut(df))
         with c4: pc(chart_waterfall(df))
+
+    # 1b. WORLD CUP 2026
+    with t_worldcup:
+        render_world_cup(df_raw)
 
     # 2. PEOPLE
     with t_people:
