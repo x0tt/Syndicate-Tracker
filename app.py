@@ -227,6 +227,25 @@ def chart_cumulative_bankroll(df: pd.DataFrame, opening: float = 0.00, bankroll_
             fig.add_annotation(x=dd_row["date_str"], y=dd_row["bankroll"], text=f"Max Drawdown<br>-${dd_row['drawdown']:.0f}", showarrow=True, arrowhead=2, arrowcolor=LOSS_COLOR, ax=0, ay=40, font=dict(color=LOSS_COLOR, size=11))
 
     fig.add_hline(y=total_invested, line_dash="dash", line_color=GRID_CLR, annotation_text=f"Invested ${total_invested:.0f}", annotation_font_color=GRID_CLR, annotation_position="bottom right")
+
+    # Journey milestones — understated dashed markers at the first bet of each big event.
+    # Drawn as an explicit shape + annotation (avoids add_vline's annotation auto-positioning,
+    # which errors on a categorical/string date axis in some plotly versions).
+    MILESTONES = [("EPL 24/25", "EPL 24/25"), ("Club World Cup", "Club WC"),
+                  ("EPL 25/26", "EPL 25/26"), ("FIFA World Cup 2026", "World Cup")]
+    if "competition" in df2.columns:
+        for comp, label in MILESTONES:
+            cm = df2[df2["competition"] == comp]
+            if cm.empty: continue
+            x0 = cm["date_str"].iloc[0]
+            fig.add_shape(type="line", xref="x", yref="paper", layer="below",
+                          x0=x0, x1=x0, y0=0, y1=1,
+                          line=dict(color="rgba(136,136,170,0.35)", width=1, dash="dot"))
+            fig.add_annotation(x=x0, xref="x", y=1, yref="paper",
+                               text=label, showarrow=False, textangle=-90,
+                               xanchor="left", yanchor="top",
+                               font=dict(size=9, color="#8888aa"))
+
     fig.update_yaxes(visible=False, showgrid=False)
     fig.update_xaxes(showgrid=False)
     
@@ -1223,27 +1242,44 @@ def chart_wc_return_dist(w: pd.DataFrame) -> go.Figure:
 
 # 8 ── ODDS STRIP / BEESWARM (dot per bet, hollow = loss) ───────────────────────
 def chart_wc_odds_strip(w: pd.DataFrame) -> go.Figure:
+    """Bubble chart: x = odds (log), y = operator row, bubble radius ∝ stake,
+    filled = won / hollow = lost, vertical tick = member median odds."""
     s = w[w["status"].isin(["Win","Loss"])].copy()
-    if s.empty: return apply_layout(go.Figure(), title="No decisive bets", height=440, showlegend=False)
+    if s.empty: return apply_layout(go.Figure(), title="No decisive bets", height=460, showlegend=False)
     s = s.dropna(subset=["odds"])
     s["logodds"] = np.log10(s["odds"].clip(1.0))
     yorder = [WC_LABEL.get(u, u) for u in WC_ORDER if not s[s["user"]==u].empty]
     ymap = {lab:i for i, lab in enumerate(yorder)}
+
+    def _rgba(hexc, a):
+        h = hexc.lstrip("#"); return f"rgba({int(h[0:2],16)},{int(h[2:4],16)},{int(h[4:6],16)},{a})"
+
+    # area ∝ stake → sizemode="area" with a shared sizeref so bubbles are comparable.
+    # sizeref = 2 * max(value) / (desired_max_diameter ** 2)  [plotly convention]
+    max_stake = max(float(s["stake"].max()), 1.0)
+    MAX_DIA = 44.0
+    sizeref = 2.0 * max_stake / (MAX_DIA ** 2)
+
     fig = go.Figure()
     seen_w = seen_l = False
+    rng = np.random.default_rng(7)
     for user in WC_ORDER:
         u = s[s["user"] == user]
         if u.empty: continue
         color = MEMBER_COLORS.get(user, ACCENT); lab = WC_LABEL.get(user, user)
         base = ymap[lab]
-        rng = np.random.default_rng(len(u))
         jit = (rng.random(len(u)) - 0.5) * 0.5
         for status, filled in [("Win", True), ("Loss", False)]:
-            g = u[u["status"] == status]
+            mask = (u["status"] == status).values
+            g = u[mask]
             if g.empty: continue
-            gj = jit[(u["status"] == status).values]
-            marker = (dict(color=color, size=9, line=dict(width=0)) if filled
-                      else dict(color="rgba(0,0,0,0)", size=9, line=dict(color=color, width=1.6)))
+            gj = jit[mask]
+            marker = (dict(color=_rgba(color, 0.50), size=g["stake"].astype(float),
+                           sizemode="area", sizeref=sizeref, sizemin=5,
+                           line=dict(color=color, width=1.2)) if filled
+                      else dict(color="rgba(0,0,0,0)", size=g["stake"].astype(float),
+                                sizemode="area", sizeref=sizeref, sizemin=5,
+                                line=dict(color=color, width=1.6)))
             showleg = (filled and not seen_w) or ((not filled) and not seen_l)
             if filled: seen_w = seen_w or showleg
             else: seen_l = seen_l or showleg
@@ -1252,20 +1288,22 @@ def chart_wc_odds_strip(w: pd.DataFrame) -> go.Figure:
                 name=("won" if filled else "lost"), legendgroup=("won" if filled else "lost"),
                 showlegend=showleg, marker=marker,
                 customdata=np.column_stack([g["home_team"].astype(str), g["away_team"].astype(str),
-                                            g["selection"].astype(str), g["odds"], g["aw_num"]]),
+                                            g["selection"].astype(str), g["odds"], g["stake"], g["aw_num"]]),
                 hovertemplate=("%{customdata[0]} v %{customdata[1]}<br>%{customdata[2]}<br>"
-                               "odds %{customdata[3]:.2f} · P/L $%{customdata[4]:+.2f}<extra></extra>")))
+                               "odds %{customdata[3]:.2f} · stake $%{customdata[4]:.0f} · "
+                               "P/L $%{customdata[5]:+.2f}<extra></extra>")))
         # median tick
         med = u["logodds"].median()
-        fig.add_shape(type="line", x0=med, x1=med, y0=base-0.34, y1=base+0.34,
+        fig.add_shape(type="line", x0=med, x1=med, y0=base-0.36, y1=base+0.36,
                       line=dict(color=color, width=2))
     ticks = [1.2, 1.5, 2, 2.5, 3, 4, 5, 7, 10]
     fig.update_xaxes(title="odds taken (log scale) · vertical bar = member median",
                      tickmode="array", tickvals=[np.log10(t) for t in ticks],
                      ticktext=[str(t) for t in ticks])
     fig.update_yaxes(tickmode="array", tickvals=list(ymap.values()), ticktext=list(ymap.keys()),
-                     range=[-0.6, len(yorder)-0.4])
-    return apply_layout(fig, title="⚪ Who Takes What Price — filled = won, hollow = lost", height=440)
+                     range=[-0.7, len(yorder)-0.3])
+    return apply_layout(fig, title="⚪ Who Takes What Price — bubble size = stake · filled = won · hollow = lost",
+                        height=460)
 
 
 # 9 ── MONTE CARLO FAN (actual path vs zero-edge cone) ──────────────────────────
@@ -1363,11 +1401,28 @@ def render_world_cup(df: pd.DataFrame):
     st.caption(f"{len(settled)} settled bets" + (f" · {pending} still open" if pending else "")
                + f" · staked ${settled['stake'].sum():.0f}")
 
-    # ── KPI cards, one per active operator ────────────────────────────────────
+    # ── KPI cards: combined first, then one per active operator ────────────────
     section("🏁 The Table")
     active = [u for u in WC_ORDER if wc_stats(w, u)["bets"] > 0]
-    ccols = cols(len(active)) if active else cols(1)
-    for col, user in zip(ccols, active):
+
+    # combined (whole syndicate on the current round subset)
+    sett = w[w["status"].isin(_SETTLED)]
+    tw = int((sett["status"] == "Win").sum()); tl = int((sett["status"] == "Loss").sum())
+    tp = int((sett["status"] == "Push").sum())
+    t_stake = sett["stake"].sum(); t_pl = sett["aw_num"].sum()
+    t_roi = t_pl / t_stake * 100 if t_stake > 0 else 0
+    t_dec = tw + tl
+    t_hit = tw / t_dec * 100 if t_dec > 0 else 0
+    t_imp = sett[sett["status"].isin(["Win", "Loss"])]["implied"].mean() * 100 if t_dec > 0 else 0
+    t_col = WIN_COLOR if t_pl >= 0 else LOSS_COLOR
+
+    ccols = cols(len(active) + 1)
+    with ccols[0]:
+        stat_card("🌍 Combined", f'${t_pl:+.2f}',
+                  sub=(f'{tw}–{tl}–{tp} · ROI {t_roi:+.1f}%<br>'
+                       f'hit {t_hit:.0f} / imp {t_imp:.0f} · {len(sett)} bets'),
+                  color=t_col, border_color=ACCENT + "88")
+    for col, user in zip(ccols[1:], active):
         s = wc_stats(w, user); c = MEMBER_COLORS.get(user, ACCENT)
         pl_col = WIN_COLOR if s["pl"] >= 0 else LOSS_COLOR
         with col:
