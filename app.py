@@ -924,38 +924,69 @@ def chart_anim_win_rate_evolution(df: pd.DataFrame) -> go.Figure:
 # ─────────────────────────────────────────────────────────────────────────────
 # WORLD CUP 2026
 # ─────────────────────────────────────────────────────────────────────────────
-# ── WORLD CUP CONFIG ───────────────────────────────────────────────────────────
-WC_COMPETITION = "FIFA World Cup 2026"
-WC_ROUND_MAP = {1:"Group · MD1", 2:"Group · MD2", 3:"Group · MD3", 4:"Round of 32",
-                5:"Round of 16", 6:"Quarter-finals", 7:"Semi-finals", 8:"Final"}
-WC_ROUND_SHORT = {1:"MD1", 2:"MD2", 3:"MD3", 4:"R32", 5:"R16", 6:"QF", 7:"SF", 8:"Final"}
+# ── EVENT CONFIG ───────────────────────────────────────────────────────────────
+# Per-tournament matchday→stage maps. Anything not listed here is treated as a
+# league (matchday N → "Matchday N"). Club World Cup has no matchday data in the
+# sheet, so it collapses to a single "Whole Event" view automatically.
+EVENT_ROUND_MAPS = {
+    "FIFA World Cup 2026": {1:"Group · MD1", 2:"Group · MD2", 3:"Group · MD3", 4:"Round of 32",
+                            5:"Round of 16", 6:"Quarter-finals", 7:"Semi-finals", 8:"Final"},
+}
+EVENT_ROUND_SHORT = {
+    "FIFA World Cup 2026": {1:"MD1", 2:"MD2", 3:"MD3", 4:"R32", 5:"R16", 6:"QF", 7:"SF", 8:"Final"},
+}
+EVENT_MIN_BETS = 20          # a competition needs this many bets to count as a "major event"
+
 WC_LABEL = {"John":"John","Richard":"Richard","Xander":"Xander","Team":"Bot"}
 WC_ORDER = ["John","Richard","Xander","Team"]
 _SETTLED = ["Win","Loss","Push"]
 
 
-def wc_prepare(df: pd.DataFrame) -> pd.DataFrame:
-    """Filter the enriched ledger to the World Cup and attach round labels."""
-    w = df[df["competition"] == WC_COMPETITION].copy()
+def event_list(df: pd.DataFrame):
+    """Major events (>= EVENT_MIN_BETS bets), most recent first (by latest bet date)."""
+    d = df.dropna(subset=["competition"]).copy()
+    d = d[d["competition"].astype(str).str.strip() != ""]
+    if d.empty: return []
+    d["_date"] = pd.to_datetime(d["date"], errors="coerce")
+    rows = []
+    for comp, g in d.groupby("competition"):
+        if len(g) >= EVENT_MIN_BETS:
+            rows.append((comp, g["_date"].max()))
+    rows.sort(key=lambda r: (pd.isna(r[1]), r[1]), reverse=True)   # newest first, NaT last
+    return [r[0] for r in rows]
+
+
+def event_prepare(df: pd.DataFrame, competition: str) -> pd.DataFrame:
+    """Filter the enriched ledger to one event and attach stage labels."""
+    w = df[df["competition"] == competition].copy()
     if w.empty: return w
-    w["date"] = pd.to_datetime(w["date"])
+    w["date"]   = pd.to_datetime(w["date"])
     w["aw_num"] = pd.to_numeric(w["actual_winnings"], errors="coerce").fillna(0)
     w["stake"]  = pd.to_numeric(w["stake"], errors="coerce").fillna(0)
     w["odds"]   = pd.to_numeric(w["odds"], errors="coerce")
     md = pd.to_numeric(w["matchday"], errors="coerce")
-    w["round_num"]   = md
-    w["round_label"] = md.map(WC_ROUND_MAP).fillna("Outright / Other")
-    w["round_short"] = md.map(WC_ROUND_SHORT).fillna("—")
+    w["round_num"] = md
+    rmap = EVENT_ROUND_MAPS.get(competition)
+    smap = EVENT_ROUND_SHORT.get(competition)
+    if rmap:  # known tournament
+        w["round_label"] = md.map(lambda x: rmap.get(int(x), f"Round {int(x)}") if pd.notna(x) else "Outright / Other")
+        w["round_short"] = md.map(lambda x: smap.get(int(x), f"R{int(x)}") if pd.notna(x) else "—")
+    else:     # league / everything else
+        w["round_label"] = md.map(lambda x: f"Matchday {int(x)}" if pd.notna(x) else "Other")
+        w["round_short"] = md.map(lambda x: f"MD{int(x)}" if pd.notna(x) else "—")
     w["label"] = w["user"].map(WC_LABEL).fillna(w["user"])
     w["implied"] = 1.0 / w["odds"].replace(0, np.nan)
-    w = w.sort_values(["date"]).reset_index(drop=True)
-    return w
+    return w.sort_values(["date"]).reset_index(drop=True)
 
 
-def wc_round_options(w: pd.DataFrame):
-    """Ordered list of round labels present in the data (group stages collapsed option handled in UI)."""
+def event_stage_options(w: pd.DataFrame):
+    """Ordered stage labels present in the data (numeric matchday order)."""
     present = sorted(w["round_num"].dropna().unique())
-    return [WC_ROUND_MAP.get(int(r), f"Round {int(r)}") for r in present]
+    out = []
+    for r in present:
+        lbl = w.loc[w["round_num"] == r, "round_label"].iloc[0]
+        if lbl not in out: out.append(lbl)
+    return out
 
 
 def wc_stats(w: pd.DataFrame, user: str) -> dict:
@@ -1302,19 +1333,39 @@ def wc_standings(w: pd.DataFrame) -> pd.DataFrame:
     return pd.DataFrame(rows)
 
 
-# ── WORLD CUP TAB RENDERER ─────────────────────────────────────────────────────
-def render_world_cup(df: pd.DataFrame):
-    """Self-contained World Cup 2026 tab: round selector + a wall of graphs."""
-    w_all = wc_prepare(df)
-    if w_all.empty:
-        st.info("No FIFA World Cup 2026 bets in the ledger yet.")
+# ── EVENT TAB RENDERER ─────────────────────────────────────────────────────────
+def render_event(df: pd.DataFrame):
+    """Self-contained Event tab: event picker + stage filter + a wall of graphs."""
+    events = event_list(df)
+    if not events:
+        st.info("No events with enough bets yet.")
         return
 
-    round_opts = ["🌍 Whole Tournament", "⚽ Group Stage (MD1–3)"] + wc_round_options(w_all)
-    choice = st.radio("Round", round_opts, horizontal=True, label_visibility="collapsed")
-    if choice == "🌍 Whole Tournament":
+    event = st.selectbox("Event", events, index=0)      # most recent event first
+    w_all = event_prepare(df, event)
+    if w_all.empty:
+        st.info(f"No bets for {event} yet.")
+        return
+
+    # ── stage filter (adapts to the event) ────────────────────────────────────
+    is_tourn = event in EVENT_ROUND_MAPS
+    stages = event_stage_options(w_all)
+    has_group = is_tourn and {1, 2, 3}.issubset(set(w_all["round_num"].dropna().astype(int)))
+    opts = [f"🌍 Whole {event}"]
+    if has_group:
+        opts.append("⚽ Group Stage")
+    opts += stages
+
+    if len(opts) <= 1:
+        choice = opts[0]                                # single-view events (e.g. Club World Cup)
+    elif len(opts) <= 8:
+        choice = st.radio("Stage", opts, horizontal=True, label_visibility="collapsed")
+    else:
+        choice = st.selectbox("Stage", opts, index=0, label_visibility="collapsed")
+
+    if choice.startswith("🌍"):
         w = w_all
-    elif choice == "⚽ Group Stage (MD1–3)":
+    elif choice == "⚽ Group Stage":
         w = w_all[w_all["round_num"].isin([1, 2, 3])]
     else:
         w = w_all[w_all["round_label"] == choice]
@@ -1322,7 +1373,7 @@ def render_world_cup(df: pd.DataFrame):
     settled = w[w["status"].isin(_SETTLED)]
     pending = (w["status"] == "Pending").sum()
     if settled.empty:
-        st.info("No settled bets in this round yet." + (f"  ({pending} pending)" if pending else ""))
+        st.info("No settled bets in this selection yet." + (f"  ({pending} pending)" if pending else ""))
         return
     st.caption(f"{len(settled)} settled bets" + (f" · {pending} still open" if pending else "")
                + f" · staked ${settled['stake'].sum():.0f}")
@@ -1331,7 +1382,6 @@ def render_world_cup(df: pd.DataFrame):
     section("🏁 The Table")
     active = [u for u in WC_ORDER if wc_stats(w, u)["bets"] > 0]
 
-    # combined (whole syndicate on the current round subset)
     sett = w[w["status"].isin(_SETTLED)]
     tw = int((sett["status"] == "Win").sum()); tl = int((sett["status"] == "Loss").sum())
     tp = int((sett["status"] == "Push").sum())
@@ -1422,8 +1472,8 @@ def main():
         </div>''', unsafe_allow_html=True)
     st.divider()
 
-    t_home, t_worldcup, t_people, t_markets, t_timeline, t_analytics, t_extremes, t_anim, t_inbox, t_ledger = st.tabs([
-        "🏠 Home", "🏆 World Cup", "👤 People", "📈 Markets", "📆 Timeline", "📐 Analytics", "🎯 Extremes", "🎬 Anim", "📥 Inbox", "📒 Ledger"
+    t_home, t_event, t_people, t_markets, t_timeline, t_analytics, t_extremes, t_anim, t_inbox, t_ledger = st.tabs([
+        "🏠 Home", "🏆 Event", "👤 People", "📈 Markets", "📆 Timeline", "📐 Analytics", "🎯 Extremes", "🎬 Anim", "📥 Inbox", "📒 Ledger"
     ])
 
     # 1. HOME
@@ -1447,9 +1497,9 @@ def main():
         with c3: pc(chart_win_loss_donut(df))
         with c4: pc(chart_waterfall(df))
 
-    # 1b. WORLD CUP 2026
-    with t_worldcup:
-        render_world_cup(df_raw)
+    # 1b. EVENT
+    with t_event:
+        render_event(df_raw)
 
     # 2. PEOPLE
     with t_people:
