@@ -455,21 +455,21 @@ def chart_global_odds_beeswarm(df: pd.DataFrame) -> go.Figure:
     fig.update_layout(
         title=dict(text="🎯 Dollar Density — odds spread weighted by stake, wins vs losses",
                    font=dict(size=14, color=TEXT_CLR), x=0.01),
-        height=680, showlegend=True, violinmode="overlay",
+        height=700, showlegend=True, violinmode="overlay",
         paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
         font=dict(family="'DM Mono', 'Courier New', monospace", size=13, color=TEXT_CLR),
-        margin=dict(l=6, r=6, t=56, b=60),
+        margin=dict(l=6, r=6, t=56, b=96),
         modebar=dict(orientation="v", bgcolor="rgba(0,0,0,0)", color="#555577", activecolor=ACCENT),
         dragmode=False,
         legend=dict(bgcolor="rgba(0,0,0,0.3)", bordercolor=GRID_CLR, borderwidth=1,
-                    font=dict(size=12), orientation="h", yanchor="top", y=-0.05, xanchor="center", x=0.5))
+                    font=dict(size=12), orientation="h", yanchor="top", y=-0.16, xanchor="center", x=0.5))
     for ann in fig.layout.annotations:
         ann.update(font=dict(size=12, color="#8888aa"), x=0.01, xanchor="left")
     fig.update_yaxes(showticklabels=False, showgrid=False, zeroline=False, range=[-1.05, 1.05])
     for r in (1, 2):
         fig.update_xaxes(gridcolor=GRID_CLR, range=[XLO, XHI], row=r, col=1)
     fig.update_xaxes(tickmode="array", tickvals=[np.log10(t) for t in TICKO],
-                     ticktext=[str(t) for t in TICKO],
+                     ticktext=[str(t) for t in TICKO], title_standoff=8,
                      title_text="odds (log scale) · dotted tick = stake-weighted mean odds", row=2, col=1)
     return fig
 
