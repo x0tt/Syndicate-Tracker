@@ -1117,8 +1117,23 @@ def chart_wc_sankey(w: pd.DataFrame) -> go.Figure:
                   hovertemplate="%{label}<br>$%{value:.0f} staked<extra></extra>"),
         link=dict(source=src, target=tgt, value=val, color=lcol,
                   hovertemplate="%{source.label} → %{target.label}<br>$%{value:.0f}<extra></extra>")))
+
+    # Sankeys have no native legend — add proxy traces so the colour key shows below.
+    legend_items = [(WC_LABEL.get(m, m), MEMBER_COLORS.get(m, ACCENT)) for m in member_src]
+    legend_items += [(o, WIN_COLOR if o == "Won" else PUSH_COLOR if o == "Push" else LOSS_COLOR)
+                     for o in outcomes]
+    for name, color in legend_items:
+        fig.add_trace(go.Scatter(x=[None], y=[None], mode="markers", name=name,
+                                 marker=dict(size=11, color=color, symbol="square", line=dict(width=0)),
+                                 showlegend=True, hoverinfo="skip"))
+    fig.update_xaxes(visible=False, range=[0, 1])
+    fig.update_yaxes(visible=False, range=[0, 1])
     return apply_layout(fig, title="🌐 Money Flow — Member → Market → Outcome (width = stake)",
-                        height=520, showlegend=False)
+                        height=560, showlegend=True,
+                        margin=dict(l=6, r=6, t=52, b=72),
+                        legend=dict(orientation="h", yanchor="top", y=-0.01, xanchor="center", x=0.5,
+                                    bgcolor="rgba(0,0,0,0.3)", bordercolor=GRID_CLR, borderwidth=1,
+                                    font=dict(size=11)))
 
 
 # 5 ── P/L BY MARKET TYPE (diverging bars) ──────────────────────────────────────
